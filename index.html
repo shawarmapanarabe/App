@@ -199,7 +199,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // 1. Memoria de sesión del cliente
+    // 1. Persistencia de la sesión del cliente
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -212,7 +212,7 @@
       } catch(e) {}
     }
 
-    // 2. Parámetro obligatorio para evitar el bucle con la Línea 1 de Google Apps Script
+    // 2. Parámetro obligatorio para evitar el bucle con Apps Script
     var separador = (query && query.length > 1) ? '&' : '?';
     var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
 
@@ -226,11 +226,10 @@
       });
     }
 
-    // Detección de instalación
+    // Detección de instalación: solo se muestra si NO está instalada en modo standalone
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    var yaCerroBarra = sessionStorage.getItem('banner_cerrado_temporal');
 
-    if (!esPWA && !yaCerroBarra) {
+    if (!esPWA) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
@@ -265,15 +264,14 @@
       }
     }
 
+    // Se cierra solo para la vista actual, pero reaparece al recargar la página
     function cerrarBarra() {
       document.getElementById('pwaBarBottom').style.display = 'none';
-      sessionStorage.setItem('banner_cerrado_temporal', '1');
     }
 
     function cerrarGuiaIos() {
       document.getElementById('iosGuideModal').style.display = 'none';
       document.getElementById('pwaBarBottom').style.display = 'none';
-      sessionStorage.setItem('banner_cerrado_temporal', '1');
     }
 
     window.addEventListener('appinstalled', function() {
