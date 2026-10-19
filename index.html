@@ -162,11 +162,8 @@
 </head>
 <body>
 
-  <!-- Sandbox bloquea que cualquier acción interna se salga hacia Google -->
-  <iframe id="appFrame" 
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" 
-          src="">
-  </iframe>
+  <!-- Iframe limpio y sin bloqueos de ejecución -->
+  <iframe id="appFrame" name="appFrame" src=""></iframe>
 
   <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
@@ -174,7 +171,7 @@
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
       <div>
         <p class="bar-title">Instalar SP!</p>
-        <p class="bar-sub">Acceso rápido a tus puntos</p>
+        <p class="bar-sub">Acceso rápido a tu saldo</p>
       </div>
     </div>
     <div class="bar-right">
@@ -202,7 +199,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Guardar y recuperar sesión del cliente
+    // Persistencia de la sesión del cliente
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -225,7 +222,7 @@
       });
     }
 
-    // Lógica del aviso de instalación
+    // Detección de instalación PWA
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     var yaCerroBarra = sessionStorage.getItem('banner_cerrado_temporal');
 
