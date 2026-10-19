@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SP!</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1E2743">
@@ -22,6 +22,8 @@
       overflow: hidden;
       background-color: #1E2743;
       font-family: 'Poppins', sans-serif;
+      overscroll-behavior-y: none;
+      -webkit-overscroll-behavior: none;
     }
     iframe {
       position: fixed;
@@ -64,7 +66,7 @@
     .bar-icon {
       width: 36px;
       height: 36px;
-      border-radius: 9px;
+      border-radius: 8px;
       object-fit: cover;
     }
     .bar-title {
@@ -104,7 +106,7 @@
       line-height: 1;
     }
 
-    /* Modal explicativo para iPhone */
+    /* Modal explicativo real para iPhone */
     #iosGuideModal {
       display: none;
       position: fixed;
@@ -135,19 +137,25 @@
       to { transform: scale(1); opacity: 1; }
     }
     .modal-title {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 800;
-      margin: 10px 0 6px 0;
+      margin: 10px 0 8px 0;
     }
     .modal-step {
-      font-size: 12.5px;
-      color: #4b5563;
+      font-size: 13px;
+      color: #334155;
       text-align: left;
       margin: 10px 0;
       background: #f8fafc;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 12px;
-      line-height: 1.4;
+      line-height: 1.45;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-step svg {
+      flex-shrink: 0;
     }
     .modal-btn-ok {
       margin-top: 14px;
@@ -155,20 +163,19 @@
       background: #e95042;
       color: white;
       border: none;
-      padding: 11px;
+      padding: 12px;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 13.5px;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- Marco fijo a pantalla completa -->
-  <iframe id="appFrame" name="appFrame" src=""></iframe>
+  <!-- Iframe con permiso explícito para descargas en Android -->
+  <iframe id="appFrame" name="appFrame" src="" allow="downloads"></iframe>
 
-  <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -183,18 +190,30 @@
     </div>
   </div>
 
-  <!-- Modal explicativo paso a paso para iPhone -->
   <div id="iosGuideModal">
     <div class="modal-card">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" style="width: 48px; height: 48px; border-radius: 12px;" alt="Logo">
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" style="width: 50px; height: 50px; border-radius: 12px;" alt="Logo">
       <h3 class="modal-title">Instalar en tu iPhone</h3>
+      
       <div class="modal-step">
-        <b>1.</b> Toca el botón <b>Compartir</b> <span style="font-size:16px;">⎋</span> en la barra inferior de Safari o Chrome.
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <polyline points="16 6 12 2 8 6"></polyline>
+          <line x1="12" y1="2" x2="12" y2="15"></line>
+        </svg>
+        <span><b>1.</b> Toca el botón <b>Compartir</b> en la barra inferior de Safari.</span>
       </div>
+
       <div class="modal-step">
-        <b>2.</b> Elige <b>"Agregar a la pantalla de inicio"</b> 📲.
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1E2743" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+        <span><b>2.</b> Desliza y selecciona <b>"Agregar a Inicio"</b>.</span>
       </div>
-      <button class="modal-btn-ok" onclick="cerrarGuiaIos()">¡Listo!</button>
+
+      <button class="modal-btn-ok" onclick="cerrarGuiaIos()">¡Entendido!</button>
     </div>
   </div>
 
@@ -202,7 +221,6 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Persistencia del perfil del cliente (código y PIN)
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -215,17 +233,18 @@
       } catch(e) {}
     }
 
-    var frame = document.getElementById("appFrame");
-    frame.src = urlBase + (query ? query : "");
+    var separador = (query && query.length > 1) ? '&' : '?';
+    var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
 
-    // Service Worker
+    var frame = document.getElementById("appFrame");
+    frame.src = urlFinalIframe;
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
 
-    // Detección de instalación: solo se muestra si NO está en modo standalone
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
