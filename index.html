@@ -162,16 +162,16 @@
 </head>
 <body>
 
-  <!-- Iframe sin sandbox para permitir la recarga fluida de tu Apps Script -->
+  <!-- Iframe limpio y sin restricciones para permitir la recarga fluida de Apps Script -->
   <iframe id="appFrame" name="appFrame" src=""></iframe>
 
-  <!-- Barra flotante inferior con texto corregido -->
+  <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
       <div>
-        <p class="bar-title">Instalar SP!</p>
-        <p class="bar-sub">Acceso rápido a tu saldo</p>
+        <p class="bar-title">Instalar Tarjeta</p>
+        <p class="bar-sub">Acceso directo a tu saldo</p>
       </div>
     </div>
     <div class="bar-right">
@@ -222,7 +222,7 @@
       });
     }
 
-    // Detección de entorno
+    // Detección de entorno e instalación
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     var yaCerroBarra = sessionStorage.getItem('banner_cerrado_temporal');
 
