@@ -30,7 +30,7 @@
       display: block;
     }
 
-    /* Banner inferior flotante: no interfiere con cabeceras ni popups superiores */
+    /* Banner flotante inferior de instalación */
     #pwaBarBottom {
       display: none;
       position: fixed;
@@ -101,7 +101,7 @@
       line-height: 1;
     }
 
-    /* Modal emergente con la guía para iPhone */
+    /* Modal explicativo para iPhone */
     #iosGuideModal {
       display: none;
       position: fixed;
@@ -162,7 +162,11 @@
 </head>
 <body>
 
-  <iframe id="appFrame" src=""></iframe>
+  <!-- Sandbox bloquea que cualquier acción interna se salga hacia Google -->
+  <iframe id="appFrame" 
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals" 
+          src="">
+  </iframe>
 
   <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
@@ -198,7 +202,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Memoria local del cliente
+    // Guardar y recuperar sesión del cliente
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -211,7 +215,8 @@
       } catch(e) {}
     }
 
-    document.getElementById("appFrame").src = urlBase + (query ? query : "");
+    var frame = document.getElementById("appFrame");
+    frame.src = urlBase + (query ? query : "");
 
     // Service Worker
     if ('serviceWorker' in navigator) {
@@ -220,7 +225,7 @@
       });
     }
 
-    // Detección de instalación
+    // Lógica del aviso de instalación
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     var yaCerroBarra = sessionStorage.getItem('banner_cerrado_temporal');
 
@@ -230,7 +235,6 @@
       var btnInstalar = document.getElementById('btnBarInstall');
 
       if (esIphone) {
-        // En iPhone aparece abajo suavemente para no tapar contenido superior
         setTimeout(function() {
           barra.style.display = 'flex';
         }, 1200);
@@ -239,8 +243,6 @@
           document.getElementById('iosGuideModal').style.display = 'flex';
         };
       } else {
-        // En Android, Chrome suele lanzar su barra superior nativa.
-        // Si no la lanza automáticamente, esta barra inferior queda lista para asistir.
         var promptDiferido;
         window.addEventListener('beforeinstallprompt', function(e) {
           e.preventDefault();
