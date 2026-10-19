@@ -24,9 +24,12 @@
       font-family: 'Poppins', sans-serif;
     }
     iframe {
-      border: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 100dvh;
+      height: 100%;
+      border: 0;
       display: block;
     }
 
@@ -162,7 +165,7 @@
 </head>
 <body>
 
-  <!-- Marco de la aplicación -->
+  <!-- Marco fijo a pantalla completa -->
   <iframe id="appFrame" name="appFrame" src=""></iframe>
 
   <!-- Barra flotante inferior de instalación -->
@@ -199,7 +202,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // 1. Persistencia de la sesión del cliente
+    // Persistencia del perfil del cliente (código y PIN)
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -212,12 +215,8 @@
       } catch(e) {}
     }
 
-    // 2. Parámetro obligatorio para evitar el bucle con Apps Script
-    var separador = (query && query.length > 1) ? '&' : '?';
-    var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
-
     var frame = document.getElementById("appFrame");
-    frame.src = urlFinalIframe;
+    frame.src = urlBase + (query ? query : "");
 
     // Service Worker
     if ('serviceWorker' in navigator) {
@@ -226,7 +225,7 @@
       });
     }
 
-    // Detección de instalación: solo se muestra si NO está instalada en modo standalone
+    // Detección de instalación: solo se muestra si NO está en modo standalone
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
@@ -264,7 +263,6 @@
       }
     }
 
-    // Se cierra solo para la vista actual, pero reaparece al recargar la página
     function cerrarBarra() {
       document.getElementById('pwaBarBottom').style.display = 'none';
     }
