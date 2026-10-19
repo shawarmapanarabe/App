@@ -162,7 +162,7 @@
 </head>
 <body>
 
-  <!-- Iframe limpio y sin restricciones para permitir la recarga fluida de Apps Script -->
+  <!-- Marco de la aplicación -->
   <iframe id="appFrame" name="appFrame" src=""></iframe>
 
   <!-- Barra flotante inferior de instalación -->
@@ -199,7 +199,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Persistencia del perfil del cliente (código y PIN)
+    // 1. Memoria de sesión del cliente
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -212,8 +212,12 @@
       } catch(e) {}
     }
 
+    // 2. Parámetro obligatorio para evitar el bucle con la Línea 1 de Google Apps Script
+    var separador = (query && query.length > 1) ? '&' : '?';
+    var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
+
     var frame = document.getElementById("appFrame");
-    frame.src = urlBase + (query ? query : "");
+    frame.src = urlFinalIframe;
 
     // Service Worker
     if ('serviceWorker' in navigator) {
@@ -222,7 +226,7 @@
       });
     }
 
-    // Detección de entorno e instalación
+    // Detección de instalación
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     var yaCerroBarra = sessionStorage.getItem('banner_cerrado_temporal');
 
