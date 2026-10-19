@@ -3,7 +3,7 @@
   "short_name": "SP!",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#1E2743",
+  "background_color": "#FFFFFF",
   "theme_color": "#1E2743",
   "orientation": "portrait",
   "icons": [
@@ -21,4 +21,3 @@
     }
   ]
 }
-
