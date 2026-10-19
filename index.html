@@ -129,10 +129,23 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
+    // 1. GESTIÓN DE SESIÓN / MEMORIA DE CLIENTE
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
+      // Si el enlace incluye código de cliente, se almacena en memoria
+      try {
+        localStorage.setItem('panarabe_last_query', query);
+      } catch(e) {}
+    } else {
+      // Si se abre desde el ícono instalado (sin parámetros), recupera la última sesión
+      try {
+        var guardado = localStorage.getItem('panarabe_last_query');
+        if (guardado) {
+          query = guardado;
+        }
+      } catch(e) {}
     }
 
     document.getElementById("appFrame").src = urlBase + (query ? query : "");
@@ -157,13 +170,11 @@
       var btnInstalar = document.getElementById('btnAccionInstalar');
 
       if (esIphone) {
-        // En iPhone explicamos el paso de Safari
         txtDesc.innerHTML = 'Toca <b>Compartir</b> ⎋ abajo y luego <b>"Agregar a inicio"</b> 📲';
         btnInstalar.textContent = '¡Entendido!';
         btnInstalar.onclick = function() { cerrarBannerInstalacion(); };
         setTimeout(function() { banner.style.display = 'block'; }, 2000);
       } else {
-        // En Android escuchamos el disparador directo de Chrome
         var promptDiferido;
         window.addEventListener('beforeinstallprompt', function(e) {
           e.preventDefault();
@@ -188,7 +199,6 @@
       localStorage.setItem('banner_pwa_cerrado', '1');
     }
 
-    // Si el usuario instala la app, ocultar inmediatamente el banner
     window.addEventListener('appinstalled', function() {
       document.getElementById('pwaInstallBanner').style.display = 'none';
       localStorage.setItem('banner_pwa_cerrado', '1');
@@ -196,3 +206,4 @@
   </script>
 </body>
 </html>
+
