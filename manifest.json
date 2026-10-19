@@ -1,11 +1,10 @@
 {
-  "name": "Shawarma PANARABE",
-  "short_name": "PANARABE",
-  "start_url": "./index.html",
+  "name": "SP!",
+  "short_name": "SP!",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1E2743",
   "theme_color": "#1E2743",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91",
