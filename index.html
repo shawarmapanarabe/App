@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Shawarma PANARABE</title>
+  <title>PANARABE</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1E2743">
   <meta name="mobile-web-app-capable" content="yes">
@@ -11,6 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PANARABE">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -20,6 +21,7 @@
       height: 100%;
       overflow: hidden;
       background-color: #1E2743;
+      font-family: 'Poppins', sans-serif;
     }
     iframe {
       border: 0;
@@ -27,12 +29,103 @@
       height: 100dvh;
       display: block;
     }
+    /* Banner flotante de instalación */
+    #pwaInstallBanner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 380px;
+      background: #ffffff;
+      color: #1E2743;
+      padding: 14px 16px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 99999;
+      animation: subirBanner 0.4s ease-out;
+      border: 1px solid #e2e8f0;
+    }
+    @keyframes subirBanner {
+      from { transform: translate(-50%, 40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .banner-body {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .banner-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .banner-text {
+      flex: 1;
+    }
+    .banner-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin: 0 0 2px 0;
+      color: #1E2743;
+    }
+    .banner-desc {
+      font-size: 11px;
+      color: #64748b;
+      margin: 0;
+      line-height: 1.35;
+    }
+    .banner-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-install {
+      background: #e95042;
+      color: #ffffff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 11.5px;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+    }
+    .btn-close {
+      background: #f1f2f6;
+      color: #57606f;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
   <iframe id="appFrame" src=""></iframe>
 
-    <script>
+  <!-- Banner de instalación personalizado -->
+  <div id="pwaInstallBanner">
+    <div class="banner-body">
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="banner-icon" alt="Logo">
+      <div class="banner-text">
+        <p class="banner-title">Instalar Tarjeta Panárabe</p>
+        <p class="banner-desc" id="bannerTxtDesc">Agrega la app a tu pantalla para revisar tus puntos al instante.</p>
+      </div>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-install" id="btnAccionInstalar">Instalar</button>
+      <button class="btn-close" onclick="cerrarBannerInstalacion()">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
@@ -44,6 +137,7 @@
 
     document.getElementById("appFrame").src = urlBase + (query ? query : "");
 
+    // Registro de Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(err){
@@ -51,5 +145,54 @@
         });
       });
     }
-    </script>
-    
+
+    // LÓGICA DE INSTALACIÓN Y MENSAJES
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var yaCerroBanner = localStorage.getItem('banner_pwa_cerrado');
+
+    if (!esPWA && !yaCerroBanner) {
+      var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      var banner = document.getElementById('pwaInstallBanner');
+      var txtDesc = document.getElementById('bannerTxtDesc');
+      var btnInstalar = document.getElementById('btnAccionInstalar');
+
+      if (esIphone) {
+        // En iPhone explicamos el paso de Safari
+        txtDesc.innerHTML = 'Toca <b>Compartir</b> ⎋ abajo y luego <b>"Agregar a inicio"</b> 📲';
+        btnInstalar.textContent = '¡Entendido!';
+        btnInstalar.onclick = function() { cerrarBannerInstalacion(); };
+        setTimeout(function() { banner.style.display = 'block'; }, 2000);
+      } else {
+        // En Android escuchamos el disparador directo de Chrome
+        var promptDiferido;
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          promptDiferido = e;
+          banner.style.display = 'block';
+
+          btnInstalar.onclick = function() {
+            banner.style.display = 'none';
+            if (promptDiferido) {
+              promptDiferido.prompt();
+              promptDiferido.userChoice.then(function(choice) {
+                promptDiferido = null;
+              });
+            }
+          };
+        });
+      }
+    }
+
+    function cerrarBannerInstalacion() {
+      document.getElementById('pwaInstallBanner').style.display = 'none';
+      localStorage.setItem('banner_pwa_cerrado', '1');
+    }
+
+    // Si el usuario instala la app, ocultar inmediatamente el banner
+    window.addEventListener('appinstalled', function() {
+      document.getElementById('pwaInstallBanner').style.display = 'none';
+      localStorage.setItem('banner_pwa_cerrado', '1');
+    });
+  </script>
+</body>
+</html>
