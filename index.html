@@ -162,10 +162,10 @@
 </head>
 <body>
 
-  <!-- Iframe limpio y sin bloqueos de ejecución -->
+  <!-- Iframe sin sandbox para permitir la recarga fluida de tu Apps Script -->
   <iframe id="appFrame" name="appFrame" src=""></iframe>
 
-  <!-- Barra flotante inferior de instalación -->
+  <!-- Barra flotante inferior con texto corregido -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -199,7 +199,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Persistencia de la sesión del cliente
+    // Persistencia del perfil del cliente (código y PIN)
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -222,7 +222,7 @@
       });
     }
 
-    // Detección de instalación PWA
+    // Detección de entorno
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     var yaCerroBarra = sessionStorage.getItem('banner_cerrado_temporal');
 
