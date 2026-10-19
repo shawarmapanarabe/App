@@ -1,0 +1,21 @@
+{
+  "name": "Shawarma PANARABE",
+  "short_name": "PANARABE",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1E2743",
+  "theme_color": "#1E2743",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
