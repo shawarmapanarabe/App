@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shawarma PANARABE</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#1E2743">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PANARABE">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1E2743;
+    }
+    iframe {
+      border: 0;
+      width: 100%;
+      height: 100dvh;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="appFrame" src=""></iframe>
+
+  <script>
+    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
+    var query = window.location.search;
+    document.getElementById("appFrame").src = urlBase + (query ? query : "");
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(err){
+          console.log('SW error: ', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
