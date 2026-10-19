@@ -157,49 +157,54 @@
       });
     }
 
-    // LÓGICA DE INSTALACIÓN Y MENSAJES
+    // LÓGICA DE INSTALACIÓN DINÁMICA
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    var yaCerroBanner = localStorage.getItem('banner_pwa_cerrado');
 
-    if (!esPWA && !yaCerroBanner) {
-      var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    // Solo se evalúa si NO está dentro de la app instalada
+    if (!esPWA) {
+      var yaLoCerroEnEstaVisita = sessionStorage.getItem('banner_cerrado_temporal');
       var banner = document.getElementById('pwaInstallBanner');
       var txtDesc = document.getElementById('bannerTxtDesc');
       var btnInstalar = document.getElementById('btnAccionInstalar');
+      var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-      if (esIphone) {
-        txtDesc.innerHTML = 'Toca <b>Compartir</b> ⎋ abajo y luego <b>"Agregar a inicio"</b> 📲';
-        btnInstalar.textContent = '¡Entendido!';
-        btnInstalar.onclick = function() { cerrarBannerInstalacion(); };
-        setTimeout(function() { banner.style.display = 'block'; }, 2000);
-      } else {
-        var promptDiferido;
-        window.addEventListener('beforeinstallprompt', function(e) {
-          e.preventDefault();
-          promptDiferido = e;
-          banner.style.display = 'block';
+      if (!yaLoCerroEnEstaVisita) {
+        if (esIphone) {
+          txtDesc.innerHTML = 'Toca <b>Compartir</b> ⎋ abajo y luego <b>"Agregar a inicio"</b> 📲';
+          btnInstalar.textContent = '¡Entendido!';
+          btnInstalar.onclick = function() { cerrarBannerInstalacion(); };
+          setTimeout(function() { banner.style.display = 'block'; }, 2000);
+        } else {
+          var promptDiferido;
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            promptDiferido = e;
+            banner.style.display = 'block';
 
-          btnInstalar.onclick = function() {
-            banner.style.display = 'none';
-            if (promptDiferido) {
-              promptDiferido.prompt();
-              promptDiferido.userChoice.then(function(choice) {
-                promptDiferido = null;
-              });
-            }
-          };
-        });
+            btnInstalar.onclick = function() {
+              if (promptDiferido) {
+                promptDiferido.prompt();
+                promptDiferido.userChoice.then(function(choice) {
+                  if (choice.outcome === 'accepted') {
+                    banner.style.display = 'none';
+                  }
+                  promptDiferido = null;
+                });
+              }
+            };
+          });
+        }
       }
     }
 
     function cerrarBannerInstalacion() {
       document.getElementById('pwaInstallBanner').style.display = 'none';
-      localStorage.setItem('banner_pwa_cerrado', '1');
+      // Solo se oculta durante la navegación actual; si vuelve a abrir el link otro día, le volverá a ofrecer
+      sessionStorage.setItem('banner_cerrado_temporal', '1');
     }
 
     window.addEventListener('appinstalled', function() {
       document.getElementById('pwaInstallBanner').style.display = 'none';
-      localStorage.setItem('banner_pwa_cerrado', '1');
     });
   </script>
 </body>
