@@ -18,12 +18,7 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
+
