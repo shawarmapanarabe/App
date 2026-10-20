@@ -35,6 +35,7 @@
       display: block;
     }
 
+    /* Banner flotante inferior de instalación */
     #pwaBarBottom {
       display: none;
       position: fixed;
@@ -105,6 +106,7 @@
       line-height: 1;
     }
 
+    /* Modal explicativo para iPhone */
     #iosGuideModal {
       display: none;
       position: fixed;
@@ -171,8 +173,10 @@
 </head>
 <body>
 
+  <!-- Marco fijo a pantalla completa con permiso de descargas -->
   <iframe id="appFrame" name="appFrame" src="" allow="downloads"></iframe>
 
+  <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -187,6 +191,7 @@
     </div>
   </div>
 
+  <!-- Modal explicativo paso a paso para iPhone -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" style="width: 50px; height: 50px; border-radius: 12px;" alt="Logo">
@@ -217,33 +222,39 @@
   <script>
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
+    // Persistencia inteligente del perfil del cliente
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
       try { localStorage.setItem('panarabe_last_query', query); } catch(e) {}
-    } else {
+    } else if (esPWA) {
       try {
         var guardado = localStorage.getItem('panarabe_last_query');
         if (guardado) query = guardado;
       } catch(e) {}
     }
 
-    var separador = (query && query.length > 1) ? '&' : '?';
-    var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
+    // Construcción limpia del enlace para evitar parámetros vacíos o búsquedas fantasma
+    var urlFinalIframe = urlBase;
+    if (query && query.length > 1) {
+      var sep = (query.indexOf('?') === -1) ? '?' : '&';
+      urlFinalIframe += query + sep + "app_in_frame=1";
+    }
 
     var frame = document.getElementById("appFrame");
     frame.src = urlFinalIframe;
 
+    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
 
-    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
+    // Detección de instalación PWA
     if (!esPWA) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var barra = document.getElementById('pwaBarBottom');
@@ -294,4 +305,3 @@
   </script>
 </body>
 </html>
-
