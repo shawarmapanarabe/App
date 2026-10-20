@@ -217,21 +217,25 @@
   <script>
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
       try { localStorage.setItem('panarabe_last_query', query); } catch(e) {}
-    } else {
+    } else if (esPWA) {
       try {
         var guardado = localStorage.getItem('panarabe_last_query');
         if (guardado) query = guardado;
       } catch(e) {}
     }
 
-    var separador = (query && query.length > 1) ? '&' : '?';
-    var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
+    var urlFinalIframe = urlBase;
+    if (query && query.length > 1) {
+      var sep = (query.indexOf('?') === -1) ? '?' : '&';
+      urlFinalIframe += query + sep + "app_in_frame=1";
+    }
 
     var frame = document.getElementById("appFrame");
     frame.src = urlFinalIframe;
@@ -241,8 +245,6 @@
         navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
-
-    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
