@@ -106,7 +106,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // CAPTURA Y PERSISTENCIA BLINDADA DE CREDENCIALES
+    // CAPTURA Y PERSISTENCIA DE PARÁMETROS
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -125,29 +125,25 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // AUTO-CLIC Y AUTOCOMPLETADO INTELIGENTE DENTRO DEL IFRAME
+    // AUTO-CLIC Y AUTOCOMPLETADO
     frame.onload = function() {
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
         var btnIngresar = iframeDoc.getElementById('btnBuscar');
         
-        // Si estamos en la pantalla de verificación y tenemos el PIN guardado en la URL
         if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
           var matchPin = query.match(/pin=([^&]+)/i);
           if (matchPin && matchPin[1]) {
             var pinVal = decodeURIComponent(matchPin[1]);
             pinInput.value = pinVal;
-            // Simular el evento de escritura y hacer clic automático de inmediato
             pinInput.dispatchEvent(new Event('input', { bubbles: true }));
             setTimeout(function() {
               btnIngresar.click();
             }, 150);
           }
         }
-      } catch(err) {
-        // Por políticas de seguridad de origen cruzado de Google, si el navegador bloquea el acceso al DOM del iframe, no afecta la ejecución normal
-      }
+      } catch(err) {}
     };
 
     // Service Worker
@@ -210,4 +206,3 @@
   </script>
 </body>
 </html>
-
