@@ -67,6 +67,7 @@
 </head>
 <body>
 
+  <!-- Marco con permisos ampliados de navegación y formularios para iOS -->
   <iframe 
     id="appFrame" 
     name="appFrame" 
@@ -107,18 +108,18 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // CAPTURA Y PERSISTENCIA NATIVA DE CREDENCIALES (INCLUYENDO PIN EN iOS)
+    // CAPTURA Y PERSISTENCIA BLINDADA DE LA RUTA COMPLETA (CÓDIGO + PIN)
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
       try { 
-        localStorage.setItem('panarabe_ios_query', query); 
+        localStorage.setItem('panarabe_final_query', query); 
         sessionStorage.setItem('panarabe_session_query', query);
       } catch(e) {}
     } else {
       try {
-        var guardado = localStorage.getItem('panarabe_ios_query') || sessionStorage.getItem('panarabe_session_query');
+        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
         if (guardado) query = guardado;
       } catch(e) {}
     }
@@ -134,7 +135,7 @@
     }
 
     // Detección de instalación PWA
-    var esPWA = window.matchMedia('(display-mode: standalone) kamar').matches || window.navigator.standalone === true;
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
