@@ -107,7 +107,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // GESTIÓN PURA Y FORZADA DE CREDENCIALES (CÓDIGO + PIN)
+    // CAPTURA INTELIGENTE DE CREDENCIALES ACTIVAS (CÓDIGO + PIN)
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -133,10 +133,11 @@
       });
     }
 
-    // Detección de instalación PWA
+    // MOSTRAR BARRA DE INSTALACIÓN ÚNICAMENTE CUANDO EL USUARIO YA INGRESó A SU PERFIL (TIENE PIN O BÚSQUEDA VÁLIDA)
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var tieneSesionActiva = query && (query.indexOf('search=') !== -1 || query.indexOf('pin=') !== -1);
 
-    if (!esPWA) {
+    if (!esPWA && tieneSesionActiva) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
