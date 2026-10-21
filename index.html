@@ -15,159 +15,58 @@
   <style>
     * { box-sizing: border-box; }
     html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #FFFFFF;
-      font-family: 'Poppins', sans-serif;
-      overscroll-behavior-y: none;
-      -webkit-overscroll-behavior: none;
+      margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+      background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
+      overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
-    iframe {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-    }
+    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; }
 
-    /* Barra flotante inferior de instalación PWA */
     #pwaBarBottom {
-      display: none;
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 28px);
-      max-width: 400px;
-      background: #202124;
-      color: #ffffff;
-      padding: 10px 14px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      z-index: 99998;
-      align-items: center;
-      justify-content: space-between;
+      display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 28px); max-width: 400px; background: #202124; color: #ffffff;
+      padding: 10px 14px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      z-index: 99998; align-items: center; justify-content: space-between;
       animation: subirBarra 0.35s ease-out;
     }
     @keyframes subirBarra {
       from { transform: translate(-50%, 40px); opacity: 0; }
       to { transform: translate(-50%, 0); opacity: 1; }
     }
-    .bar-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .bar-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 9px;
-      object-fit: cover;
-    }
-    .bar-title {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: #ffffff;
-      margin: 0;
-      line-height: 1.2;
-    }
-    .bar-sub {
-      font-size: 11px;
-      color: #9aa0a6;
-      margin: 0;
-    }
-    .bar-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .btn-bar-install {
-      background: #8ab4f8;
-      color: #202124;
-      border: none;
-      font-size: 12.5px;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 7px 14px;
-      border-radius: 20px;
-    }
-    .btn-bar-close {
-      background: transparent;
-      color: #9aa0a6;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 4px;
-      line-height: 1;
-    }
+    .bar-left { display: flex; align-items: center; gap: 10px; }
+    .bar-icon { width: 36px; height: 36px; border-radius: 9px; object-fit: cover; }
+    .bar-title { font-size: 13.5px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; }
+    .bar-sub { font-size: 11px; color: #9aa0a6; margin: 0; }
+    .bar-right { display: flex; align-items: center; gap: 8px; }
+    .btn-bar-install { background: #8ab4f8; color: #202124; border: none; font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: 20px; }
+    .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
-    /* Modal explicativo para iPhone */
     #iosGuideModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(4px);
-      z-index: 99999;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 99999;
+      align-items: center; justify-content: center; padding: 20px;
     }
     .modal-card {
-      background: #ffffff;
-      color: #1E2743;
-      width: 100%;
-      max-width: 330px;
-      border-radius: 20px;
-      padding: 22px 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-      text-align: center;
-      animation: zoomModal 0.25s ease-out;
+      background: #ffffff; color: #1E2743; width: 100%; max-width: 330px;
+      border-radius: 20px; padding: 22px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      text-align: center; animation: zoomModal 0.25s ease-out;
     }
     @keyframes zoomModal {
       from { transform: scale(0.92); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
-    .modal-title {
-      font-size: 15px;
-      font-weight: 800;
-      margin: 10px 0 6px 0;
-    }
+    .modal-title { font-size: 15px; font-weight: 800; margin: 10px 0 6px 0; }
     .modal-step {
-      font-size: 12.5px;
-      color: #4b5563;
-      text-align: left;
-      margin: 10px 0;
-      background: #f8fafc;
-      padding: 10px 12px;
-      border-radius: 12px;
-      line-height: 1.4;
+      font-size: 12.5px; color: #4b5563; text-align: left; margin: 10px 0;
+      background: #f8fafc; padding: 10px 12px; border-radius: 12px; line-height: 1.4;
     }
     .modal-btn-ok {
-      margin-top: 14px;
-      width: 100%;
-      background: #e95042;
-      color: white;
-      border: none;
-      padding: 11px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
+      margin-top: 14px; width: 100%; background: #e95042; color: white; border: none;
+      padding: 11px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <!-- Marco de la aplicación con permisos completos para evitar pantallas en blanco en iOS -->
   <iframe 
     id="appFrame" 
     name="appFrame" 
@@ -176,7 +75,6 @@
     sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
   ></iframe>
 
-  <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -191,7 +89,6 @@
     </div>
   </div>
 
-  <!-- Modal explicativo paso a paso para iPhone -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" style="width: 48px; height: 48px; border-radius: 12px;" alt="Logo">
@@ -210,15 +107,18 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Persistencia y recuperación inteligente del código del cliente
+    // SISTEMA DE PERSISTENCIA BLINDADO PARA iOS Y ANDROID
     if (query && query.length > 1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
-      try { localStorage.setItem('panarabe_last_query', query); } catch(e) {}
+      try { 
+        localStorage.setItem('panarabe_last_query', query); 
+        sessionStorage.setItem('panarabe_session_query', query);
+      } catch(e) {}
     } else {
       try {
-        var guardado = localStorage.getItem('panarabe_last_query');
+        var guardado = localStorage.getItem('panarabe_last_query') || sessionStorage.getItem('panarabe_session_query');
         if (guardado) query = guardado;
       } catch(e) {}
     }
@@ -226,14 +126,12 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
 
-    // Detección de instalación PWA
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
@@ -286,3 +184,4 @@
   </script>
 </body>
 </html>
+
