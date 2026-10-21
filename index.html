@@ -106,22 +106,21 @@
   <script>
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
-
     var tieneCredenciales = false;
 
-    // VALIDACIÓN ESTRICTA: DETECTAR SI LLEGA EL LINK COMPLETO CON CREDENCIALES
-    if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 3)) {
+    // CAPTURA Y PERSISTENCIA BLINDADA DE CREDENCIALES
+    if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
       tieneCredenciales = true;
       try { 
-        localStorage.setItem('panarabe_master_query', query); 
+        localStorage.setItem('panarabe_final_query', query); 
         sessionStorage.setItem('panarabe_session_query', query);
       } catch(e) {}
     } else {
       try {
-        var guardado = localStorage.getItem('panarabe_master_query') || sessionStorage.getItem('panarabe_session_query');
+        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
         if (guardado) {
           query = guardado;
           tieneCredenciales = true;
@@ -132,7 +131,7 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // AUTO-CLIC Y AUTOCOMPLETADO INTELIGENTE DEL PIN
+    // AUTO-CLIC Y AUTOCOMPLETADO INTELIGENTE DENTRO DEL IFRAME
     frame.onload = function() {
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -160,7 +159,7 @@
       });
     }
 
-    // EL BOTÓN DE INSTALAR SOLO APARECE SI TIENE CREDENCIALES Y NO ESTÁ EN MODO STANDALONE
+    // EL BOTÓN DE INSTALAR SOLO SE MUESTRA SI YA SE TIENEN LAS CREDENCIALES DEL CLIENTE
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA && tieneCredenciales) {
@@ -213,3 +212,4 @@
   </script>
 </body>
 </html>
+
