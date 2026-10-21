@@ -204,7 +204,7 @@
     }
 
     var frame = document.getElementById("appFrame");
-    frame.src = urlBase + (query ? query : "");
+    frame.src = urlBase + (query ? (query + "&iframe_mode=1") : "?iframe_mode=1");
 
     // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
     var tiempoSplash = esApple ? 2800 : 1400;
