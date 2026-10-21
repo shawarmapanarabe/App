@@ -21,20 +21,29 @@
     }
     iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.3s ease; }
     
-    /* Pantalla de carga con el logo idéntico a Android para evitar el fondo negro en iOS */
+    /* Pantalla de carga impecable con fondo blanco puro y contenedor visible */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #FFFFFF; display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 99999;
       transition: opacity 0.4s ease;
     }
+    .splash-card {
+      text-align: center; animation: pulseLogo 1.2s infinite alternate;
+    }
     .splash-logo {
-      width: 140px; height: 140px; border-radius: 28px; object-fit: cover;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08); animation: pulseLogo 1.2s infinite alternate;
+      width: 130px; height: 130px; border-radius: 26px; object-fit: cover;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12); margin-bottom: 15px; background: #f8fafc;
+    }
+    .splash-title {
+      font-size: 24px; font-weight: 800; color: #1E2743; letter-spacing: 1px; margin: 0;
+    }
+    .splash-sub {
+      font-size: 12px; font-weight: 600; color: #64748b; margin-top: 5px;
     }
     @keyframes pulseLogo {
-      from { transform: scale(0.96); }
-      to { transform: scale(1.04); }
+      from { transform: scale(0.97); }
+      to { transform: scale(1.03); }
     }
 
     #pwaBarBottom {
@@ -69,9 +78,13 @@
 </head>
 <body>
 
-  <!-- Pantalla de carga con logo para enmascarar el fondo negro inicial de iOS -->
+  <!-- Pantalla de carga con logo visible y tipografía institucional -->
   <div id="splashScreen">
-    <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="SP!">
+    <div class="splash-card">
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="SP!" onerror="this.style.display='none'">
+      <h1 class="splash-title">SP!</h1>
+      <p class="splash-sub">SHAWARMA PANARABE</p>
+    </div>
   </div>
 
   <iframe id="appFrame" name="appFrame" src="" allow="downloads; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation" onload="document.getElementById('splashScreen').style.opacity='0'; setTimeout(function(){ document.getElementById('splashScreen').style.display='none'; document.getElementById('appFrame').style.opacity='1'; }, 300);"></iframe>
