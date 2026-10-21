@@ -107,7 +107,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // CAPTURA Y BLINDAJE TOTAL DE LA RUTA COMPLETA (CÓDIGO + PIN)
+    // GESTIÓN PURA Y FORZADA DE CREDENCIALES (CÓDIGO + PIN)
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
