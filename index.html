@@ -36,7 +36,7 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* BARRA INFERIOR */
+    /* BARRA INFERIOR - GUARDAR TARJETA */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
@@ -66,7 +66,7 @@
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
-    /* MODAL DE GUÍA IOS NEUTRAL Y PROPORCIONADO */
+    /* MODAL DE GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -112,6 +112,22 @@
       box-shadow: 0 4px 12px rgba(233, 80, 66, 0.25);
     }
     .modal-btn-ok:active { transform: scale(0.96); }
+
+    /* DIFUMINADO INFERIOR PARA CUBRIR ÁREA SEGURA EN IOS */
+    #safeAreaBlur {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: env(safe-area-inset-bottom, 34px);
+      min-height: 24px;
+      background: rgba(30, 39, 67, 0.42);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 99997;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -122,6 +138,9 @@
     src="" 
     allow="downloads; clipboard-write" 
   ></iframe>
+
+  <!-- ELEMENTO DIFUMINADO DE COBERTURA INFERIOR -->
+  <div id="safeAreaBlur"></div>
 
   <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
@@ -138,7 +157,7 @@
     </div>
   </div>
 
-  <!-- GUÍA DE GUARDADO RÁPIDO CON AMBOS PASOS EN ROJO -->
+  <!-- GUÍA DE GUARDADO RÁPIDO -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
@@ -216,6 +235,12 @@
     }
 
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    // Activar difuminado inferior en iOS para cubrir la franja blanca
+    if (esApple) {
+      var blurEl = document.getElementById('safeAreaBlur');
+      if (blurEl) blurEl.style.display = 'block';
+    }
 
     if (!esPWA) {
       var barra = document.getElementById('pwaBarBottom');
