@@ -291,6 +291,16 @@
     window.addEventListener('appinstalled', function() {
       document.getElementById('pwaBarBottom').style.display = 'none';
     });
+
+    /* Receptor de actualización externa */
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.tipo === 'RECARGAR_TARJETA') {
+        var u = urlBase + '?search=' + encodeURIComponent(e.data.cod);
+        if (e.data.pin) u += '&pin=' + encodeURIComponent(e.data.pin);
+        u += '&app_in_frame=1&_t=' + Date.now();
+        document.getElementById('appFrame').src = u;
+      }
+    });
   </script>
 </body>
 </html>
