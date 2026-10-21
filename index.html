@@ -86,8 +86,8 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Limpieza inteligente de parámetros para capturar el código del cliente
-    if (query) {
+    // Validación estricta para evitar que tome valores vacíos o erróneos como "app_in_frame"
+    if (query && query.length > 2 && query.indexOf('app_in_frame') === -1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
@@ -95,17 +95,20 @@
     } else {
       try {
         var guardado = localStorage.getItem('panarabe_last_query');
-        if (guardado) query = guardado;
+        if (guardado) {
+          query = guardado;
+        }
       } catch(e) {}
     }
 
-    var separador = (query && query.length > 1) ? '&' : '?';
-    var urlFinalIframe = urlBase + (query ? query : "") + separador + "app_in_frame=1";
+    // Si aún así no hay query guardada, aseguramos que cargue limpio sin inventar códigos falsos
+    var queryFinal = (query && query.length > 2 && query.indexOf('app_in_frame') === -1) ? query : "";
+    var separador = (queryFinal && queryFinal.length > 1) ? '&' : '?';
+    var urlFinalIframe = urlBase + queryFinal + (queryFinal ? separador : "?") + "app_in_frame=1";
 
     var frame = document.getElementById("appFrame");
     frame.src = urlFinalIframe;
 
-    // Lógica para mostrar la barra de instalación en iPhone y Android
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     if (!esPWA) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
