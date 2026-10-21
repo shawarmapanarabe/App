@@ -167,7 +167,7 @@
 </head>
 <body>
 
-  <!-- Marco de la aplicación con permisos completos para evitar bloqueos en iOS -->
+  <!-- Marco de la aplicación con permisos completos para evitar pantallas en blanco en iOS -->
   <iframe 
     id="appFrame" 
     name="appFrame" 
@@ -210,8 +210,8 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Persistencia y gestión limpia de parámetros del cliente
-    if (query) {
+    // Persistencia y recuperación inteligente del código del cliente
+    if (query && query.length > 1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
