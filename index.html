@@ -86,8 +86,8 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Validación estricta para evitar que tome valores vacíos o erróneos como "app_in_frame"
-    if (query && query.length > 2 && query.indexOf('app_in_frame') === -1) {
+    // Captura limpia de la URL o recuperación automática desde la memoria del celular
+    if (query && query.length > 1 && query.indexOf('app_in_frame') === -1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
@@ -95,16 +95,12 @@
     } else {
       try {
         var guardado = localStorage.getItem('panarabe_last_query');
-        if (guardado) {
-          query = guardado;
-        }
+        if (guardado) { query = guardado; }
       } catch(e) {}
     }
 
-    // Si aún así no hay query guardada, aseguramos que cargue limpio sin inventar códigos falsos
-    var queryFinal = (query && query.length > 2 && query.indexOf('app_in_frame') === -1) ? query : "";
-    var separador = (queryFinal && queryFinal.length > 1) ? '&' : '?';
-    var urlFinalIframe = urlBase + queryFinal + (queryFinal ? separador : "?") + "app_in_frame=1";
+    var queryFinal = (query && query.indexOf('app_in_frame') === -1) ? query : "";
+    var urlFinalIframe = urlBase + queryFinal + (queryFinal ? "&" : "?") + "app_in_frame=1";
 
     var frame = document.getElementById("appFrame");
     frame.src = urlFinalIframe;
