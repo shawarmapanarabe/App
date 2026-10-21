@@ -19,7 +19,7 @@
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
-    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; background: #FFFFFF; }
+    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; background-color: #FFFFFF; }
 
     #pwaBarBottom {
       display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
@@ -67,12 +67,12 @@
 </head>
 <body>
 
-  <!-- Se elimina el atributo 'sandbox' para evitar que el navegador bloquee las redirecciones internas de Google Apps Script -->
+  <!-- Iframe sin restricciones sandbox para compatibilidad total con Apps Script en Android -->
   <iframe 
     id="appFrame" 
     name="appFrame" 
     src="" 
-    allow="downloads; clipboard-write"
+    allow="downloads; clipboard-write" 
   ></iframe>
 
   <div id="pwaBarBottom">
@@ -107,7 +107,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // CAPTURA Y PERSISTENCIA DE PARÁMETROS
+    // CAPTURA Y PERSISTENCIA BLINDADA DE CREDENCIALES
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -123,10 +123,42 @@
       } catch(e) {}
     }
 
-    // Se asigna la URL directamente. Si el enlace trae 'search' y 'pin', Apps Script 
-    // abrirá la tarjeta directamente sin necesitar el auto-clic fallido.
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
+
+    // ------------------------------------------------------------------------
+    // NUEVO: RECEPTOR DE MENSAJES (Puente de comunicación con Apps Script)
+    // ------------------------------------------------------------------------
+    window.addEventListener("message", function(e) {
+      if (e.data && e.data.accion === "navegar") {
+        window.location.search = e.data.query;
+      }
+    });
+
+    // AUTO-CLIC Y AUTOCOMPLETADO INTELIGENTE DENTRO DEL IFRAME
+    frame.onload = function() {
+      try {
+        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        var pinInput = iframeDoc.getElementById('inputPin');
+        var btnIngresar = iframeDoc.getElementById('btnBuscar');
+        
+        // Si estamos en la pantalla de verificación y tenemos el PIN guardado en la URL
+        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
+          var matchPin = query.match(/pin=([^&]+)/i);
+          if (matchPin && matchPin[1]) {
+            var pinVal = decodeURIComponent(matchPin[1]);
+            pinInput.value = pinVal;
+            // Simular el evento de escritura y hacer clic automático de inmediato
+            pinInput.dispatchEvent(new Event('input', { bubbles: true }));
+            setTimeout(function() {
+              btnIngresar.click();
+            }, 150);
+          }
+        }
+      } catch(err) {
+        // Por políticas de seguridad de origen cruzado de Google, si el navegador bloquea el acceso al DOM del iframe, no afecta la ejecución normal
+      }
+    };
 
     // Service Worker
     if ('serviceWorker' in navigator) {
@@ -135,6 +167,7 @@
       });
     }
 
+    // Detección de instalación PWA
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
