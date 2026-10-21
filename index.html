@@ -21,7 +21,6 @@
     }
     iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.4s ease; }
     
-    /* Pantalla de carga limpia con identidad corporativa (sin repetir imagen) */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #FFFFFF; display: flex; flex-direction: column;
@@ -80,7 +79,6 @@
 </head>
 <body>
 
-  <!-- Pantalla de bienvenida estilizada (Elimina el efecto de doble logo) -->
   <div id="splashScreen">
     <div class="splash-brand">
       <span>SP!</span>
@@ -89,7 +87,14 @@
     <p class="splash-sub">TARJETA PREFERENTE</p>
   </div>
 
-  <iframe id="appFrame" name="appFrame" src="" allow="downloads; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"></iframe>
+  <!-- Permisos avanzados y sandbox en el iframe para evitar pantallas en blanco en iOS -->
+  <iframe 
+    id="appFrame" 
+    name="appFrame" 
+    src="" 
+    allow="downloads; clipboard-write" 
+    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
+  ></iframe>
 
   <div id="pwaBarBottom">
     <div class="bar-left">
