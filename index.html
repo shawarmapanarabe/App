@@ -292,7 +292,7 @@
       document.getElementById('pwaBarBottom').style.display = 'none';
     });
 
-    /* Receptor de actualización externa */
+    /* RECEPTOR EXTERNO DE ACTUALIZACIÓN */
     window.addEventListener('message', function(e) {
       if (e.data && e.data.tipo === 'RECARGAR_TARJETA') {
         var u = urlBase + '?search=' + encodeURIComponent(e.data.cod);
