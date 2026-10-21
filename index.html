@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SP!</title>
-  <!-- Enlace de manifiesto dinámico -->
-  <link id="dynamicManifest" rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1E2743">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -108,51 +107,20 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // CAPTURA Y PERSISTENCIA BLINDADA DE LA RUTA COMPLETA (CÓDIGO + PIN)
-    if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
+    // PUENTE DE MEMORIA PERSISTENTE PARA LA MÁSCARA (GITHUB PAGES)
+    if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 3)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
       try { 
-        localStorage.setItem('panarabe_final_query', query); 
+        localStorage.setItem('panarabe_master_query', query); 
         sessionStorage.setItem('panarabe_session_query', query);
       } catch(e) {}
     } else {
       try {
-        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
+        var guardado = localStorage.getItem('panarabe_master_query') || sessionStorage.getItem('panarabe_session_query');
         if (guardado) query = guardado;
       } catch(e) {}
-    }
-
-    // TRUCO TÉCNICO DE CARESTINO: CREAR UN MANIFIESTO DINÁMICO CON LA RUTA DEL PERFIL
-    if (query) {
-      var manifestData = {
-        "name": "PANARABE",
-        "short_name": "SP!",
-        "start_url": "./index.html" + query,
-        "display": "standalone",
-        "background_color": "#FFFFFF",
-        "theme_color": "#1E2743",
-        "orientation": "portrait",
-        "icons": [
-          {
-            "src": "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-          },
-          {
-            "src": "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-          }
-        ]
-      };
-      var stringManifest = JSON.stringify(manifestData);
-      var blob = new Blob([stringManifest], {type: 'application/json'});
-      var manifestURL = URL.createObjectURL(blob);
-      document.getElementById('dynamicManifest').setAttribute('href', manifestURL);
     }
 
     var frame = document.getElementById("appFrame");
@@ -218,3 +186,4 @@
   </script>
 </body>
 </html>
+
