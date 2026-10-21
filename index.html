@@ -19,9 +19,9 @@
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
-    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.3s ease; }
+    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.4s ease; }
     
-    /* Pantalla de carga con fondo blanco e imagen central idéntica a Android */
+    /* Pantalla de carga profesional con fondo blanco puro y tu logotipo oficial */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #FFFFFF; display: flex; flex-direction: column;
@@ -69,12 +69,12 @@
 </head>
 <body>
 
-  <!-- Pantalla de bienvenida con el logo para evitar la pantalla negra en iPhone -->
+  <!-- Pantalla de bienvenida corporativa idéntica a Android -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="SP!">
   </div>
 
-  <iframe id="appFrame" name="appFrame" src="" allow="downloads; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation" onload="document.getElementById('splashScreen').style.opacity='0'; setTimeout(function(){ document.getElementById('splashScreen').style.display='none'; document.getElementById('appFrame').style.opacity='1'; }, 300);"></iframe>
+  <iframe id="appFrame" name="appFrame" src="" allow="downloads; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"></iframe>
 
   <div id="pwaBarBottom">
     <div class="bar-left">
@@ -108,8 +108,8 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Rescate y persistencia inteligente del código del cliente
-    if (query && query.length > 1 && query.indexOf('app_in_frame') === -1) {
+    // Gestión inteligente de parámetros y persistencia del cliente
+    if (query && query.length > 1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
@@ -121,12 +121,23 @@
       } catch(e) {}
     }
 
-    var queryFinal = (query && query.indexOf('app_in_frame') === -1 && query.length > 3) ? query : "";
-    var separador = (queryFinal && queryFinal.length > 1) ? '&' : '?';
-    var urlFinalIframe = urlBase + queryFinal + (queryFinal ? separador : "?") + "app_in_frame=1";
+    var urlFinalIframe = urlBase + (query ? query : "");
 
     var frame = document.getElementById("appFrame");
     frame.src = urlFinalIframe;
+
+    // Desvanecimiento controlado del splash screen para garantizar visualización del logo
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var splash = document.getElementById('splashScreen');
+        var appF = document.getElementById('appFrame');
+        if (splash) {
+          splash.style.opacity = '0';
+          setTimeout(function() { splash.style.display = 'none'; }, 400);
+        }
+        if (appF) { appF.style.opacity = '1'; }
+      }, 1800);
+    });
 
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
     if (!esPWA) {
