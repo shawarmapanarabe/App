@@ -5,76 +5,169 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SP!</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#FFFFFF">
+  <meta name="theme-color" content="#1E2743">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SP!">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     html, body {
-      margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-      background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
-      overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #FFFFFF;
+      font-family: 'Poppins', sans-serif;
+      overscroll-behavior-y: none;
+      -webkit-overscroll-behavior: none;
     }
-    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.4s ease; }
-    
-    /* Pantalla de carga limpia con el logotipo cuadrado original y sin textos */
-    #splashScreen {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #FFFFFF; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 99999;
-      transition: opacity 0.4s ease;
-    }
-    .splash-logo-img {
-      width: 130px; height: 130px; border-radius: 24px; object-fit: cover;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      animation: pulseLogo 1.1s infinite alternate;
-    }
-    @keyframes pulseLogo {
-      from { transform: scale(0.96); }
-      to { transform: scale(1.04); }
+    iframe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
     }
 
+    /* Barra flotante inferior de instalación PWA */
     #pwaBarBottom {
-      display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-      width: calc(100% - 28px); max-width: 400px; background: #202124; color: #ffffff;
-      padding: 10px 14px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      z-index: 99998; align-items: center; justify-content: space-between;
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 28px);
+      max-width: 400px;
+      background: #202124;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      z-index: 99998;
+      align-items: center;
+      justify-content: space-between;
+      animation: subirBarra 0.35s ease-out;
     }
-    .bar-left { display: flex; align-items: center; gap: 10px; }
-    .bar-icon { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
-    .bar-title { font-size: 13.5px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; }
-    .bar-sub { font-size: 11px; color: #9aa0a6; margin: 0; }
-    .bar-right { display: flex; align-items: center; gap: 8px; }
-    .btn-bar-install { background: #8ab4f8; color: #202124; border: none; font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: 20px; }
-    .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
+    @keyframes subirBarra {
+      from { transform: translate(-50%, 40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .bar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      object-fit: cover;
+    }
+    .bar-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1.2;
+    }
+    .bar-sub {
+      font-size: 11px;
+      color: #9aa0a6;
+      margin: 0;
+    }
+    .bar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-bar-install {
+      background: #8ab4f8;
+      color: #202124;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 7px 14px;
+      border-radius: 20px;
+    }
+    .btn-bar-close {
+      background: transparent;
+      color: #9aa0a6;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    /* Modal explicativo para iPhone */
     #iosGuideModal {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); z-index: 99999;
-      align-items: center; justify-content: center; padding: 20px;
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
     .modal-card {
-      background: #ffffff; color: #1E2743; width: 100%; max-width: 330px;
-      border-radius: 20px; padding: 22px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); text-align: center;
+      background: #ffffff;
+      color: #1E2743;
+      width: 100%;
+      max-width: 330px;
+      border-radius: 20px;
+      padding: 22px 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      text-align: center;
+      animation: zoomModal 0.25s ease-out;
     }
-    .modal-title { font-size: 16px; font-weight: 800; margin: 10px 0 8px 0; }
+    @keyframes zoomModal {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 10px 0 6px 0;
+    }
     .modal-step {
-      font-size: 13px; color: #334155; text-align: left; margin: 10px 0;
-      background: #f8fafc; padding: 12px 14px; border-radius: 12px; line-height: 1.45; display: flex; align-items: center; gap: 10px;
+      font-size: 12.5px;
+      color: #4b5563;
+      text-align: left;
+      margin: 10px 0;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 12px;
+      line-height: 1.4;
     }
-    .modal-btn-ok { margin-top: 14px; width: 100%; background: #e95042; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 700; font-size: 13.5px; cursor: pointer; }
+    .modal-btn-ok {
+      margin-top: 14px;
+      width: 100%;
+      background: #e95042;
+      color: white;
+      border: none;
+      padding: 11px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Pantalla de bienvenida únicamente con el logotipo cuadrado original -->
-  <div id="splashScreen">
-    <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo-img" alt="SP!">
-  </div>
-
+  <!-- Marco de la aplicación con permisos completos para evitar bloqueos en iOS -->
   <iframe 
     id="appFrame" 
     name="appFrame" 
@@ -83,6 +176,7 @@
     sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
   ></iframe>
 
+  <!-- Barra flotante inferior de instalación -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -97,17 +191,18 @@
     </div>
   </div>
 
+  <!-- Modal explicativo paso a paso para iPhone -->
   <div id="iosGuideModal">
     <div class="modal-card">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" style="width: 50px; height: 50px; border-radius: 12px;" alt="Logo">
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" style="width: 48px; height: 48px; border-radius: 12px;" alt="Logo">
       <h3 class="modal-title">Instalar en tu iPhone</h3>
       <div class="modal-step">
-        <span><b>1.</b> Toca el botón <b>Compartir</b> en la barra inferior de Safari.</span>
+        <b>1.</b> Toca el botón <b>Compartir</b> <span style="font-size:16px;">⎋</span> en la barra inferior de Safari o Chrome.
       </div>
       <div class="modal-step">
-        <span><b>2.</b> Desliza y selecciona <b>"Agregar a Inicio"</b>.</span>
+        <b>2.</b> Elige <b>"Agregar a la pantalla de inicio"</b> 📲.
       </div>
-      <button class="modal-btn-ok" onclick="cerrarGuiaIos()">¡Entendido!</button>
+      <button class="modal-btn-ok" onclick="cerrarGuiaIos()">¡Listo!</button>
     </div>
   </div>
 
@@ -115,7 +210,8 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    if (query && query.length > 1) {
+    // Persistencia y gestión limpia de parámetros del cliente
+    if (query) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
@@ -123,43 +219,70 @@
     } else {
       try {
         var guardado = localStorage.getItem('panarabe_last_query');
-        if (guardado) { query = guardado; }
+        if (guardado) query = guardado;
       } catch(e) {}
     }
 
-    var urlFinalIframe = urlBase + (query ? query : "");
-
     var frame = document.getElementById("appFrame");
-    frame.src = urlFinalIframe;
+    frame.src = urlBase + (query ? query : "");
 
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        var splash = document.getElementById('splashScreen');
-        var appF = document.getElementById('appFrame');
-        if (splash) {
-          splash.style.opacity = '0';
-          setTimeout(function() { splash.style.display = 'none'; }, 400);
-        }
-        if (appF) { appF.style.opacity = '1'; }
-      }, 1600);
-    });
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(){});
+      });
+    }
 
+    // Detección de instalación PWA
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
     if (!esPWA) {
       var esIphone = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
+
       if (esIphone) {
-        setTimeout(function() { barra.style.display = 'flex'; }, 1200);
-        btnInstalar.onclick = function() { document.getElementById('iosGuideModal').style.display = 'flex'; };
+        setTimeout(function() {
+          barra.style.display = 'flex';
+        }, 1200);
+
+        btnInstalar.onclick = function() {
+          document.getElementById('iosGuideModal').style.display = 'flex';
+        };
+      } else {
+        var promptDiferido;
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          promptDiferido = e;
+          barra.style.display = 'flex';
+
+          btnInstalar.onclick = function() {
+            if (promptDiferido) {
+              promptDiferido.prompt();
+              promptDiferido.userChoice.then(function(choice) {
+                if (choice.outcome === 'accepted') {
+                  barra.style.display = 'none';
+                }
+                promptDiferido = null;
+              });
+            }
+          };
+        });
       }
     }
 
-    function cerrarBarra() { document.getElementById('pwaBarBottom').style.display = 'none'; }
-    function cerrarGuiaIos() { 
-      document.getElementById('iosGuideModal').style.display = 'none'; 
-      document.getElementById('pwaBarBottom').style.display = 'none'; 
+    function cerrarBarra() {
+      document.getElementById('pwaBarBottom').style.display = 'none';
     }
+
+    function cerrarGuiaIos() {
+      document.getElementById('iosGuideModal').style.display = 'none';
+      document.getElementById('pwaBarBottom').style.display = 'none';
+    }
+
+    window.addEventListener('appinstalled', function() {
+      document.getElementById('pwaBarBottom').style.display = 'none';
+    });
   </script>
 </body>
 </html>
