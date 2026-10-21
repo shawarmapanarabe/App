@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SP!</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#FFFFFF">
+  <meta name="theme-color" content="#1E2743">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SP!">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -21,29 +21,31 @@
     }
     iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.3s ease; }
     
-    /* Pantalla de carga impecable con fondo blanco puro y contenedor visible */
+    /* Splash Screen con diseño institucional nativo (sin fallos de red en iOS) */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: #FFFFFF; display: flex; flex-direction: column;
       align-items: center; justify-content: center; z-index: 99999;
       transition: opacity 0.4s ease;
     }
-    .splash-card {
-      text-align: center; animation: pulseLogo 1.2s infinite alternate;
+    .splash-box {
+      width: 120px; height: 120px; background: #1E2743; border-radius: 28px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 12px 30px rgba(30,39,67,0.25); margin-bottom: 16px;
+      animation: pulseLogo 1s infinite alternate;
     }
-    .splash-logo {
-      width: 130px; height: 130px; border-radius: 26px; object-fit: cover;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12); margin-bottom: 15px; background: #f8fafc;
+    .splash-box span {
+      font-size: 42px; font-weight: 800; color: #F1C40F; letter-spacing: -1px;
     }
     .splash-title {
-      font-size: 24px; font-weight: 800; color: #1E2743; letter-spacing: 1px; margin: 0;
+      font-size: 20px; font-weight: 800; color: #1E2743; margin: 0; letter-spacing: 0.5px;
     }
     .splash-sub {
-      font-size: 12px; font-weight: 600; color: #64748b; margin-top: 5px;
+      font-size: 11px; font-weight: 700; color: #e95042; margin-top: 4px; letter-spacing: 1px;
     }
     @keyframes pulseLogo {
-      from { transform: scale(0.97); }
-      to { transform: scale(1.03); }
+      from { transform: scale(0.95); }
+      to { transform: scale(1.05); }
     }
 
     #pwaBarBottom {
@@ -78,16 +80,16 @@
 </head>
 <body>
 
-  <!-- Pantalla de carga con logo visible y tipografía institucional -->
+  <!-- Pantalla de carga nativa garantizada sin retrasos de red -->
   <div id="splashScreen">
-    <div class="splash-card">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="SP!" onerror="this.style.display='none'">
-      <h1 class="splash-title">SP!</h1>
-      <p class="splash-sub">SHAWARMA PANARABE</p>
+    <div class="splash-box">
+      <span>SP!</span>
     </div>
+    <h1 class="splash-title">PANARABE</h1>
+    <p class="splash-sub">TARJETA PREFERENTE</p>
   </div>
 
-  <iframe id="appFrame" name="appFrame" src="" allow="downloads; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation" onload="document.getElementById('splashScreen').style.opacity='0'; setTimeout(function(){ document.getElementById('splashScreen').style.display='none'; document.getElementById('appFrame').style.opacity='1'; }, 300);"></iframe>
+  <iframe id="appFrame" name="appFrame" src="" allow="downloads; clipboard-write" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation" onload="document.getElementById('splashScreen').style.opacity='0'; setTimeout(function(){ document.getElementById('splashScreen').style.display='none'; document.getElementById('appFrame').style.opacity='1'; }, 350);"></iframe>
 
   <div id="pwaBarBottom">
     <div class="bar-left">
