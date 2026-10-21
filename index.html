@@ -36,21 +36,25 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* PANTALLA DE CARGA - EXACTA AL SISTEMA NATIVO DE ANDROID */
+    /* PANTALLA DE CARGA - CALIBRACIÓN EXACTA A PANTALLA NATIVA */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+      transition: opacity 0.35s ease-out, visibility 0.35s ease-out;
       pointer-events: none;
     }
-    /* Tamaño fijo estándar nativo de WebAPK: 170px */
     .splash-logo {
-      width: 170px; height: 170px;
-      border-radius: 0; object-fit: contain; box-shadow: none; background: transparent;
-      user-select: none; -webkit-user-select: none;
-      /* Ajuste milimétrico para igualar el centro visual descontando barra de estado */
-      transform: translateY(-8px);
+      width: 53vw;
+      max-width: 228px;
+      height: auto;
+      aspect-ratio: 1/1;
+      border-radius: 0;
+      object-fit: contain;
+      box-shadow: none;
+      background: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     /* BARRA INFERIOR */
@@ -133,7 +137,7 @@
 </head>
 <body>
 
-  <!-- PANTALLA SPLASH CON LOGO FIJO CALIBRADO -->
+  <!-- PANTALLA SPLASH CON PROPORCIÓN EXACTA NATIVA -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -211,8 +215,8 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // TIEMPO DIFERENCIADO: 2.8s EN IPHONE (PARA EVITAR LAG Y ASENTAR EL MOTOR) Y 1.2s EN ANDROID (PARA EMPALMAR PERFECTO)
-    var tiempoSplash = esApple ? 2800 : 1200;
+    // TIEMPO DIFERENCIADO SEGÚN DISPOSITIVO
+    var tiempoSplash = esApple ? 2800 : 1100;
 
     setTimeout(function() {
       var splash = document.getElementById("splashScreen");
@@ -220,7 +224,7 @@
         splash.style.opacity = "0";
         setTimeout(function() {
           splash.style.display = "none";
-        }, 400);
+        }, 350);
       }
     }, tiempoSplash);
 
@@ -301,3 +305,4 @@
   </script>
 </body>
 </html>
+
