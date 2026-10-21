@@ -36,18 +36,21 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* PANTALLA DE CARGA - CALZADA CON EL SPLASH NATIVO DE ANDROID */
+    /* PANTALLA DE CARGA - EXACTA AL SISTEMA NATIVO DE ANDROID */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.35s ease-out, visibility 0.35s ease-out;
+      transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
       pointer-events: none;
     }
+    /* Tamaño fijo estándar nativo de WebAPK: 170px */
     .splash-logo {
-      width: 50vw; max-width: 210px; height: auto; aspect-ratio: 1/1;
+      width: 170px; height: 170px;
       border-radius: 0; object-fit: contain; box-shadow: none; background: transparent;
       user-select: none; -webkit-user-select: none;
+      /* Ajuste milimétrico para igualar el centro visual descontando barra de estado */
+      transform: translateY(-8px);
     }
 
     /* BARRA INFERIOR */
@@ -208,16 +211,18 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // OCULTAR SPLASH SCREEN SIN PARPADEOS (CALIBRADO A 1.2s)
+    // TIEMPO DIFERENCIADO: 2.8s EN IPHONE (PARA EVITAR LAG Y ASENTAR EL MOTOR) Y 1.2s EN ANDROID (PARA EMPALMAR PERFECTO)
+    var tiempoSplash = esApple ? 2800 : 1200;
+
     setTimeout(function() {
       var splash = document.getElementById("splashScreen");
       if (splash) {
         splash.style.opacity = "0";
         setTimeout(function() {
           splash.style.display = "none";
-        }, 350);
+        }, 400);
       }
-    }, 1200);
+    }, tiempoSplash);
 
     frame.onload = function() {
       try {
