@@ -107,7 +107,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // SISTEMA DE PERSISTENCIA BLINDADO PARA iOS Y ANDROID
+    // SISTEMA BLINDADO DE INYECCIÓN DE CÓDIGO Y PIN (CONTRASEÑA)
     if (query && query.length > 1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -126,12 +126,14 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
+    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
 
+    // Detección de instalación PWA
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA) {
@@ -184,4 +186,3 @@
   </script>
 </body>
 </html>
-
