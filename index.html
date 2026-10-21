@@ -86,7 +86,7 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
 
-    // Captura limpia de la URL o recuperación automática desde la memoria del celular
+    // Limpieza estricta y persistencia obligatoria del código del cliente
     if (query && query.length > 1 && query.indexOf('app_in_frame') === -1) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -99,7 +99,8 @@
       } catch(e) {}
     }
 
-    var queryFinal = (query && query.indexOf('app_in_frame') === -1) ? query : "";
+    // Si la query sigue vacía, evitamos mandar textos erróneos y pasamos una ruta limpia que no colapse
+    var queryFinal = (query && query.indexOf('app_in_frame') === -1 && query.length > 3) ? query : "";
     var urlFinalIframe = urlBase + queryFinal + (queryFinal ? "&" : "?") + "app_in_frame=1";
 
     var frame = document.getElementById("appFrame");
