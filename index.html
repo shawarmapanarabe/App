@@ -31,17 +31,7 @@
       background-color: #F9F9F9; font-family: 'Poppins', sans-serif;
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
-    iframe { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: calc(100% + env(safe-area-inset-bottom, 30px)); 
-      min-height: -webkit-fill-available;
-      border: 0; 
-      display: block; 
-      background-color: #F9F9F9; 
-    }
+    iframe { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: 0; display: block; background-color: #F9F9F9; }
 
     #pwaBarBottom {
       display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
@@ -93,7 +83,7 @@
     id="appFrame" 
     name="appFrame" 
     src="" 
-    allow="downloads; clipboard-write" 
+    allow="downloads; clipboard-write"
   ></iframe>
 
   <div id="pwaBarBottom">
