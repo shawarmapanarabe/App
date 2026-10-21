@@ -36,17 +36,18 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* PANTALLA DE CARGA - CALIBRACIÓN EXACTA A PANTALLA NATIVA */
+    /* PANTALLA DE CARGA - CALIBRACIÓN EXACTA Y PALPITACIÓN SUAVE */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.35s ease-out, visibility 0.35s ease-out;
+      transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
       pointer-events: none;
     }
     .splash-logo {
-      width: 53vw;
-      max-width: 228px;
+      /* Mismo tamaño exacto del splash nativo de Android */
+      width: 66vw;
+      max-width: 290px;
       height: auto;
       aspect-ratio: 1/1;
       border-radius: 0;
@@ -55,6 +56,13 @@
       background: transparent;
       user-select: none;
       -webkit-user-select: none;
+      /* Compensación del alto de la barra superior */
+      margin-top: -24px;
+      animation: palpitarLogo 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes palpitarLogo {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.03); }
     }
 
     /* BARRA INFERIOR */
@@ -137,7 +145,7 @@
 </head>
 <body>
 
-  <!-- PANTALLA SPLASH CON PROPORCIÓN EXACTA NATIVA -->
+  <!-- PANTALLA SPLASH CON LOGO CALIBRADO Y PALPITACIÓN -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -215,8 +223,8 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // TIEMPO DIFERENCIADO SEGÚN DISPOSITIVO
-    var tiempoSplash = esApple ? 2800 : 1100;
+    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID (EMPALME EXACTO)
+    var tiempoSplash = esApple ? 2800 : 1400;
 
     setTimeout(function() {
       var splash = document.getElementById("splashScreen");
@@ -224,7 +232,7 @@
         splash.style.opacity = "0";
         setTimeout(function() {
           splash.style.display = "none";
-        }, 350);
+        }, 400);
       }
     }, tiempoSplash);
 
@@ -305,4 +313,3 @@
   </script>
 </body>
 </html>
-
