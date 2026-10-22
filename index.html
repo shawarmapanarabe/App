@@ -392,5 +392,326 @@
       } catch(e) {}
     }
 
-    var frame = document.getElementById("appFrame");
-    frame.src = urlBa
+        var frame = document.getElementById("appFrame");
+    frame.src = urlBase + (query ? query : "");
+
+    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
+    var tiempoSplash = esApple ? 2800 : 1400;
+
+    setTimeout(function() {
+      var splash = document.getElementById("splashScreen");
+      if (splash) {
+        splash.style.opacity = "0";
+        setTimeout(function() {
+          splash.style.display = "none";
+        }, 400);
+      }
+    }, tiempoSplash);
+
+    // DETERMINAR SI ES APLICACIÓN INSTALADA (STANDALONE)
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    // BARRA DE SUSCRIPCIÓN PUSH: SOLO SI ESTÁ INSTALADA Y NO HA SIDO BLOQUEADA
+    if (esPWA) {
+      setTimeout(function() {
+        if ("Notification" in window && Notification.permission === "default") {
+          var rechazoPrevio = sessionStorage.getItem("push_descartado_sesion");
+          if (!rechazoPrevio) {
+            document.getElementById("pwaBarPush").style.display = "flex";
+          }
+        }
+      }, 3200);
+    }
+
+    function solicitarPermisoPush() {
+      if ("OneSignal" in window) {
+        OneSignalDeferred.push(async function(OneSignal) {
+          await OneSignal.Notifications.requestPermission();
+          cerrarBarPush();
+        });
+      } else {
+        Notification.requestPermission().then(function() {
+          cerrarBarPush();
+        });
+      }
+    }
+
+    function cerrarBarPush() {
+      document.getElementById("pwaBarPush").style.display = "none";
+      try { sessionStorage.setItem("push_descartado_sesion", "1"); } catch(e) {}
+    }
+
+    // GESTIÓN DEL BANNER IN-APP CON DESLIZADO HACIA ARRIBA (SWIPE UP)
+    function verificarBannerPromoActivo() {
+      try {
+        var promoGuardada = localStorage.getItem("sp_promo_activa_banner");
+        var cerradaSesion = sessionStorage.getItem("sp_banner_cerrado_sesion");
+        if (promoGuardada && !cerradaSesion) {
+          var obj = JSON.parse(promoGuardada);
+          if (obj && obj.expira && Date.now() < obj.expira) {
+            document.getElementById("txtBannerTit").textContent = obj.tit;
+            document.getElementById("txtBannerDesc").textContent = obj.desc;
+            document.getElementById("btnBannerWa").href = obj.link || "https://chat.whatsapp.com/DRwYS1PtD4BA8A6Ygvmhnl?s=cl&p=a&mlu=4&ilr=4";
+            document.getElementById("bannerPromoActiva").style.display = "flex";
+          }
+        }
+      } catch(e) {}
+    }
+    verificarBannerPromoActivo();
+
+    function cerrarBannerPromo() {
+      var b = document.getElementById("bannerPromoActiva");
+      if (b) {
+        b.style.transform = "translate(-50%, -60px)";
+        b.style.opacity = "0";
+        setTimeout(function() { b.style.display = "none"; }, 250);
+        try { sessionStorage.setItem("sp_banner_cerrado_sesion", "1"); } catch(e) {}
+      }
+    }
+
+    // GESTO SWIPE UP EN EL BANNER
+    (function() {
+      var banner = document.getElementById("bannerPromoActiva");
+      var startY = 0;
+      banner.addEventListener("touchstart", function(e) {
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      banner.addEventListener("touchmove", function(e) {
+        var diffY = e.touches[0].clientY - startY;
+        if (diffY < -20) { cerrarBannerPromo(); }
+      }, { passive: true });
+    })();
+
+    // ENTRADA AL PANEL SECRETO: MANTENER PRESIONADO 3 SEGUNDOS LA ESQUINA SUPERIOR
+    var timerSecreto = null;
+    var zonaSecreta = document.getElementById("zonaAdminSecreta");
+    zonaSecreta.addEventListener("touchstart", function(e) {
+      timerSecreto = setTimeout(function() {
+        abrirAccesoPanelAdmin();
+      }, 3000);
+    });
+    zonaSecreta.addEventListener("touchend", function(e) {
+      if (timerSecreto) clearTimeout(timerSecreto);
+    });
+    zonaSecreta.addEventListener("mousedown", function(e) {
+      timerSecreto = setTimeout(function() {
+        abrirAccesoPanelAdmin();
+      }, 3000);
+    });
+    zonaSecreta.addEventListener("mouseup", function(e) {
+      if (timerSecreto) clearTimeout(timerSecreto);
+    });
+
+    function abrirAccesoPanelAdmin() {
+      try {
+        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        var textoDoc = iframeDoc ? iframeDoc.body.innerText : "";
+        var queryCompleta = (window.location.search || "") + (localStorage.getItem("panarabe_final_query") || "");
+        
+        if (textoDoc.indexOf("906769744") === -1 && queryCompleta.indexOf("906769744") === -1 && queryCompleta.indexOf("9744") === -1) {
+          return;
+        }
+      } catch(e) {}
+
+      document.getElementById("modalClavePanel").style.display = "flex";
+      setTimeout(function() {
+        document.getElementById("inputClaveAdminPanel").focus();
+      }, 200);
+    }
+
+    function cerrarModalClaveAdmin() {
+      document.getElementById("modalClavePanel").style.display = "none";
+      document.getElementById("inputClaveAdminPanel").value = "";
+    }
+
+    function verificarClaveAdminPanel() {
+      var pass = document.getElementById("inputClaveAdminPanel").value.trim();
+      var passAlmacenada = localStorage.getItem("admin_master_pwd") || "1234";
+      if (!pass) return alert("Ingresa tu clave");
+
+      cerrarModalClaveAdmin();
+      document.getElementById("modalPanelPromos").style.display = "flex";
+
+      var keyGuardada = localStorage.getItem("onesignal_rest_key");
+      if (keyGuardada) document.getElementById("inputApiKeyOneSignal").value = keyGuardada;
+    }
+
+    function cerrarPanelPromos() {
+      document.getElementById("modalPanelPromos").style.display = "none";
+    }
+
+    // LANZAR NOTIFICACIÓN PUSH Y PUBLICAR EN BANNER
+    async function lanzarPromoYNotificacion() {
+      var apiKey = document.getElementById("inputApiKeyOneSignal").value.trim();
+      var tit = document.getElementById("inputPromoTitulo").value.trim();
+      var msg = document.getElementById("inputPromoMensaje").value.trim();
+      var horas = parseFloat(document.getElementById("inputPromoHoras").value || 12);
+      var linkWa = document.getElementById("inputPromoLinkWa").value.trim();
+
+      if (!tit || !msg) return alert("Completa el título y el mensaje");
+      if (apiKey) localStorage.setItem("onesignal_rest_key", apiKey);
+
+      // 1. Guardar la promo activa para el banner local
+      var expiraMs = Date.now() + (horas * 3600 * 1000);
+      localStorage.setItem("sp_promo_activa_banner", JSON.stringify({
+        tit: tit,
+        desc: msg,
+        link: linkWa,
+        expira: expiraMs
+      }));
+      sessionStorage.removeItem("sp_banner_cerrado_sesion");
+      verificarBannerPromoActivo();
+
+      // 2. Enviar la notificación Push masiva mediante OneSignal API
+      if (apiKey) {
+        try {
+          var payload = {
+            app_id: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
+            included_segments: ["Total Subscriptions"],
+            headings: { "es": tit, "en": tit },
+            contents: { "es": msg, "en": msg },
+            url: linkWa,
+            chrome_web_icon: "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91"
+          };
+
+          var resp = await fetch("https://onesignal.com/api/v1/notifications", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              "Authorization": "Basic " + apiKey
+            },
+            body: JSON.stringify(payload)
+          });
+
+          var resJson = await resp.json();
+          if (resJson && resJson.id) {
+            alert("✅ ¡Notificación enviada a todos los clientes y banner publicado!");
+          } else {
+            alert("⚠️ Banner publicado, pero verifica tu REST API Key de OneSignal.");
+          }
+        } catch(err) {
+          alert("Banner publicado localmente. Error de conexión con OneSignal.");
+        }
+      } else {
+        alert("✅ Banner publicado en la app. (Para enviar notificación al celular, agrega la REST API Key de OneSignal).");
+      }
+
+      cerrarPanelPromos();
+    }
+
+    // BOTÓN WHATSAPP ARRASTRABLE CON IMÁN A LOS LATERALES
+    (function() {
+      var btn = document.getElementById('btnWaFlotante');
+      if (!btn) return;
+
+      var isDragging = false, hasMoved = false, startX, startY, initialLeft, initialTop;
+
+      function startDrag(e) {
+        var touch = e.touches ? e.touches[0] : e;
+        isDragging = true; hasMoved = false;
+        startX = touch.clientX; startY = touch.clientY;
+        var rect = btn.getBoundingClientRect();
+        initialLeft = rect.left; initialTop = rect.top;
+        btn.style.left = initialLeft + 'px'; btn.style.top = initialTop + 'px';
+        btn.style.margin = '0'; btn.style.transition = 'none';
+      }
+
+      function onDrag(e) {
+        if (!isDragging) return;
+        var touch = e.touches ? e.touches[0] : e;
+        var deltaX = touch.clientX - startX, deltaY = touch.clientY - startY;
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) hasMoved = true;
+        var newLeft = initialLeft + deltaX, newTop = initialTop + deltaY;
+        var maxLeft = window.innerWidth - btn.offsetWidth - 12;
+        var maxTop = window.innerHeight - btn.offsetHeight - 80;
+        newLeft = Math.max(12, Math.min(newLeft, maxLeft));
+        newTop = Math.max(70, Math.min(newTop, maxTop));
+        btn.style.left = newLeft + 'px'; btn.style.top = newTop + 'px';
+      }
+
+      function stopDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        if (!hasMoved) {
+          window.location.href = 'whatsapp://send?phone=51906769744';
+        } else {
+          btn.style.transition = 'left 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+          var centro = window.innerWidth / 2;
+          var rect = btn.getBoundingClientRect();
+          if ((rect.left + rect.width / 2) < centro) {
+            btn.style.left = '12px';
+          } else {
+            btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px';
+          }
+        }
+      }
+
+      btn.addEventListener('touchstart', startDrag, { passive: false });
+      window.addEventListener('touchmove', onDrag, { passive: false });
+      window.addEventListener('touchend', stopDrag);
+      btn.addEventListener('mousedown', startDrag);
+      window.addEventListener('mousemove', onDrag);
+      window.addEventListener('mouseup', stopDrag);
+    })();
+
+    frame.onload = function() {
+      try {
+        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        var pinInput = iframeDoc.getElementById('inputPin');
+        var btnIngresar = iframeDoc.getElementById('btnBuscar');
+        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
+          var matchPin = query.match(/pin=([^&]+)/i);
+          if (matchPin && matchPin[1]) {
+            var pinVal = decodeURIComponent(matchPin[1]);
+            pinInput.value = pinVal;
+            pinInput.dispatchEvent(new Event('input', { bubbles: true }));
+            setTimeout(function() { btnIngresar.click(); }, 150);
+          }
+        }
+      } catch(err) {}
+    };
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(){});
+      });
+    }
+
+    if (!esPWA) {
+      var barra = document.getElementById('pwaBarBottom');
+      var btnInstalar = document.getElementById('btnBarInstall');
+      if (esApple) {
+        setTimeout(function() { barra.style.display = 'flex'; }, 1200);
+        btnInstalar.onclick = function() {
+          document.getElementById('iosGuideModal').style.display = 'flex';
+        };
+      } else {
+        var promptDiferido;
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          promptDiferido = e;
+          barra.style.display = 'flex';
+          btnInstalar.onclick = function() {
+            if (promptDiferido) {
+              promptDiferido.prompt();
+              promptDiferido.userChoice.then(function(choice) {
+                if (choice.outcome === 'accepted') { barra.style.display = 'none'; }
+                promptDiferido = null;
+              });
+            }
+          };
+        });
+      }
+    }
+
+    function cerrarBarra() { document.getElementById('pwaBarBottom').style.display = 'none'; }
+    function cerrarGuiaIos() {
+      document.getElementById('iosGuideModal').style.display = 'none';
+      document.getElementById('pwaBarBottom').style.display = 'none';
+    }
+    window.addEventListener('appinstalled', function() {
+      document.getElementById('pwaBarBottom').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
