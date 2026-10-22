@@ -24,28 +24,6 @@
     }
   </script>
 
-  <!-- ONESIGNAL SDK WEB -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
-        serviceWorkerPath: "OneSignalSDKWorker.js",
-        serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
-        serviceWorkerParam: { scope: "/App/" },
-        path: "/App/",
-        autoResubscribe: true,
-        notifyButton: { enable: false },
-        promptOptions: {
-          slidedown: {
-            prompts: []
-          }
-        }
-      });
-    });
-  </script>
-
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -58,88 +36,7 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* ZONA SECRETA DE ENTRADA AL PANEL (ESQUINA SUPERIOR IZQUIERDA) */
-    #zonaAdminSecreta {
-      position: fixed; top: 0; left: 0; width: 75px; height: 75px;
-      z-index: 99997; background: transparent; -webkit-tap-highlight-color: transparent;
-    }
-
-    /* BARRA INFERIOR DE PROMOCIONES */
-    #pwaBarPush {
-      display: none; 
-      position: fixed; 
-      bottom: calc(env(safe-area-inset-bottom, 14px) + 12px); 
-      left: 50%; 
-      transform: translateX(-50%);
-      width: calc(100% - 28px); 
-      max-width: 390px; 
-      background: #1E2743; 
-      color: #ffffff;
-      padding: 10px 14px; 
-      border-radius: 18px; 
-      box-shadow: 0 10px 28px rgba(30, 39, 67, 0.45);
-      z-index: 99995; 
-      align-items: center; 
-      justify-content: space-between;
-      animation: subirBarraPush 0.35s ease-out; 
-      border: 1px solid rgba(255, 255, 255, 0.16);
-    }
-    @keyframes subirBarraPush {
-      from { transform: translate(-50%, 40px); opacity: 0; }
-      to { transform: translate(-50%, 0); opacity: 1; }
-    }
-    .bar-push-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .bar-push-icon { font-size: 19px; line-height: 1; }
-    .bar-push-text { font-size: 12.5px; font-weight: 800; color: #ffffff; margin: 0; line-height: 1.2; letter-spacing: 0.3px; }
-    .bar-push-sub { font-size: 10.5px; color: #F2B647; margin: 0; font-weight: 500; }
-    .bar-push-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .btn-push-activar {
-      background: #E95042; color: #ffffff; border: none; font-size: 12px;
-      font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: 18px;
-      font-family: 'Poppins', sans-serif; box-shadow: 0 2px 8px rgba(233, 80, 66, 0.3);
-    }
-    .btn-push-activar:active { transform: scale(0.95); }
-    .btn-push-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
-
-    /* CINTA IN-APP DE PROMOCIÓN ACTIVA DESLIZABLE */
-    #bannerPromoActiva {
-      display: none; 
-      position: fixed; 
-      top: calc(env(safe-area-inset-top, 16px) + 12px); 
-      left: 50%; 
-      transform: translateX(-50%);
-      width: calc(100% - 28px); 
-      max-width: 390px; 
-      background: #1E2743; 
-      color: #ffffff;
-      padding: 10px 14px; 
-      border-radius: 16px; 
-      box-shadow: 0 10px 25px rgba(30, 39, 67, 0.45);
-      z-index: 99996; 
-      align-items: center; 
-      justify-content: space-between;
-      border: 1px solid rgba(242, 182, 71, 0.4); 
-      touch-action: none;
-      animation: bajarBarra 0.35s ease-out; 
-      transition: transform 0.25s ease, opacity 0.25s ease;
-    }
-    @keyframes bajarBarra {
-      from { transform: translate(-50%, -40px); opacity: 0; }
-      to { transform: translate(-50%, 0); opacity: 1; }
-    }
-    .banner-left { min-width: 0; flex: 1; padding-right: 8px; }
-    .banner-tit { font-size: 12.5px; font-weight: 800; color: #F2B647; margin: 0; line-height: 1.2; }
-    .banner-desc { font-size: 11px; color: #ffffff; margin: 2px 0 0 0; line-height: 1.3; }
-    .banner-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .btn-banner-wa {
-      background: #25D366; color: #ffffff; border: none; font-size: 11.5px;
-      font-weight: 700; cursor: pointer; padding: 6px 12px; border-radius: 18px;
-      font-family: 'Poppins', sans-serif; text-decoration: none; display: inline-flex;
-      align-items: center; gap: 4px;
-    }
-    .btn-banner-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 2px 4px; line-height: 1; }
-
-    /* BOTÓN FLOTANTE WHATSAPP ARRASTRABLE */
+    /* CONTENEDOR WHATSAPP ARRASTRABLE LIMPIO */
     #btnWaFlotante {
       position: fixed;
       top: clamp(265px, 73vw, 315px);
@@ -155,21 +52,41 @@
       -webkit-tap-highlight-color: transparent;
       text-decoration: none;
     }
-    #btnWaFlotante:active { cursor: grabbing; }
+    #btnWaFlotante:active {
+      cursor: grabbing;
+    }
 
+    /* BURBUJA CIRCULAR CON ICONO OFICIAL DE WHATSAPP (SIN TEXTO) */
     .burbuja-wa-inner {
-      width: 100%; height: 100%; background: #25D366; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45); border: 2px solid #ffffff;
-      animation: palpitarWa 1.5s ease-in-out infinite alternate; pointer-events: none;
+      width: 100%;
+      height: 100%;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45);
+      border: 2px solid #ffffff;
+      animation: palpitarWa 1.5s ease-in-out infinite alternate;
+      pointer-events: none;
     }
-    .burbuja-wa-inner svg { width: 26px; height: 26px; fill: #ffffff; }
+    .burbuja-wa-inner svg {
+      width: 26px;
+      height: 26px;
+      fill: #ffffff;
+    }
     @keyframes palpitarWa {
-      0% { transform: scale(1); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); }
-      100% { transform: scale(1.1); box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7); }
+      0% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+      }
+      100% {
+        transform: scale(1.1);
+        box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7);
+      }
     }
 
-    /* PANTALLA SPLASH */
+    /* PANTALLA DE CARGA */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -178,9 +95,17 @@
       pointer-events: none;
     }
     .splash-logo {
-      width: 66vw; max-width: 290px; height: auto; aspect-ratio: 1/1;
-      border-radius: 0; object-fit: contain; box-shadow: none; background: transparent;
-      user-select: none; -webkit-user-select: none; margin-top: -24px;
+      width: 66vw;
+      max-width: 290px;
+      height: auto;
+      aspect-ratio: 1/1;
+      border-radius: 0;
+      object-fit: contain;
+      box-shadow: none;
+      background: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      margin-top: -24px;
       animation: palpitarLogo 1.4s ease-in-out infinite alternate;
     }
     @keyframes palpitarLogo {
@@ -188,25 +113,13 @@
       100% { transform: scale(1.03); }
     }
 
-    /* BARRA INFERIOR DE INSTALACIÓN */
+    /* BARRA INFERIOR */
     #pwaBarBottom {
-      display: none; 
-      position: fixed; 
-      bottom: calc(env(safe-area-inset-bottom, 14px) + 12px); 
-      left: 50%; 
-      transform: translateX(-50%);
-      width: calc(100% - 32px); 
-      max-width: 380px; 
-      background: #1E2743; 
-      color: #ffffff;
-      padding: 10px 14px; 
-      border-radius: 16px; 
-      box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
-      z-index: 99998; 
-      align-items: center; 
-      justify-content: space-between;
-      animation: subirBarra 0.35s ease-out; 
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
+      padding: 10px 14px; border-radius: 16px; box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
+      z-index: 99998; align-items: center; justify-content: space-between;
+      animation: subirBarra 0.35s ease-out; border: 1px solid rgba(255, 255, 255, 0.12);
     }
     @keyframes subirBarra {
       from { transform: translate(-50%, 40px); opacity: 0; }
@@ -215,14 +128,22 @@
     .bar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .bar-icon { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
     .bar-text-group { min-width: 0; }
-    .bar-title { font-size: 13px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-title { 
+      font-size: 13px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    }
     .bar-sub { font-size: 11px; color: #F2B647; margin: 0; font-weight: 500; }
     .bar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .btn-bar-save { background: #E95042; color: #ffffff; border: none; font-size: 12px; font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; font-family: 'Poppins', sans-serif; }
+    
+    .btn-bar-save { 
+      background: #E95042; color: #ffffff; border: none; font-size: 12px; 
+      font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
+      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease;
+    }
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
-    /* MODAL GUÍA IOS */
+    /* MODAL DE GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -237,96 +158,34 @@
       from { transform: scale(0.9); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
-    .modal-logo { width: 76px; height: 76px; border-radius: 0; margin: 0 auto 12px auto; display: block; object-fit: contain; }
-    .modal-title { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 800; color: #1E2743; margin: 0 0 16px 0; letter-spacing: -0.3px; line-height: 1.3; }
+    .modal-logo {
+      width: 76px; height: 76px; border-radius: 0; margin: 0 auto 12px auto;
+      display: block; object-fit: contain;
+    }
+    .modal-title { 
+      font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 800; 
+      color: #1E2743; margin: 0 0 16px 0; letter-spacing: -0.3px; line-height: 1.3;
+    }
     .modal-instruction {
       background: #F9F9F9; border-radius: 16px; padding: 14px 16px; margin: 0 0 18px 0;
       text-align: center; font-size: 13px; color: #334155; line-height: 1.6; border: 1px solid #eef0f2;
     }
-    .icon-inline { display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin: 0 2px; }
+    .icon-inline {
+      display: inline-flex; align-items: center; justify-content: center;
+      vertical-align: middle; margin: 0 2px;
+    }
     .modal-btn-ok {
-      width: 100%; background: #E95042; color: #ffffff; border: none; padding: 13px;
-      border-radius: 14px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 13.5px;
-      cursor: pointer; box-shadow: 0 4px 12px rgba(233, 80, 66, 0.25);
+      width: 100%; background: #E95042; color: #ffffff; border: none;
+      padding: 13px; border-radius: 14px; font-family: 'Poppins', sans-serif;
+      font-weight: 700; font-size: 13.5px; cursor: pointer; transition: transform 0.1s ease;
+      box-shadow: 0 4px 12px rgba(233, 80, 66, 0.25);
     }
     .modal-btn-ok:active { transform: scale(0.96); }
-
-    /* MODAL CLAVE PANEL PROMOS */
-    #modalClavePanel {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 999999;
-      align-items: center; justify-content: center; padding: 15px;
-    }
-    .card-clave {
-      background: white; padding: 25px 20px; width: 100%; max-width: 330px;
-      border-radius: 24px; text-align: center; box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    }
-    .input-clave-admin {
-      width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px;
-      font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 14px; outline: none;
-    }
-
-    /* MODAL PANEL DE NOTIFICACIONES */
-    #modalPanelPromos {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 999999;
-      align-items: center; justify-content: center; padding: 15px;
-    }
-    .card-panel-promos {
-      background: white; padding: 22px 18px; width: 100%; max-width: 380px;
-      max-height: 90vh; overflow-y: auto; border-radius: 24px; text-align: left;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-    }
-    .label-panel { font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 3px; }
-    .input-panel {
-      width: 100%; padding: 9px 11px; border: 1.5px solid #cbd5e1; border-radius: 10px;
-      font-size: 13px; margin-bottom: 10px; outline: none; font-family: 'Poppins', sans-serif;
-    }
-    .btn-lanzar-push {
-      width: 100%; background: #E95042; color: #ffffff; border: none; padding: 12px;
-      border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer;
-      font-family: 'Poppins', sans-serif; box-shadow: 0 4px 12px rgba(233, 80, 66, 0.3); margin-top: 4px;
-    }
-    .btn-cerrar-panel {
-      width: 100%; background: #f1f2f6; color: #475569; border: 1px solid #cbd5e1;
-      padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700;
-      cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 8px;
-    }
   </style>
 </head>
 <body>
 
-  <!-- ZONA INVISIBLE DE ENTRADA AL PANEL (MANTENER PRESIONADO 3 SEGUNDOS) -->
-  <div id="zonaAdminSecreta"></div>
-
-  <!-- BARRA INFERIOR DE PROMOCIONES (SOLO PWA INSTALADA) -->
-  <div id="pwaBarPush">
-    <div class="bar-push-left">
-      <span class="bar-push-icon">🔔</span>
-      <div>
-        <p class="bar-push-text">PROMOCIONES</p>
-        <p class="bar-push-sub">No te las pierdas</p>
-      </div>
-    </div>
-    <div class="bar-push-right">
-      <button class="btn-push-activar" onclick="solicitarPermisoPush()">Activar</button>
-      <button class="btn-push-close" onclick="cerrarBarPush()">✕</button>
-    </div>
-  </div>
-
-  <!-- CINTA IN-APP DE PROMOCIÓN ACTIVA DESLIZABLE -->
-  <div id="bannerPromoActiva">
-    <div class="banner-left">
-      <p class="banner-tit" id="txtBannerTit">¡PROMO DE HOY!</p>
-      <p class="banner-desc" id="txtBannerDesc">Detalles de la promo aquí.</p>
-    </div>
-    <div class="banner-right">
-      <a class="btn-banner-wa" id="btnBannerWa" href="https://chat.whatsapp.com/DRwYS1PtD4BA8A6Ygvmhnl?s=cl&p=a&mlu=4&ilr=4" target="_blank">Ver</a>
-      <button class="btn-banner-close" onclick="cerrarBannerPromo()">✕</button>
-    </div>
-  </div>
-
-  <!-- BOTÓN FLOTANTE WHATSAPP CIRCULAR LIMPIO -->
+  <!-- BOTÓN FLOTANTE WHATSAPP CIRCULAR LIMPIO CON ICONO OFICIAL -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -334,7 +193,8 @@
       </svg>
     </div>
   </div>
-    <!-- PANTALLA SPLASH -->
+
+  <!-- PANTALLA SPLASH -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -346,7 +206,7 @@
     allow="downloads; clipboard-write" 
   ></iframe>
 
-  <!-- BARRA INFERIOR DE INSTALACIÓN -->
+  <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -366,6 +226,7 @@
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
       <h3 class="modal-title">Guardar Tarjeta</h3>
+      
       <div class="modal-instruction">
         En tu navegador, toca los tres puntos <b style="letter-spacing:1px;">•••</b>, elige <b>Compartir</b> 
         <span class="icon-inline">
@@ -377,44 +238,8 @@
         </span>, 
         baja y busca <b>"Agregar a inicio"</b>.
       </div>
-      <button class="modal-btn-ok" onclick="cerrarGuiaIos()">¡Entendido!</button>
-    </div>
-  </div>
-
-  <!-- MODAL CLAVE MAESTRA PANEL -->
-  <div id="modalClavePanel">
-    <div class="card-clave">
-      <h3 style="margin:0 0 12px 0; font-size:16px; color:#1E2743; font-weight:800;">PANEL PROMOS</h3>
-      <input type="password" id="inputClaveAdminPanel" placeholder="Clave Maestra" maxlength="10" class="input-clave-admin">
-      <div style="display:flex; gap:8px;">
-        <button onclick="cerrarModalClaveAdmin()" class="btn-cerrar-panel" style="margin:0; flex:1;">Atrás</button>
-        <button onclick="verificarClaveAdminPanel()" class="btn-lanzar-push" style="margin:0; flex:1;">Entrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL PANEL DE NOTIFICACIONES Y PROMOS -->
-  <div id="modalPanelPromos">
-    <div class="card-panel-promos">
-      <h3 style="margin:0 0 12px 0; font-size:17px; color:#1E2743; font-weight:800; text-align:center;">LANZAR PROMOCIÓN</h3>
       
-      <label class="label-panel">REST API KEY (ONESIGNAL):</label>
-      <input type="password" id="inputApiKeyOneSignal" placeholder="Pegar clave REST API" class="input-panel">
-
-      <label class="label-panel">TÍTULO DE LA NOTIFICACIÓN:</label>
-      <input type="text" id="inputPromoTitulo" placeholder="Ej. ¡Hoy 2do Shawarma al 50%! 🌯" class="input-panel">
-
-      <label class="label-panel">MENSAJE / CONDICIÓN:</label>
-      <textarea id="inputPromoMensaje" rows="2" placeholder="Válido en salón mostrando tarjeta o en comunidad" class="input-panel" style="resize:none;"></textarea>
-
-      <label class="label-panel">VIGENCIA DEL BANNER (HORAS):</label>
-      <input type="number" id="inputPromoHoras" value="12" placeholder="Horas activa" class="input-panel">
-
-      <label class="label-panel">LINK DE DESTINO (WHATSAPP):</label>
-      <input type="text" id="inputPromoLinkWa" value="https://chat.whatsapp.com/DRwYS1PtD4BA8A6Ygvmhnl?s=cl&p=a&mlu=4&ilr=4" class="input-panel">
-
-      <button onclick="lanzarPromoYNotificacion()" class="btn-lanzar-push">📢 Publicar y Notificar</button>
-      <button onclick="cerrarPanelPromos()" class="btn-cerrar-panel">Cerrar</button>
+      <button class="modal-btn-ok" onclick="cerrarGuiaIos()">¡Entendido!</button>
     </div>
   </div>
 
@@ -440,253 +265,81 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // OCULTAR SPLASH ÚNICAMENTE CUANDO EL CONTENIDO CARGA
-    var splashOcultado = false;
-    function ocultarSplashSeguro() {
-      if (splashOcultado) return;
-      splashOcultado = true;
+    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
+    var tiempoSplash = esApple ? 2800 : 1400;
+
+    setTimeout(function() {
       var splash = document.getElementById("splashScreen");
       if (splash) {
         splash.style.opacity = "0";
-        setTimeout(function() { splash.style.display = "none"; }, 400);
-      }
-      // Mostrar la barra de promociones 1 segundo después de que la tarjeta ya cargó
-      mostrarBarraPushSiAplica();
-    }
-
-    // Si la conexión tarda demasiado, el splash se retira tras 6 segundos por seguridad
-    setTimeout(ocultarSplashSeguro, 6000);
-
-    // DETERMINAR SI ES APLICACIÓN INSTALADA (STANDALONE)
-    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-    function mostrarBarraPushSiAplica() {
-      if (esPWA) {
         setTimeout(function() {
-          if ("Notification" in window && Notification.permission === "default") {
-            var rechazoPrevio = sessionStorage.getItem("push_descartado_sesion");
-            if (!rechazoPrevio) {
-              document.getElementById("pwaBarPush").style.display = "flex";
-            }
-          }
-        }, 1000);
+          splash.style.display = "none";
+        }, 400);
       }
-    }
+    }, tiempoSplash);
 
-    function solicitarPermisoPush() {
-      if ("OneSignal" in window) {
-        OneSignalDeferred.push(async function(OneSignal) {
-          await OneSignal.Notifications.requestPermission();
-          cerrarBarPush();
-        });
-      } else {
-        Notification.requestPermission().then(function() {
-          cerrarBarPush();
-        });
-      }
-    }
-
-    function cerrarBarPush() {
-      document.getElementById("pwaBarPush").style.display = "none";
-      try { sessionStorage.setItem("push_descartado_sesion", "1"); } catch(e) {}
-    }
-
-    // GESTIÓN DEL BANNER IN-APP CON DESLIZADO HACIA ARRIBA (SWIPE UP)
-    function verificarBannerPromoActivo() {
-      try {
-        var promoGuardada = localStorage.getItem("sp_promo_activa_banner");
-        var cerradaSesion = sessionStorage.getItem("sp_banner_cerrado_sesion");
-        if (promoGuardada && !cerradaSesion) {
-          var obj = JSON.parse(promoGuardada);
-          if (obj && obj.expira && Date.now() < obj.expira) {
-            document.getElementById("txtBannerTit").textContent = obj.tit;
-            document.getElementById("txtBannerDesc").textContent = obj.desc;
-            document.getElementById("btnBannerWa").href = obj.link || "https://chat.whatsapp.com/DRwYS1PtD4BA8A6Ygvmhnl?s=cl&p=a&mlu=4&ilr=4";
-            document.getElementById("bannerPromoActiva").style.display = "flex";
-          }
-        }
-      } catch(e) {}
-    }
-    verificarBannerPromoActivo();
-
-    function cerrarBannerPromo() {
-      var b = document.getElementById("bannerPromoActiva");
-      if (b) {
-        b.style.transform = "translate(-50%, -60px)";
-        b.style.opacity = "0";
-        setTimeout(function() { b.style.display = "none"; }, 250);
-        try { sessionStorage.setItem("sp_banner_cerrado_sesion", "1"); } catch(e) {}
-      }
-    }
-
-    // GESTO SWIPE UP EN EL BANNER
-    (function() {
-      var banner = document.getElementById("bannerPromoActiva");
-      var startY = 0;
-      banner.addEventListener("touchstart", function(e) {
-        startY = e.touches[0].clientY;
-      }, { passive: true });
-      banner.addEventListener("touchmove", function(e) {
-        var diffY = e.touches[0].clientY - startY;
-        if (diffY < -20) { cerrarBannerPromo(); }
-      }, { passive: true });
-    })();
-
-    // ENTRADA AL PANEL SECRETO: MANTENER PRESIONADO 3 SEGUNDOS LA ESQUINA SUPERIOR
-    var timerSecreto = null;
-    var zonaSecreta = document.getElementById("zonaAdminSecreta");
-    zonaSecreta.addEventListener("touchstart", function(e) {
-      timerSecreto = setTimeout(function() {
-        abrirAccesoPanelAdmin();
-      }, 3000);
-    });
-    zonaSecreta.addEventListener("touchend", function(e) {
-      if (timerSecreto) clearTimeout(timerSecreto);
-    });
-    zonaSecreta.addEventListener("mousedown", function(e) {
-      timerSecreto = setTimeout(function() {
-        abrirAccesoPanelAdmin();
-      }, 3000);
-    });
-    zonaSecreta.addEventListener("mouseup", function(e) {
-      if (timerSecreto) clearTimeout(timerSecreto);
-    });
-
-    function abrirAccesoPanelAdmin() {
-      try {
-        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
-        var textoDoc = iframeDoc ? iframeDoc.body.innerText : "";
-        var queryCompleta = (window.location.search || "") + (localStorage.getItem("panarabe_final_query") || "");
-        
-        if (textoDoc.indexOf("906769744") === -1 && queryCompleta.indexOf("906769744") === -1 && queryCompleta.indexOf("9744") === -1) {
-          return;
-        }
-      } catch(e) {}
-
-      document.getElementById("modalClavePanel").style.display = "flex";
-      setTimeout(function() {
-        document.getElementById("inputClaveAdminPanel").focus();
-      }, 200);
-    }
-
-    function cerrarModalClaveAdmin() {
-      document.getElementById("modalClavePanel").style.display = "none";
-      document.getElementById("inputClaveAdminPanel").value = "";
-    }
-
-    function verificarClaveAdminPanel() {
-      var pass = document.getElementById("inputClaveAdminPanel").value.trim();
-      var passAlmacenada = localStorage.getItem("admin_master_pwd") || "1234";
-      if (!pass) return alert("Ingresa tu clave");
-
-      cerrarModalClaveAdmin();
-      document.getElementById("modalPanelPromos").style.display = "flex";
-
-      var keyGuardada = localStorage.getItem("onesignal_rest_key");
-      if (keyGuardada) document.getElementById("inputApiKeyOneSignal").value = keyGuardada;
-    }
-
-    function cerrarPanelPromos() {
-      document.getElementById("modalPanelPromos").style.display = "none";
-    }
-
-    // LANZAR NOTIFICACIÓN PUSH Y PUBLICAR EN BANNER
-    async function lanzarPromoYNotificacion() {
-      var apiKey = document.getElementById("inputApiKeyOneSignal").value.trim();
-      var tit = document.getElementById("inputPromoTitulo").value.trim();
-      var msg = document.getElementById("inputPromoMensaje").value.trim();
-      var horas = parseFloat(document.getElementById("inputPromoHoras").value || 12);
-      var linkWa = document.getElementById("inputPromoLinkWa").value.trim();
-
-      if (!tit || !msg) return alert("Completa el título y el mensaje");
-      if (apiKey) localStorage.setItem("onesignal_rest_key", apiKey);
-
-      var expiraMs = Date.now() + (horas * 3600 * 1000);
-      localStorage.setItem("sp_promo_activa_banner", JSON.stringify({
-        tit: tit,
-        desc: msg,
-        link: linkWa,
-        expira: expiraMs
-      }));
-      sessionStorage.removeItem("sp_banner_cerrado_sesion");
-      verificarBannerPromoActivo();
-
-      if (apiKey) {
-        try {
-          var payload = {
-            app_id: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
-            included_segments: ["Total Subscriptions"],
-            headings: { "es": tit, "en": tit },
-            contents: { "es": msg, "en": msg },
-            url: linkWa,
-            chrome_web_icon: "https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91"
-          };
-
-          var resp = await fetch("https://onesignal.com/api/v1/notifications", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=utf-8",
-              "Authorization": "Basic " + apiKey
-            },
-            body: JSON.stringify(payload)
-          });
-
-          var resJson = await resp.json();
-          if (resJson && resJson.id) {
-            alert("✅ ¡Notificación enviada a todos los clientes y banner publicado!");
-          } else {
-            alert("⚠️ Banner publicado, pero verifica tu REST API Key de OneSignal.");
-          }
-        } catch(err) {
-          alert("Banner publicado localmente. Error de conexión con OneSignal.");
-        }
-      } else {
-        alert("✅ Banner publicado en la app. (Para enviar notificación al celular, agrega la REST API Key de OneSignal).");
-      }
-
-      cerrarPanelPromos();
-    }
-
-    // BOTÓN WHATSAPP ARRASTRABLE CON IMÁN A LOS LATERALES
+    // LÓGICA DE ARRASTRE CON IMÁN A LOS LATERALES
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
 
-      var isDragging = false, hasMoved = false, startX, startY, initialLeft, initialTop;
+      var isDragging = false;
+      var hasMoved = false;
+      var startX, startY;
+      var initialLeft, initialTop;
 
       function startDrag(e) {
         var touch = e.touches ? e.touches[0] : e;
-        isDragging = true; hasMoved = false;
-        startX = touch.clientX; startY = touch.clientY;
+        isDragging = true;
+        hasMoved = false;
+        startX = touch.clientX;
+        startY = touch.clientY;
+
         var rect = btn.getBoundingClientRect();
-        initialLeft = rect.left; initialTop = rect.top;
-        btn.style.left = initialLeft + 'px'; btn.style.top = initialTop + 'px';
-        btn.style.margin = '0'; btn.style.transition = 'none';
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        btn.style.left = initialLeft + 'px';
+        btn.style.top = initialTop + 'px';
+        btn.style.margin = '0';
+        btn.style.transition = 'none';
       }
 
       function onDrag(e) {
         if (!isDragging) return;
         var touch = e.touches ? e.touches[0] : e;
-        var deltaX = touch.clientX - startX, deltaY = touch.clientY - startY;
-        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) hasMoved = true;
-        var newLeft = initialLeft + deltaX, newTop = initialTop + deltaY;
+        var deltaX = touch.clientX - startX;
+        var deltaY = touch.clientY - startY;
+
+        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+          hasMoved = true;
+        }
+
+        var newLeft = initialLeft + deltaX;
+        var newTop = initialTop + deltaY;
+
         var maxLeft = window.innerWidth - btn.offsetWidth - 12;
         var maxTop = window.innerHeight - btn.offsetHeight - 80;
+
         newLeft = Math.max(12, Math.min(newLeft, maxLeft));
         newTop = Math.max(70, Math.min(newTop, maxTop));
-        btn.style.left = newLeft + 'px'; btn.style.top = newTop + 'px';
+
+        btn.style.left = newLeft + 'px';
+        btn.style.top = newTop + 'px';
       }
 
       function stopDrag() {
         if (!isDragging) return;
         isDragging = false;
+
         if (!hasMoved) {
           window.location.href = 'whatsapp://send?phone=51906769744';
         } else {
           btn.style.transition = 'left 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
-          var centro = window.innerWidth / 2;
+          var centroPantalla = window.innerWidth / 2;
           var rect = btn.getBoundingClientRect();
-          if ((rect.left + rect.width / 2) < centro) {
+
+          if ((rect.left + rect.width / 2) < centroPantalla) {
             btn.style.left = '12px';
           } else {
             btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px';
@@ -697,26 +350,27 @@
       btn.addEventListener('touchstart', startDrag, { passive: false });
       window.addEventListener('touchmove', onDrag, { passive: false });
       window.addEventListener('touchend', stopDrag);
+
       btn.addEventListener('mousedown', startDrag);
       window.addEventListener('mousemove', onDrag);
       window.addEventListener('mouseup', stopDrag);
     })();
 
     frame.onload = function() {
-      // Retira el Splash inmediatamente cuando el iframe responde con la tarjeta
-      ocultarSplashSeguro();
-
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
         var btnIngresar = iframeDoc.getElementById('btnBuscar');
+        
         if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
           var matchPin = query.match(/pin=([^&]+)/i);
           if (matchPin && matchPin[1]) {
             var pinVal = decodeURIComponent(matchPin[1]);
             pinInput.value = pinVal;
             pinInput.dispatchEvent(new Event('input', { bubbles: true }));
-            setTimeout(function() { btnIngresar.click(); }, 150);
+            setTimeout(function() {
+              btnIngresar.click();
+            }, 150);
           }
         }
       } catch(err) {}
@@ -728,11 +382,17 @@
       });
     }
 
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
     if (!esPWA) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
+
       if (esApple) {
-        setTimeout(function() { barra.style.display = 'flex'; }, 1200);
+        setTimeout(function() {
+          barra.style.display = 'flex';
+        }, 1200);
+
         btnInstalar.onclick = function() {
           document.getElementById('iosGuideModal').style.display = 'flex';
         };
@@ -742,11 +402,14 @@
           e.preventDefault();
           promptDiferido = e;
           barra.style.display = 'flex';
+
           btnInstalar.onclick = function() {
             if (promptDiferido) {
               promptDiferido.prompt();
               promptDiferido.userChoice.then(function(choice) {
-                if (choice.outcome === 'accepted') { barra.style.display = 'none'; }
+                if (choice.outcome === 'accepted') {
+                  barra.style.display = 'none';
+                }
                 promptDiferido = null;
               });
             }
@@ -755,15 +418,18 @@
       }
     }
 
-    function cerrarBarra() { document.getElementById('pwaBarBottom').style.display = 'none'; }
+    function cerrarBarra() {
+      document.getElementById('pwaBarBottom').style.display = 'none';
+    }
+
     function cerrarGuiaIos() {
       document.getElementById('iosGuideModal').style.display = 'none';
       document.getElementById('pwaBarBottom').style.display = 'none';
     }
+
     window.addEventListener('appinstalled', function() {
       document.getElementById('pwaBarBottom').style.display = 'none';
     });
   </script>
 </body>
 </html>
-
