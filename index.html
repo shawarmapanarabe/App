@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SP!</title>
   
-  <meta name="theme-color" content="#1E2743">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SP!">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
@@ -29,35 +29,24 @@
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
-      overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
+      overscroll-behavior: none; -webkit-overscroll-behavior: none;
+      touch-action: none; /* Bloquea el rebote elástico táctil de Safari */
+      position: fixed;
     }
 
-    /* IFRAME AJUSTADO A ÁREAS SEGURAS (ISLA DINÁMICA Y BASE) */
+    /* IFRAME 100% FIJO PARA EVITAR QUE SE OCULTE EL BOTÓN DE WHATSAPP */
     iframe { 
       position: fixed; 
-      top: env(safe-area-inset-top, 0px); 
+      top: 0; 
       left: 0; 
       width: 100%; 
-      height: calc(100% - env(safe-area-inset-top, 0px)); 
+      height: 100%; 
       border: 0; 
       display: block; 
       background-color: #FFFFFF; 
     }
 
-    /* BARRA SUPERIOR DE ENLACE VISUAL Y DIFUMINADO */
-    #topSafeAreaOverlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: calc(env(safe-area-inset-top, 0px) + 20px);
-      background: linear-gradient(to bottom, #1E2743 0%, rgba(30, 39, 67, 0.75) 45%, rgba(30, 39, 67, 0) 100%);
-      pointer-events: none;
-      z-index: 99990;
-    }
-
-    /* PANTALLA SPLASH */
+    /* PANTALLA SPLASH LIMPIA (FONDO BLANCO PURO) */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -116,7 +105,7 @@
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
-    /* MODAL DE GUÍA IOS */
+    /* MODAL GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -158,10 +147,6 @@
 </head>
 <body>
 
-  <!-- DIFUMINADO CONTINUO SUPERIOR PARA IPHONE / ISLA DINÁMICA -->
-  <div id="topSafeAreaOverlay"></div>
-
-  <!-- PANTALLA SPLASH -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -173,7 +158,6 @@
     allow="downloads; clipboard-write" 
   ></iframe>
 
-  <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -188,7 +172,6 @@
     </div>
   </div>
 
-  <!-- GUÍA DE GUARDADO RÁPIDO PUNTUAL -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
@@ -211,11 +194,17 @@
   </div>
 
   <script>
+    // PREVENIR REBOTE Y MOVIMIENTO EN IOS
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
     var tieneCredenciales = false;
 
-    // DETECCIÓN Y PERSISTENCIA DE CREDENCIALES
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -238,13 +227,6 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // ACTIVACIÓN DE LA SOMBRA CONTINUA EN IPHONE
-    if (esApple) {
-      var topOverlay = document.getElementById("topSafeAreaOverlay");
-      if (topOverlay) topOverlay.style.display = "block";
-    }
-
-    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
     var tiempoSplash = esApple ? 2800 : 1400;
 
     setTimeout(function() {
@@ -261,16 +243,15 @@
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
-        var btnIngresar = iframeDoc.getElementById('btnBuscar');
+        var btnBuscar = iframeDoc.getElementById('btnBuscar');
         
-        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
+        if (pinInput && btnBuscar && query && query.indexOf('pin=') !== -1) {
           var matchPin = query.match(/pin=([^&]+)/i);
           if (matchPin && matchPin[1]) {
-            var pinVal = decodeURIComponent(matchPin[1]);
-            pinInput.value = pinVal;
+            pinInput.value = decodeURIComponent(matchPin[1]);
             pinInput.dispatchEvent(new Event('input', { bubbles: true }));
             setTimeout(function() {
-              btnIngresar.click();
+              btnBuscar.click();
             }, 150);
           }
         }
@@ -283,7 +264,6 @@
       });
     }
 
-    // EL BOTÓN DE INSTALAR SOLO APARECE SI HAY CREDENCIALES CARGADAS
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (!esPWA && tieneCredenciales) {
@@ -335,3 +315,4 @@
   </script>
 </body>
 </html>
+
