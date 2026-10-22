@@ -59,11 +59,11 @@
       display: block;
     }
 
-    /* BOTÓN WHATSAPP: BAJA EN ANDROID PARA CENTRAR EN FRANJA BLANCA (OCULTO EN WEB POR DEFECTO) */
+    /* BOTÓN WHATSAPP: CALIBRADO AL CENTRO EXACTO EN ANDROID */
     #btnWaFlotante {
       display: none;
       position: fixed;
-      top: clamp(290px, 80vw, 345px);
+      top: clamp(282px, 78vw, 335px);
       left: calc(50% + min(50vw, 215px) - 58px);
       z-index: 99990;
       width: 46px;
@@ -77,7 +77,7 @@
       text-decoration: none;
     }
 
-    /* COMPENSACIÓN DEL BOTÓN SOLO EN APP INSTALADA EN IPHONE (MANTIENE ALTURA ORIGINAL) */
+    /* IPHONE INSTALADO: MANTIENE SU POSICIÓN INTACTA */
     body.is-apple-installed #btnWaFlotante {
       top: calc(clamp(275px, 76vw, 325px) + env(safe-area-inset-top, 0px));
     }
@@ -217,7 +217,7 @@
   <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA EN IPHONE -->
   <div id="iosTopBar"></div>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP -->
+  <!-- BOTÓN FLOTANTE WHATSAPP (SOLO EN APP INSTALADA) -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -483,4 +483,3 @@
   </script>
 </body>
 </html>
-
