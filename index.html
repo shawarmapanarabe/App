@@ -36,7 +36,7 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* CONTENEDOR ARRASTRABLE */
+    /* CONTENEDOR WHATSAPP ARRASTRABLE */
     #btnWaFlotante {
       position: fixed;
       top: clamp(200px, 57vw, 242px);
@@ -55,7 +55,7 @@
       cursor: grabbing;
     }
 
-    /* BURBUJA VERDE CON ANIMACIÓN INDEPENDIENTE (PALPITA SIEMPRE) */
+    /* BURBUJA VERDE PALPITANTE PERMANENTE */
     .burbuja-wa-inner {
       width: 100%;
       height: 100%;
@@ -184,7 +184,7 @@
 </head>
 <body>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP ARRASTRABLE CON PALPITACIÓN AISLADA -->
+  <!-- BOTÓN FLOTANTE WHATSAPP IMANTADO A LOS BORDES -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 24 24">
@@ -262,7 +262,7 @@
     }
 
     var frame = document.getElementById("appFrame");
-    frame.src = urlBase + (query ? (query + "&iframe_mode=1") : "?iframe_mode=1");
+    frame.src = urlBase + (query ? query : "");
 
     // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
     var tiempoSplash = esApple ? 2800 : 1400;
@@ -277,7 +277,7 @@
       }
     }, tiempoSplash);
 
-    // LÓGICA DE ARRASTRE SIN ANULAR LA PALPITACIÓN
+    // LÓGICA DE ARRASTRE CON IMÁN A LOS LATERALES
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -301,6 +301,7 @@
         btn.style.left = initialLeft + 'px';
         btn.style.top = initialTop + 'px';
         btn.style.margin = '0';
+        btn.style.transition = 'none'; // Quitar transición durante el arrastre
       }
 
       function onDrag(e) {
@@ -316,11 +317,12 @@
         var newLeft = initialLeft + deltaX;
         var newTop = initialTop + deltaY;
 
-        var maxLeft = window.innerWidth - btn.offsetWidth - 10;
-        var maxTop = window.innerHeight - btn.offsetHeight - 10;
+        // Limitar dentro de la pantalla
+        var maxLeft = window.innerWidth - btn.offsetWidth - 12;
+        var maxTop = window.innerHeight - btn.offsetHeight - 80; // No tapar barra inferior
 
-        newLeft = Math.max(10, Math.min(newLeft, maxLeft));
-        newTop = Math.max(10, Math.min(newTop, maxTop));
+        newLeft = Math.max(12, Math.min(newLeft, maxLeft));
+        newTop = Math.max(70, Math.min(newTop, maxTop)); // No tapar barra superior
 
         btn.style.left = newLeft + 'px';
         btn.style.top = newTop + 'px';
@@ -330,9 +332,20 @@
         if (!isDragging) return;
         isDragging = false;
 
-        // Si solo se tocó sin deslizar, abre la app de WhatsApp
         if (!hasMoved) {
+          // Clic limpio: abrir WhatsApp nativo
           window.location.href = 'whatsapp://send?phone=51906769744';
+        } else {
+          // EFECTO IMÁN: pegar al lateral más cercano
+          btn.style.transition = 'left 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
+          var centroPantalla = window.innerWidth / 2;
+          var rect = btn.getBoundingClientRect();
+
+          if ((rect.left + rect.width / 2) < centroPantalla) {
+            btn.style.left = '12px'; // Imantado a la izquierda
+          } else {
+            btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px'; // Imantado a la derecha
+          }
         }
       }
 
