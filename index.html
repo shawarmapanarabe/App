@@ -29,73 +29,35 @@
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
-      overscroll-behavior: none; -webkit-overscroll-behavior: none;
-      touch-action: none;
+      overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
+
+    /* IFRAME AJUSTADO A ÁREAS SEGURAS (ISLA DINÁMICA Y BASE) */
     iframe { 
       position: fixed; 
-      top: 0; 
+      top: env(safe-area-inset-top, 0px); 
       left: 0; 
       width: 100%; 
-      height: 100%; 
+      height: calc(100% - env(safe-area-inset-top, 0px)); 
       border: 0; 
       display: block; 
-      background-color: #FFFFFF;
-      overscroll-behavior: none;
-      -webkit-overscroll-behavior: none;
+      background-color: #FFFFFF; 
     }
 
-    /* CONTENEDOR WHATSAPP ARRASTRABLE CON ALTURA ESTABLE */
-    #btnWaFlotante {
+    /* BARRA SUPERIOR DE ENLACE VISUAL Y DIFUMINADO */
+    #topSafeAreaOverlay {
+      display: none;
       position: fixed;
-      top: clamp(235px, 32vh, 275px);
-      left: calc(50% + min(50vw, 215px) - 58px);
-      z-index: 99990;
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
-      cursor: grab;
-      -webkit-tap-highlight-color: transparent;
-      text-decoration: none;
-    }
-    #btnWaFlotante:active {
-      cursor: grabbing;
-    }
-
-    /* BURBUJA CIRCULAR CON ICONO OFICIAL DE WHATSAPP */
-    .burbuja-wa-inner {
+      top: 0;
+      left: 0;
       width: 100%;
-      height: 100%;
-      background: #25D366;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45);
-      border: 2px solid #ffffff;
-      animation: palpitarWa 1.5s ease-in-out infinite alternate;
+      height: calc(env(safe-area-inset-top, 0px) + 20px);
+      background: linear-gradient(to bottom, #1E2743 0%, rgba(30, 39, 67, 0.75) 45%, rgba(30, 39, 67, 0) 100%);
       pointer-events: none;
-    }
-    .burbuja-wa-inner svg {
-      width: 26px;
-      height: 26px;
-      fill: #ffffff;
-    }
-    @keyframes palpitarWa {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-      }
-      100% {
-        transform: scale(1.1);
-        box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7);
-      }
+      z-index: 99990;
     }
 
-    /* PANTALLA DE CARGA (SPLASH) */
+    /* PANTALLA SPLASH */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -124,7 +86,9 @@
 
     /* BARRA INFERIOR */
     #pwaBarBottom {
-      display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      display: none; position: fixed; 
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); 
+      left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
       padding: 10px 14px; border-radius: 16px; box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
       z-index: 99998; align-items: center; justify-content: space-between;
@@ -194,14 +158,8 @@
 </head>
 <body>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP CIRCULAR LIMPIO CON ICONO OFICIAL -->
-  <div id="btnWaFlotante" aria-label="WhatsApp">
-    <div class="burbuja-wa-inner">
-      <svg viewBox="0 0 32 32">
-        <path d="M16 2C8.268 2 2 8.268 2 16c0 2.766.804 5.344 2.188 7.514L2.05 30.086l6.762-2.072A13.918 13.918 0 0 0 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.6c-2.316 0-4.484-.666-6.318-1.814l-.452-.284-4.228 1.296 1.306-4.134-.294-.468A11.535 11.535 0 0 1 4.4 16c0-6.408 5.192-11.6 11.6-11.6s11.6 5.192 11.6 11.6-5.192 11.6-11.6 11.6zm6.368-8.718c-.348-.174-2.062-1.018-2.382-1.134-.32-.116-.552-.174-.784.174s-.9 1.134-1.104 1.366-.406.262-.754.088c-.348-.174-1.47-.542-2.8-1.728-1.036-.924-1.736-2.064-1.94-2.412-.204-.348-.022-.536.152-.71.156-.156.348-.406.522-.61.174-.204.232-.348.348-.58.116-.232.058-.436-.03-.61-.088-.174-.784-1.89-1.074-2.588-.282-.68-.57-.588-.784-.6l-.668-.012c-.232 0-.61.088-.93.436s-1.22 1.192-1.22 2.908 1.25 3.372 1.424 3.604c.174.232 2.458 3.754 5.956 5.262.832.36 1.482.574 1.988.736.836.266 1.596.228 2.198.138.67-.1 2.062-.842 2.352-1.656.29-.814.29-1.512.204-1.656-.088-.146-.32-.232-.668-.406z"/>
-      </svg>
-    </div>
-  </div>
+  <!-- DIFUMINADO CONTINUO SUPERIOR PARA IPHONE / ISLA DINÁMICA -->
+  <div id="topSafeAreaOverlay"></div>
 
   <!-- PANTALLA SPLASH -->
   <div id="splashScreen">
@@ -255,11 +213,14 @@
   <script>
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
+    var tieneCredenciales = false;
 
+    // DETECCIÓN Y PERSISTENCIA DE CREDENCIALES
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
+      tieneCredenciales = true;
       try { 
         localStorage.setItem('panarabe_final_query', query); 
         sessionStorage.setItem('panarabe_session_query', query);
@@ -267,18 +228,26 @@
     } else {
       try {
         var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
-        if (guardado) query = guardado;
+        if (guardado) {
+          query = guardado;
+          tieneCredenciales = true;
+        }
       } catch(e) {}
     }
 
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // OCULTAR SPLASH ÚNICAMENTE CUANDO EL IFRAME HAYA CARGADO
-    var splashOcultado = false;
-    function ocultarSplashSeguro() {
-      if (splashOcultado) return;
-      splashOcultado = true;
+    // ACTIVACIÓN DE LA SOMBRA CONTINUA EN IPHONE
+    if (esApple) {
+      var topOverlay = document.getElementById("topSafeAreaOverlay");
+      if (topOverlay) topOverlay.style.display = "block";
+    }
+
+    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
+    var tiempoSplash = esApple ? 2800 : 1400;
+
+    setTimeout(function() {
       var splash = document.getElementById("splashScreen");
       if (splash) {
         splash.style.opacity = "0";
@@ -286,93 +255,9 @@
           splash.style.display = "none";
         }, 400);
       }
-    }
-
-    // Tiempo límite de seguridad (máximo 7s si la conexión está muy lenta)
-    setTimeout(ocultarSplashSeguro, 7000);
-
-    // LÓGICA DE ARRASTRE CON IMÁN A LOS LATERALES
-    (function() {
-      var btn = document.getElementById('btnWaFlotante');
-      if (!btn) return;
-
-      var isDragging = false;
-      var hasMoved = false;
-      var startX, startY;
-      var initialLeft, initialTop;
-
-      function startDrag(e) {
-        var touch = e.touches ? e.touches[0] : e;
-        isDragging = true;
-        hasMoved = false;
-        startX = touch.clientX;
-        startY = touch.clientY;
-
-        var rect = btn.getBoundingClientRect();
-        initialLeft = rect.left;
-        initialTop = rect.top;
-
-        btn.style.left = initialLeft + 'px';
-        btn.style.top = initialTop + 'px';
-        btn.style.margin = '0';
-        btn.style.transition = 'none';
-      }
-
-      function onDrag(e) {
-        if (!isDragging) return;
-        var touch = e.touches ? e.touches[0] : e;
-        var deltaX = touch.clientX - startX;
-        var deltaY = touch.clientY - startY;
-
-        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-          hasMoved = true;
-        }
-
-        var newLeft = initialLeft + deltaX;
-        var newTop = initialTop + deltaY;
-
-        var maxLeft = window.innerWidth - btn.offsetWidth - 12;
-        var maxTop = window.innerHeight - btn.offsetHeight - 80;
-
-        newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        newTop = Math.max(70, Math.min(newTop, maxTop));
-
-        btn.style.left = newLeft + 'px';
-        btn.style.top = newTop + 'px';
-      }
-
-      function stopDrag() {
-        if (!isDragging) return;
-        isDragging = false;
-
-        if (!hasMoved) {
-          window.location.href = 'whatsapp://send?phone=51906769744';
-        } else {
-          btn.style.transition = 'left 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
-          var centroPantalla = window.innerWidth / 2;
-          var rect = btn.getBoundingClientRect();
-
-          if ((rect.left + rect.width / 2) < centroPantalla) {
-            btn.style.left = '12px';
-          } else {
-            btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px';
-          }
-        }
-      }
-
-      btn.addEventListener('touchstart', startDrag, { passive: false });
-      window.addEventListener('touchmove', onDrag, { passive: false });
-      window.addEventListener('touchend', stopDrag);
-
-      btn.addEventListener('mousedown', startDrag);
-      window.addEventListener('mousemove', onDrag);
-      window.addEventListener('mouseup', stopDrag);
-    })();
+    }, tiempoSplash);
 
     frame.onload = function() {
-      // Oculta el Splash de inmediato al terminar de pintar la tarjeta
-      ocultarSplashSeguro();
-
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
@@ -398,9 +283,10 @@
       });
     }
 
+    // EL BOTÓN DE INSTALAR SOLO APARECE SI HAY CREDENCIALES CARGADAS
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    if (!esPWA) {
+    if (!esPWA && tieneCredenciales) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
 
