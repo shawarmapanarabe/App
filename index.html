@@ -32,36 +32,19 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
-    /* IFRAME BASE */
+    /* IFRAME: EN WEB (SAFARI Y ANDROID) 100% LIMPIO SIN ESPACIO ARTIFICIAL */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* PWA INSTALADA EN ANDROID: SE LE DA LA FRANJA SUPERIOR Y SE EMPUJA HACIA ABAJO */
-    body.is-android-installed iframe {
-      top: 14px;
-      height: calc(100% - 14px);
-    }
-    #androidTopBar {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 14px;
-      background-color: #1E2743;
-      z-index: 99990;
-    }
-    body.is-android-installed #androidTopBar {
-      display: block;
-    }
-
-    /* PWA INSTALADA EN IPHONE */
+    /* SOLO CUANDO ESTÁ INSTALADA EN IPHONE BAJA POR LA ISLA */
     body.is-apple-installed iframe {
       top: env(safe-area-inset-top, 0px);
       height: calc(100% - env(safe-area-inset-top, 0px));
     }
+
+    /* FRANJA BLANCA SUPERIOR SOLO EN APP INSTALADA EN IPHONE */
     #iosTopBar {
       display: none;
       position: fixed;
@@ -76,10 +59,11 @@
       display: block;
     }
 
-    /* BOTÓN FLOTANTE WHATSAPP BASE (WEB NORMAL) */
+    /* BOTÓN WHATSAPP: OCULTO POR DEFECTO EN WEB */
     #btnWaFlotante {
+      display: none;
       position: fixed;
-      top: clamp(280px, 78vw, 335px);
+      top: clamp(275px, 76vw, 325px);
       left: calc(50% + min(50vw, 215px) - 58px);
       z-index: 99990;
       width: 46px;
@@ -93,14 +77,9 @@
       text-decoration: none;
     }
 
-    /* COMPENSACIÓN DEL BOTÓN DE WHATSAPP EN ANDROID INSTALADO (MÁS ABAJO Y CENTRADO) */
-    body.is-android-installed #btnWaFlotante {
-      top: calc(clamp(280px, 78vw, 335px) + 16px);
-    }
-
-    /* COMPENSACIÓN EN IPHONE INSTALADO */
+    /* COMPENSACIÓN DEL BOTÓN SOLO EN APP INSTALADA EN IPHONE */
     body.is-apple-installed #btnWaFlotante {
-      top: calc(clamp(280px, 78vw, 335px) + env(safe-area-inset-top, 0px));
+      top: calc(clamp(275px, 76vw, 325px) + env(safe-area-inset-top, 0px));
     }
 
     #btnWaFlotante:active {
@@ -235,9 +214,6 @@
 </head>
 <body>
 
-  <!-- FRANJA SUPERIOR SOLO EN APP INSTALADA EN ANDROID -->
-  <div id="androidTopBar"></div>
-
   <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA EN IPHONE -->
   <div id="iosTopBar"></div>
 
@@ -306,13 +282,14 @@
 
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // APLICAR CLASE ESPECÍFICA DE INSTALACIÓN SEGÚN SISTEMA
+    // EL BOTÓN DE WHATSAPP SOLO SE MUESTRA SI LA APP ESTÁ INSTALADA
     if (esPWA) {
-      if (esApple) {
-        document.body.classList.add('is-apple-installed');
-      } else {
-        document.body.classList.add('is-android-installed');
-      }
+      var btnWa = document.getElementById('btnWaFlotante');
+      if (btnWa) btnWa.style.display = 'flex';
+    }
+
+    if (esApple && esPWA) {
+      document.body.classList.add('is-apple-installed');
     }
 
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
@@ -416,10 +393,7 @@
         var maxTop = window.innerHeight - btn.offsetHeight - 80;
 
         newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        var minTop = 70;
-        if (esPWA) {
-          minTop = esApple ? 80 : 84;
-        }
+        var minTop = (esApple && esPWA) ? 80 : 70;
         newTop = Math.max(minTop, Math.min(newTop, maxTop));
 
         btn.style.left = newLeft + 'px';
