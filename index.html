@@ -39,7 +39,6 @@
     /* BOTÓN WHATSAPP FIJO, CALIBRADO A LA CURVA Y PALPITANTE */
     #btnWaFlotante {
       position: fixed;
-      /* Nivelado exactamente donde la curva blanca corta la foto */
       top: clamp(200px, 57vw, 242px);
       left: 50%;
       margin-left: calc(min(50vw, 215px) - 58px);
@@ -56,7 +55,7 @@
       text-decoration: none;
       -webkit-tap-highlight-color: transparent;
       animation: palpitarWa 1.5s ease-in-out infinite alternate;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.2s ease;
       cursor: pointer;
     }
     #btnWaFlotante:active {
@@ -267,6 +266,34 @@
         }, 400);
       }
     }, tiempoSplash);
+
+    // MONITOR AUTOMÁTICO: OCULTA EL BOTÓN WHATSAPP SI SE ABRE UN MODAL DENTRO DEL IFRAME
+    setInterval(function() {
+      try {
+        var btnWa = document.getElementById('btnWaFlotante');
+        if (!btnWa) return;
+
+        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        if (!iframeDoc) return;
+
+        // Comprueba si el modal QR o el carrusel de Beneficios están visibles
+        var mQR = iframeDoc.getElementById('modalQR');
+        var mTour = iframeDoc.getElementById('modalTour');
+        var mPass = iframeDoc.getElementById('modalPassPromo');
+        var mGrupos = iframeDoc.getElementById('modalPanelGrupos');
+
+        var qrAbierto = mQR && (mQR.style.display === 'flex' || mQR.style.display === 'block');
+        var tourAbierto = mTour && (mTour.style.display === 'flex' || mTour.style.display === 'block');
+        var passAbierto = mPass && (mPass.style.display === 'flex' || mPass.style.display === 'block');
+        var gruposAbierto = mGrupos && (mGrupos.style.display === 'flex' || mGrupos.style.display === 'block');
+
+        if (qrAbierto || tourAbierto || passAbierto || gruposAbierto) {
+          btnWa.style.display = 'none';
+        } else {
+          btnWa.style.display = 'flex';
+        }
+      } catch(e) {}
+    }, 200);
 
     frame.onload = function() {
       try {
