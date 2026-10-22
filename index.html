@@ -59,11 +59,11 @@
       display: block;
     }
 
-    /* BOTÓN WHATSAPP: OCULTO POR DEFECTO EN WEB */
+    /* BOTÓN WHATSAPP: BAJA EN ANDROID PARA CENTRAR EN FRANJA BLANCA (OCULTO EN WEB POR DEFECTO) */
     #btnWaFlotante {
       display: none;
       position: fixed;
-      top: clamp(275px, 76vw, 325px);
+      top: clamp(290px, 80vw, 345px);
       left: calc(50% + min(50vw, 215px) - 58px);
       z-index: 99990;
       width: 46px;
@@ -77,7 +77,7 @@
       text-decoration: none;
     }
 
-    /* COMPENSACIÓN DEL BOTÓN SOLO EN APP INSTALADA EN IPHONE */
+    /* COMPENSACIÓN DEL BOTÓN SOLO EN APP INSTALADA EN IPHONE (MANTIENE ALTURA ORIGINAL) */
     body.is-apple-installed #btnWaFlotante {
       top: calc(clamp(275px, 76vw, 325px) + env(safe-area-inset-top, 0px));
     }
@@ -483,3 +483,4 @@
   </script>
 </body>
 </html>
+
