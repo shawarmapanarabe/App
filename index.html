@@ -64,7 +64,7 @@
       z-index: 99997; background: transparent; -webkit-tap-highlight-color: transparent;
     }
 
-    /* BARRA INFERIOR PARA ACTIVAR NOTIFICACIONES PUSH */
+    /* BARRA INFERIOR DE PROMOCIONES */
     #pwaBarPush {
       display: none; 
       position: fixed; 
@@ -90,7 +90,7 @@
     }
     .bar-push-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .bar-push-icon { font-size: 19px; line-height: 1; }
-    .bar-push-text { font-size: 12.5px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; }
+    .bar-push-text { font-size: 12.5px; font-weight: 800; color: #ffffff; margin: 0; line-height: 1.2; letter-spacing: 0.3px; }
     .bar-push-sub { font-size: 10.5px; color: #F2B647; margin: 0; font-weight: 500; }
     .bar-push-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .btn-push-activar {
@@ -139,7 +139,7 @@
     }
     .btn-banner-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 2px 4px; line-height: 1; }
 
-    /* BOTÓN FLOTANTE WHATSAPP ARRASTRABLE LIMPIO */
+    /* BOTÓN FLOTANTE WHATSAPP ARRASTRABLE */
     #btnWaFlotante {
       position: fixed;
       top: clamp(265px, 73vw, 315px);
@@ -299,13 +299,13 @@
   <!-- ZONA INVISIBLE DE ENTRADA AL PANEL (MANTENER PRESIONADO 3 SEGUNDOS) -->
   <div id="zonaAdminSecreta"></div>
 
-  <!-- BARRA INFERIOR PARA ACTIVAR PUSH (SOLO PWA INSTALADA) -->
+  <!-- BARRA INFERIOR DE PROMOCIONES (SOLO PWA INSTALADA) -->
   <div id="pwaBarPush">
     <div class="bar-push-left">
       <span class="bar-push-icon">🔔</span>
       <div>
-        <p class="bar-push-text">Alertas de Saldo</p>
-        <p class="bar-push-sub">Entérate de promos y vigencia</p>
+        <p class="bar-push-text">PROMOCIONES</p>
+        <p class="bar-push-sub">No te las pierdas</p>
       </div>
     </div>
     <div class="bar-push-right">
@@ -440,32 +440,37 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
-    var tiempoSplash = esApple ? 2800 : 1400;
-
-    setTimeout(function() {
+    // OCULTAR SPLASH ÚNICAMENTE CUANDO EL CONTENIDO CARGA
+    var splashOcultado = false;
+    function ocultarSplashSeguro() {
+      if (splashOcultado) return;
+      splashOcultado = true;
       var splash = document.getElementById("splashScreen");
       if (splash) {
         splash.style.opacity = "0";
-        setTimeout(function() {
-          splash.style.display = "none";
-        }, 400);
+        setTimeout(function() { splash.style.display = "none"; }, 400);
       }
-    }, tiempoSplash);
+      // Mostrar la barra de promociones 1 segundo después de que la tarjeta ya cargó
+      mostrarBarraPushSiAplica();
+    }
+
+    // Si la conexión tarda demasiado, el splash se retira tras 6 segundos por seguridad
+    setTimeout(ocultarSplashSeguro, 6000);
 
     // DETERMINAR SI ES APLICACIÓN INSTALADA (STANDALONE)
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // BARRA DE SUSCRIPCIÓN PUSH: SOLO SI ESTÁ INSTALADA Y NO HA SIDO BLOQUEADA
-    if (esPWA) {
-      setTimeout(function() {
-        if ("Notification" in window && Notification.permission === "default") {
-          var rechazoPrevio = sessionStorage.getItem("push_descartado_sesion");
-          if (!rechazoPrevio) {
-            document.getElementById("pwaBarPush").style.display = "flex";
+    function mostrarBarraPushSiAplica() {
+      if (esPWA) {
+        setTimeout(function() {
+          if ("Notification" in window && Notification.permission === "default") {
+            var rechazoPrevio = sessionStorage.getItem("push_descartado_sesion");
+            if (!rechazoPrevio) {
+              document.getElementById("pwaBarPush").style.display = "flex";
+            }
           }
-        }
-      }, 3200);
+        }, 1000);
+      }
     }
 
     function solicitarPermisoPush() {
@@ -596,7 +601,6 @@
       if (!tit || !msg) return alert("Completa el título y el mensaje");
       if (apiKey) localStorage.setItem("onesignal_rest_key", apiKey);
 
-      // 1. Guardar la promo activa para el banner local
       var expiraMs = Date.now() + (horas * 3600 * 1000);
       localStorage.setItem("sp_promo_activa_banner", JSON.stringify({
         tit: tit,
@@ -607,7 +611,6 @@
       sessionStorage.removeItem("sp_banner_cerrado_sesion");
       verificarBannerPromoActivo();
 
-      // 2. Enviar la notificación Push masiva mediante OneSignal API
       if (apiKey) {
         try {
           var payload = {
@@ -700,6 +703,9 @@
     })();
 
     frame.onload = function() {
+      // Retira el Splash inmediatamente cuando el iframe responde con la tarjeta
+      ocultarSplashSeguro();
+
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
