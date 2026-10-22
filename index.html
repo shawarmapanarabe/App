@@ -29,19 +29,23 @@
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
-      overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
+      overscroll-behavior: none; -webkit-overscroll-behavior: none;
+      touch-action: none;
+      position: fixed;
     }
 
-    /* IFRAME ORIGINAL (ANDROID 100% INTACTO) */
+    /* IFRAME FIJO SIN PERMITIR DESPLAZAMIENTOS */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
+      overflow: hidden;
+      touch-action: none;
+      -webkit-overflow-scrolling: auto;
     }
 
-    /* ADAPTACIÓN PROPORCIONAL DINÁMICA A LA PANTALLA EN IPHONE */
     body.is-apple iframe {
-      top: env(safe-area-inset-top, 0px);
-      height: calc(100% - env(safe-area-inset-top, 0px));
+      top: 52px;
+      height: calc(100% - 52px);
     }
     #iosTopBar {
       display: none;
@@ -49,7 +53,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: env(safe-area-inset-top, 0px);
+      height: 52px;
       background-color: #1E2743;
       z-index: 99990;
     }
@@ -57,7 +61,6 @@
       display: block;
     }
 
-    /* CONTENEDOR WHATSAPP PROPORCIONAL */
     #btnWaFlotante {
       position: fixed;
       top: clamp(265px, 73vw, 315px);
@@ -74,9 +77,8 @@
       text-decoration: none;
     }
 
-    /* EN IPHONE SE COMPENSA DIRECTAMENTE CON EL ÁREA SEGURA DINÁMICA */
     body.is-apple #btnWaFlotante {
-      top: calc(clamp(265px, 73vw, 315px) + env(safe-area-inset-top, 0px));
+      top: calc(clamp(265px, 73vw, 315px) + 52px);
     }
 
     #btnWaFlotante:active {
@@ -112,7 +114,6 @@
       }
     }
 
-    /* PANTALLA SPLASH */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -139,7 +140,6 @@
       100% { transform: scale(1.03); }
     }
 
-    /* BARRA INFERIOR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
@@ -169,7 +169,6 @@
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
-    /* MODAL DE GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -211,10 +210,8 @@
 </head>
 <body>
 
-  <!-- FRANJA SUPERIOR AUTOMÁTICA ADAPTADA AL NOTCH O ISLA DINÁMICA -->
   <div id="iosTopBar"></div>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -223,7 +220,6 @@
     </div>
   </div>
 
-  <!-- PANTALLA SPLASH -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -232,10 +228,10 @@
     id="appFrame" 
     name="appFrame" 
     src="" 
+    scrolling="no"
     allow="downloads; clipboard-write" 
   ></iframe>
 
-  <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -250,7 +246,6 @@
     </div>
   </div>
 
-  <!-- GUÍA DE GUARDADO RÁPIDO PUNTUAL -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
@@ -273,6 +268,13 @@
   </div>
 
   <script>
+    // BLOQUEO ABSOLUTO DE DESPLAZAMIENTO Y REBOTE EN IOS
+    document.addEventListener('touchmove', function(e) {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
     var tieneCredenciales = false;
@@ -316,14 +318,25 @@
     frame.onload = function() {
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        
+        // Desactiva el scroll dentro del documento del iframe
+        if (iframeDoc && iframeDoc.body) {
+          iframeDoc.body.style.overflow = 'hidden';
+          iframeDoc.body.style.touchAction = 'none';
+          iframeDoc.addEventListener('touchmove', function(ev) {
+            if (ev.target.tagName !== 'INPUT' && ev.target.tagName !== 'TEXTAREA') {
+              ev.preventDefault();
+            }
+          }, { passive: false });
+        }
+
         var pinInput = iframeDoc.getElementById('inputPin');
         var btnIngresar = iframeDoc.getElementById('btnBuscar');
         
         if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
           var matchPin = query.match(/pin=([^&]+)/i);
           if (matchPin && matchPin[1]) {
-            var pinVal = decodeURIComponent(matchPin[1]);
-            pinInput.value = pinVal;
+            pinInput.value = decodeURIComponent(matchPin[1]);
             pinInput.dispatchEvent(new Event('input', { bubbles: true }));
             setTimeout(function() {
               btnIngresar.click();
@@ -337,7 +350,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // LÓGICA DE ARRASTRE DE WHATSAPP CON IMÁN LATERAL
+    // CONTROL DE ARRASTRE DE WHATSAPP CON IMÁN LATERAL
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
