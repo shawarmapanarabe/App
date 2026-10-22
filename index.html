@@ -36,10 +36,11 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* CONTENEDOR WHATSAPP ARRASTRABLE */
+    /* CONTENEDOR WHATSAPP ARRASTRABLE - DESPEJADO DE LA X */
     #btnWaFlotante {
       position: fixed;
-      top: clamp(200px, 57vw, 242px);
+      /* Bajado para no tapar la X del modal superior */
+      top: clamp(265px, 73vw, 315px);
       left: calc(50% + min(50vw, 215px) - 58px);
       z-index: 99990;
       width: 46px;
@@ -184,7 +185,7 @@
 </head>
 <body>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP IMANTADO A LOS BORDES -->
+  <!-- BOTÓN FLOTANTE WHATSAPP ARRASTRABLE (DESPEJADO DE LA X) -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 24 24">
@@ -301,7 +302,7 @@
         btn.style.left = initialLeft + 'px';
         btn.style.top = initialTop + 'px';
         btn.style.margin = '0';
-        btn.style.transition = 'none'; // Quitar transición durante el arrastre
+        btn.style.transition = 'none';
       }
 
       function onDrag(e) {
@@ -317,12 +318,11 @@
         var newLeft = initialLeft + deltaX;
         var newTop = initialTop + deltaY;
 
-        // Limitar dentro de la pantalla
         var maxLeft = window.innerWidth - btn.offsetWidth - 12;
-        var maxTop = window.innerHeight - btn.offsetHeight - 80; // No tapar barra inferior
+        var maxTop = window.innerHeight - btn.offsetHeight - 80;
 
         newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        newTop = Math.max(70, Math.min(newTop, maxTop)); // No tapar barra superior
+        newTop = Math.max(70, Math.min(newTop, maxTop));
 
         btn.style.left = newLeft + 'px';
         btn.style.top = newTop + 'px';
@@ -333,7 +333,6 @@
         isDragging = false;
 
         if (!hasMoved) {
-          // Clic limpio: abrir WhatsApp nativo
           window.location.href = 'whatsapp://send?phone=51906769744';
         } else {
           // EFECTO IMÁN: pegar al lateral más cercano
@@ -342,9 +341,9 @@
           var rect = btn.getBoundingClientRect();
 
           if ((rect.left + rect.width / 2) < centroPantalla) {
-            btn.style.left = '12px'; // Imantado a la izquierda
+            btn.style.left = '12px';
           } else {
-            btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px'; // Imantado a la derecha
+            btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px';
           }
         }
       }
