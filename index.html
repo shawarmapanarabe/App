@@ -36,7 +36,12 @@
         serviceWorkerParam: { scope: "/App/" },
         path: "/App/",
         autoResubscribe: true,
-        notifyButton: { enable: false }
+        notifyButton: { enable: false },
+        promptOptions: {
+          slidedown: {
+            prompts: []
+          }
+        }
       });
     });
   </script>
@@ -59,39 +64,68 @@
       z-index: 99997; background: transparent; -webkit-tap-highlight-color: transparent;
     }
 
-    /* BARRA SUPERIOR PARA ACTIVAR NOTIFICACIONES PUSH (SOLO PWA INSTALADA) */
+    /* BARRA INFERIOR PARA ACTIVAR NOTIFICACIONES PUSH */
     #pwaBarPush {
-      display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      width: calc(100% - 28px); max-width: 390px; background: #1E2743; color: #ffffff;
-      padding: 9px 12px; border-radius: 16px; box-shadow: 0 8px 24px rgba(30, 39, 67, 0.45);
-      z-index: 99995; align-items: center; justify-content: space-between;
-      animation: bajarBarra 0.35s ease-out; border: 1px solid rgba(255, 255, 255, 0.15);
+      display: none; 
+      position: fixed; 
+      bottom: calc(env(safe-area-inset-bottom, 14px) + 12px); 
+      left: 50%; 
+      transform: translateX(-50%);
+      width: calc(100% - 28px); 
+      max-width: 390px; 
+      background: #1E2743; 
+      color: #ffffff;
+      padding: 10px 14px; 
+      border-radius: 18px; 
+      box-shadow: 0 10px 28px rgba(30, 39, 67, 0.45);
+      z-index: 99995; 
+      align-items: center; 
+      justify-content: space-between;
+      animation: subirBarraPush 0.35s ease-out; 
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    @keyframes subirBarraPush {
+      from { transform: translate(-50%, 40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    .bar-push-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .bar-push-icon { font-size: 19px; line-height: 1; }
+    .bar-push-text { font-size: 12.5px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; }
+    .bar-push-sub { font-size: 10.5px; color: #F2B647; margin: 0; font-weight: 500; }
+    .bar-push-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .btn-push-activar {
+      background: #E95042; color: #ffffff; border: none; font-size: 12px;
+      font-weight: 700; cursor: pointer; padding: 7px 14px; border-radius: 18px;
+      font-family: 'Poppins', sans-serif; box-shadow: 0 2px 8px rgba(233, 80, 66, 0.3);
+    }
+    .btn-push-activar:active { transform: scale(0.95); }
+    .btn-push-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
+
+    /* CINTA IN-APP DE PROMOCIÓN ACTIVA DESLIZABLE */
+    #bannerPromoActiva {
+      display: none; 
+      position: fixed; 
+      top: calc(env(safe-area-inset-top, 16px) + 12px); 
+      left: 50%; 
+      transform: translateX(-50%);
+      width: calc(100% - 28px); 
+      max-width: 390px; 
+      background: #1E2743; 
+      color: #ffffff;
+      padding: 10px 14px; 
+      border-radius: 16px; 
+      box-shadow: 0 10px 25px rgba(30, 39, 67, 0.45);
+      z-index: 99996; 
+      align-items: center; 
+      justify-content: space-between;
+      border: 1px solid rgba(242, 182, 71, 0.4); 
+      touch-action: none;
+      animation: bajarBarra 0.35s ease-out; 
+      transition: transform 0.25s ease, opacity 0.25s ease;
     }
     @keyframes bajarBarra {
       from { transform: translate(-50%, -40px); opacity: 0; }
       to { transform: translate(-50%, 0); opacity: 1; }
-    }
-    .bar-push-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .bar-push-icon { font-size: 18px; line-height: 1; }
-    .bar-push-text { font-size: 12px; font-weight: 700; color: #ffffff; margin: 0; line-height: 1.2; }
-    .bar-push-sub { font-size: 10.5px; color: #F2B647; margin: 0; font-weight: 500; }
-    .bar-push-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .btn-push-activar {
-      background: #E95042; color: #ffffff; border: none; font-size: 11.5px;
-      font-weight: 700; cursor: pointer; padding: 6px 13px; border-radius: 18px;
-      font-family: 'Poppins', sans-serif; box-shadow: 0 2px 8px rgba(233, 80, 66, 0.3);
-    }
-    .btn-push-activar:active { transform: scale(0.95); }
-    .btn-push-close { background: transparent; color: #9aa0a6; border: none; font-size: 15px; cursor: pointer; padding: 3px; line-height: 1; }
-
-    /* CINTA IN-APP DE PROMOCIÓN ACTIVA DESLIZABLE */
-    #bannerPromoActiva {
-      display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      width: calc(100% - 28px); max-width: 390px; background: #1E2743; color: #ffffff;
-      padding: 10px 14px; border-radius: 16px; box-shadow: 0 10px 25px rgba(30, 39, 67, 0.45);
-      z-index: 99996; align-items: center; justify-content: space-between;
-      border: 1px solid rgba(242, 182, 71, 0.4); touch-action: none;
-      animation: bajarBarra 0.35s ease-out; transition: transform 0.25s ease, opacity 0.25s ease;
     }
     .banner-left { min-width: 0; flex: 1; padding-right: 8px; }
     .banner-tit { font-size: 12.5px; font-weight: 800; color: #F2B647; margin: 0; line-height: 1.2; }
@@ -156,11 +190,23 @@
 
     /* BARRA INFERIOR DE INSTALACIÓN */
     #pwaBarBottom {
-      display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
-      width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
-      padding: 10px 14px; border-radius: 16px; box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
-      z-index: 99998; align-items: center; justify-content: space-between;
-      animation: subirBarra 0.35s ease-out; border: 1px solid rgba(255, 255, 255, 0.12);
+      display: none; 
+      position: fixed; 
+      bottom: calc(env(safe-area-inset-bottom, 14px) + 12px); 
+      left: 50%; 
+      transform: translateX(-50%);
+      width: calc(100% - 32px); 
+      max-width: 380px; 
+      background: #1E2743; 
+      color: #ffffff;
+      padding: 10px 14px; 
+      border-radius: 16px; 
+      box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
+      z-index: 99998; 
+      align-items: center; 
+      justify-content: space-between;
+      animation: subirBarra 0.35s ease-out; 
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
     @keyframes subirBarra {
       from { transform: translate(-50%, 40px); opacity: 0; }
@@ -253,7 +299,7 @@
   <!-- ZONA INVISIBLE DE ENTRADA AL PANEL (MANTENER PRESIONADO 3 SEGUNDOS) -->
   <div id="zonaAdminSecreta"></div>
 
-  <!-- BARRA SUPERIOR PARA ACTIVAR PUSH (SOLO PWA INSTALADA) -->
+  <!-- BARRA INFERIOR PARA ACTIVAR PUSH (SOLO PWA INSTALADA) -->
   <div id="pwaBarPush">
     <div class="bar-push-left">
       <span class="bar-push-icon">🔔</span>
@@ -288,8 +334,7 @@
       </svg>
     </div>
   </div>
-
-  <!-- PANTALLA SPLASH -->
+    <!-- PANTALLA SPLASH -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -392,7 +437,7 @@
       } catch(e) {}
     }
 
-        var frame = document.getElementById("appFrame");
+    var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
     // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
@@ -715,3 +760,4 @@
   </script>
 </body>
 </html>
+
