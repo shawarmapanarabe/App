@@ -86,7 +86,7 @@
       }
     }
 
-    /* PANTALLA DE CARGA */
+    /* PANTALLA DE CARGA (SPLASH) */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -265,10 +265,11 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    // TIEMPO DE SPLASH: 2.8s EN IPHONE, 1.4s EN ANDROID
-    var tiempoSplash = esApple ? 2800 : 1400;
-
-    setTimeout(function() {
+    // OCULTAR SPLASH ÚNICAMENTE CUANDO EL IFRAME HAYA CARGADO
+    var splashOcultado = false;
+    function ocultarSplashSeguro() {
+      if (splashOcultado) return;
+      splashOcultado = true;
       var splash = document.getElementById("splashScreen");
       if (splash) {
         splash.style.opacity = "0";
@@ -276,7 +277,10 @@
           splash.style.display = "none";
         }, 400);
       }
-    }, tiempoSplash);
+    }
+
+    // Tiempo límite de seguridad (máximo 7s si la conexión está muy lenta)
+    setTimeout(ocultarSplashSeguro, 7000);
 
     // LÓGICA DE ARRASTRE CON IMÁN A LOS LATERALES
     (function() {
@@ -357,6 +361,9 @@
     })();
 
     frame.onload = function() {
+      // Oculta el Splash de inmediato al terminar de pintar la tarjeta
+      ocultarSplashSeguro();
+
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
