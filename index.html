@@ -32,7 +32,7 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
-    /* IFRAME: EN WEB (SAFARI Y ANDROID) 100% LIMPIO SIN ESPACIO ARTIFICIAL */
+    /* IFRAME: EN WEB 100% LIMPIO */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
@@ -59,7 +59,7 @@
       display: block;
     }
 
-    /* BOTÓN WHATSAPP: VISIBLE TANTO EN WEB COMO EN APP INSTALADA */
+    /* BOTÓN WHATSAPP: POSICIÓN BASE (ANDROID WEB / APP) */
     #btnWaFlotante {
       display: flex;
       position: fixed;
@@ -77,7 +77,12 @@
       text-decoration: none;
     }
 
-    /* IPHONE INSTALADO: MANTIENE SU POSICIÓN INTACTA RESPECTO A LA ISLA */
+    /* EN IPHONE WEB: SE ELEVA LIGERAMENTE PARA NO CHOCAR CON EL SALDO ROJO */
+    body.is-apple-web #btnWaFlotante {
+      top: clamp(255px, 71vw, 295px);
+    }
+
+    /* IPHONE INSTALADO: CONSERVA SU POSICIÓN CALIBRADA RESPECTO A LA ISLA */
     body.is-apple-installed #btnWaFlotante {
       top: calc(clamp(275px, 76vw, 325px) + env(safe-area-inset-top, 0px));
     }
@@ -284,6 +289,8 @@
 
     if (esApple && esPWA) {
       document.body.classList.add('is-apple-installed');
+    } else if (esApple && !esPWA) {
+      document.body.classList.add('is-apple-web');
     }
 
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
@@ -305,7 +312,7 @@
       } catch(e) {}
     }
 
-    // --- RECEPTOR Y MEMORIA DE COMUNIDAD / TOUR EN GITHUB ---
+    // --- PERSISTENCIA EXCLUSIVA EN GITHUB ---
     var yaSeUnio = false;
     try {
       if (localStorage.getItem('sp_unido_comunidad') === '1') {
@@ -313,10 +320,18 @@
       }
     } catch(e) {}
 
+    // Escucha el mensaje original que ya emite tu Apps Script
     window.addEventListener('message', function(ev) {
       if (ev && ev.data && (ev.data.tipo === 'UNIDO_TOUR_OK' || ev.data.tipo === 'CLIENTE_UNIDO')) {
         try { 
-          localStorage.setItem('sp_unido_comunidad', '1'); 
+          localStorage.setItem('sp_unido_comunidad', '1');
+          yaSeUnio = true;
+
+          // Sella la URL del iframe agregando tour_visto=1 para que el botón 'Actualizar' no lo levante
+          var f = document.getElementById("appFrame");
+          if (f && f.src && f.src.indexOf('tour_visto=1') === -1) {
+            f.src = f.src + (f.src.indexOf('?') !== -1 ? '&' : '?') + 'tour_visto=1';
+          }
         } catch(e) {}
       }
     });
@@ -327,7 +342,7 @@
       qFinal += (qFinal.indexOf('?') !== -1 ? '&' : '?') + 'tour_visto=1';
     }
     frame.src = urlBase + qFinal;
-    // --- FIN BLOQUE MEMORIA ---
+    // --- FIN PERSISTENCIA ---
 
     function ocultarSplash() {
       var splash = document.getElementById("splashScreen");
@@ -339,7 +354,6 @@
       }
     }
 
-    // EL SPLASH ESPERA HASTA QUE EL PERFIL SE RENDERICE COMPLETAMENTE
     frame.onload = function() {
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -498,4 +512,3 @@
   </script>
 </body>
 </html>
-
