@@ -59,9 +59,9 @@
       display: block;
     }
 
-    /* BOTÓN WHATSAPP: CALIBRADO AL CENTRO EXACTO EN ANDROID */
+    /* BOTÓN WHATSAPP: CALIBRADO TANTO EN WEB COMO EN APP INSTALADA */
     #btnWaFlotante {
-      display: none;
+      display: flex;
       position: fixed;
       top: clamp(282px, 78vw, 335px);
       left: calc(50% + min(50vw, 215px) - 58px);
@@ -217,7 +217,7 @@
   <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA EN IPHONE -->
   <div id="iosTopBar"></div>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP (SOLO EN APP INSTALADA) -->
+  <!-- BOTÓN FLOTANTE WHATSAPP (ACTIVO EN WEB Y EN APP INSTALADA) -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -281,12 +281,6 @@
     var tieneCredenciales = false;
 
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-    // EL BOTÓN DE WHATSAPP SOLO SE MUESTRA SI LA APP ESTÁ INSTALADA
-    if (esPWA) {
-      var btnWa = document.getElementById('btnWaFlotante');
-      if (btnWa) btnWa.style.display = 'flex';
-    }
 
     if (esApple && esPWA) {
       document.body.classList.add('is-apple-installed');
