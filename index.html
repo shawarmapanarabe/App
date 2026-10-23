@@ -516,40 +516,90 @@
 
 
 
-<!-- TEMPORIZADOR AUTOMÁTICO DECORACIÓN HALLOWEEN -->
+
+
+
+
+
+
+
+
+<!-- TEMPORIZADOR AUTOMÁTICO HALLOWEEN ANIMADO -->
 <script>
   (function() {
     var ahora = new Date();
-    var mes = ahora.getMonth(); // Octubre es mes 9 (en JavaScript va de 0 a 11)
+    var mes = ahora.getMonth(); // Mes 9 = Octubre
     var dia = ahora.getDate();
 
-    // Activo desde hoy (23 de octubre) hasta el 31 de octubre
     if (mes === 9 && dia >= 23 && dia <= 31) {
+      // 1. Estilos y animaciones
       var estiloH = document.createElement('style');
-      estiloH.id = 'decoracion-halloween-auto';
+      estiloH.id = 'decoracion-halloween-animada';
       estiloH.innerHTML = 
-        'body::before {' +
-          'content: "🕸️";' +
-          'position: fixed;' +
-          'top: 2px;' +
-          'left: 8px;' +
-          'font-size: 38px;' +
-          'z-index: 99995;' +
-          'pointer-events: none;' +
-          'opacity: 0.85;' +
+        '/* Contenedor fantasma que no bloquea clics */' +
+        '.hw-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99996; overflow: hidden; }' +
+        
+        '/* Telaraña con balanceo suave */' +
+        '.hw-web-left { position: absolute; top: -5px; left: -5px; font-size: 42px; transform-origin: top left; animation: oscilarWeb 4s ease-in-out infinite alternate; opacity: 0.9; }' +
+        '.hw-web-right { position: absolute; top: -5px; right: -5px; font-size: 42px; transform: scaleX(-1); transform-origin: top right; animation: oscilarWeb 4.5s ease-in-out infinite alternate; opacity: 0.9; }' +
+        
+        '/* Araña descolgándose de un hilo invisible */' +
+        '.hw-spider { position: absolute; top: -30px; left: 24px; font-size: 20px; animation: bajarSubirArana 7s ease-in-out infinite; }' +
+        
+        '/* Fantasma flotante que cruza la pantalla */' +
+        '.hw-ghost { position: absolute; top: 28%; left: -60px; font-size: 34px; opacity: 0; animation: cruzarFantasma 14s ease-in-out infinite; }' +
+        
+        '/* Murciélagos aleteando */' +
+        '.hw-bat-1 { position: absolute; top: 12%; right: -50px; font-size: 26px; animation: volarMurcielago1 10s linear infinite 2s; }' +
+        '.hw-bat-2 { position: absolute; top: 58%; left: -50px; font-size: 22px; animation: volarMurcielago2 12s linear infinite 5s; }' +
+
+        '/* FÍSICAS DE ANIMACIÓN */' +
+        '@keyframes oscilarWeb { 0% { transform: rotate(0deg); } 100% { transform: rotate(4deg); } }' +
+        '@keyframes bajarSubirArana {' +
+          '0%, 100% { transform: translateY(0); opacity: 0; }' +
+          '15% { opacity: 1; }' +
+          '50% { transform: translateY(90px) rotate(15deg); opacity: 1; }' +
+          '55% { transform: translateY(85px) rotate(-15deg); opacity: 1; }' +
+          '85% { opacity: 1; }' +
         '}' +
-        'body::after {' +
-          'content: "🕸️";' +
-          'position: fixed;' +
-          'top: 2px;' +
-          'right: 8px;' +
-          'font-size: 38px;' +
-          'z-index: 99995;' +
-          'pointer-events: none;' +
-          'transform: scaleX(-1);' +
-          'opacity: 0.85;' +
+        '@keyframes cruzarFantasma {' +
+          '0% { transform: translate(0, 0) scale(0.9); opacity: 0; }' +
+          '10% { opacity: 0.75; }' +
+          '30% { transform: translate(30vw, -25px) scale(1.1); }' +
+          '60% { transform: translate(65vw, 20px) scale(1); }' +
+          '85% { opacity: 0.75; }' +
+          '100% { transform: translate(110vw, -15px) scale(0.8); opacity: 0; }' +
+        '}' +
+        '@keyframes volarMurcielago1 {' +
+          '0% { transform: translate(0, 0) scaleX(1); opacity: 0; }' +
+          '10% { opacity: 0.85; }' +
+          '25% { transform: translate(-30vw, 30px); }' +
+          '50% { transform: translate(-60vw, -15px); }' +
+          '75% { transform: translate(-90vw, 25px); }' +
+          '95% { opacity: 0.85; }' +
+          '100% { transform: translate(-120vw, 0); opacity: 0; }' +
+        '}' +
+        '@keyframes volarMurcielago2 {' +
+          '0% { transform: translate(0, 0) scaleX(-1); opacity: 0; }' +
+          '10% { opacity: 0.8; }' +
+          '40% { transform: translate(45vw, -35px) scaleX(-1); }' +
+          '70% { transform: translate(80vw, 20px) scaleX(-1); }' +
+          '95% { opacity: 0.8; }' +
+          '100% { transform: translate(115vw, -10px) scaleX(-1); opacity: 0; }' +
         '}';
       document.head.appendChild(estiloH);
+
+      // 2. Elementos en pantalla
+      var cont = document.createElement('div');
+      cont.className = 'hw-overlay';
+      cont.innerHTML = 
+        '<div class="hw-web-left">🕸️</div>' +
+        '<div class="hw-web-right">🕸️</div>' +
+        '<div class="hw-spider">🕷️</div>' +
+        '<div class="hw-ghost">👻</div>' +
+        '<div class="hw-bat-1">🦇</div>' +
+        '<div class="hw-bat-2">🦇</div>';
+      document.body.appendChild(cont);
     }
   })();
 </script>
