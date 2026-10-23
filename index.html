@@ -29,19 +29,41 @@
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
-      overscroll-behavior: none; -webkit-overscroll-behavior: none;
-      touch-action: none;
+      overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
+
+    /* IFRAME: EN WEB (SAFARI Y ANDROID) 100% LIMPIO SIN ESPACIO ARTIFICIAL */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
-      overscroll-behavior: none; -webkit-overscroll-behavior: none;
     }
 
-    /* CONTENEDOR WHATSAPP ARRASTRABLE LIMPIO */
-    #btnWaFlotante {
+    /* SOLO CUANDO ESTÁ INSTALADA EN IPHONE BAJA POR LA ISLA */
+    body.is-apple-installed iframe {
+      top: env(safe-area-inset-top, 0px);
+      height: calc(100% - env(safe-area-inset-top, 0px));
+    }
+
+    /* FRANJA BLANCA SUPERIOR SOLO EN APP INSTALADA EN IPHONE */
+    #iosTopBar {
+      display: none;
       position: fixed;
-      top: clamp(265px, 73vw, 315px);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: env(safe-area-inset-top, 0px);
+      background-color: #FFFFFF;
+      z-index: 99990;
+    }
+    body.is-apple-installed #iosTopBar {
+      display: block;
+    }
+
+    /* BOTÓN WHATSAPP: VISIBLE EN WEB Y APP, CALIBRADO EXACTO */
+    #btnWaFlotante {
+      display: flex;
+      position: fixed;
+      top: clamp(282px, 78vw, 335px);
       left: calc(50% + min(50vw, 215px) - 58px);
       z-index: 99990;
       width: 46px;
@@ -54,11 +76,16 @@
       -webkit-tap-highlight-color: transparent;
       text-decoration: none;
     }
+
+    /* IPHONE INSTALADO: MANTIENE SU POSICIÓN INTACTA RESPECTO A LA ISLA */
+    body.is-apple-installed #btnWaFlotante {
+      top: calc(clamp(275px, 76vw, 325px) + env(safe-area-inset-top, 0px));
+    }
+
     #btnWaFlotante:active {
       cursor: grabbing;
     }
 
-    /* BURBUJA CIRCULAR CON ICONO OFICIAL DE WHATSAPP */
     .burbuja-wa-inner {
       width: 100%;
       height: 100%;
@@ -187,7 +214,10 @@
 </head>
 <body>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP CIRCULAR LIMPIO CON ICONO OFICIAL -->
+  <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA EN IPHONE -->
+  <div id="iosTopBar"></div>
+
+  <!-- BOTÓN FLOTANTE WHATSAPP -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -248,12 +278,19 @@
   <script>
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
+    var tieneCredenciales = false;
 
-    // 1. GESTIÓN DEL QUERY Y SESIÓN PERMANENTE
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    if (esApple && esPWA) {
+      document.body.classList.add('is-apple-installed');
+    }
+
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
+      tieneCredenciales = true;
       try { 
         localStorage.setItem('panarabe_final_query', query); 
         sessionStorage.setItem('panarabe_session_query', query);
@@ -261,11 +298,14 @@
     } else {
       try {
         var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
-        if (guardado) query = guardado;
+        if (guardado) {
+          query = guardado;
+          tieneCredenciales = true;
+        }
       } catch(e) {}
     }
 
-    // 2. MEMORIA DIRECTA DEL MODAL DE BENEFICIOS (SIN EXPRESIONES REGULARES FRÁGILES)
+    // --- RECEPTOR Y MEMORIA DE COMUNIDAD / TOUR EN GITHUB ---
     var yaSeUnio = false;
     try {
       if (localStorage.getItem('sp_unido_comunidad') === '1') {
@@ -273,7 +313,6 @@
       }
     } catch(e) {}
 
-    // Escucha el aviso cuando el cliente toca "¡Unirme!"
     window.addEventListener('message', function(ev) {
       if (ev && ev.data && (ev.data.tipo === 'UNIDO_TOUR_OK' || ev.data.tipo === 'CLIENTE_UNIDO')) {
         try { 
@@ -282,22 +321,17 @@
       }
     });
 
-    // Si ya se unió en este teléfono, se le añade tour_visto=1 al iframe para que nunca más salga
+    var frame = document.getElementById("appFrame");
     var qFinal = query ? query : "";
     if (yaSeUnio && qFinal.indexOf('tour_visto=1') === -1) {
       qFinal += (qFinal.indexOf('?') !== -1 ? '&' : '?') + 'tour_visto=1';
     }
-
-    var frame = document.getElementById("appFrame");
     frame.src = urlBase + qFinal;
+    // --- FIN BLOQUE MEMORIA ---
 
-    // 3. OCULTAR SPLASH ÚNICAMENTE CUANDO EL IFRAME HAYA CARGADO
-    var splashOcultado = false;
-    function ocultarSplashSeguro() {
-      if (splashOcultado) return;
-      splashOcultado = true;
+    function ocultarSplash() {
       var splash = document.getElementById("splashScreen");
-      if (splash) {
+      if (splash && splash.style.display !== "none") {
         splash.style.opacity = "0";
         setTimeout(function() {
           splash.style.display = "none";
@@ -305,10 +339,32 @@
       }
     }
 
-    // Tiempo de seguridad por si la red es muy lenta
-    setTimeout(ocultarSplashSeguro, 7000);
+    // EL SPLASH ESPERA HASTA QUE EL PERFIL SE RENDERICE COMPLETAMENTE
+    frame.onload = function() {
+      try {
+        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        var pinInput = iframeDoc.getElementById('inputPin');
+        var btnIngresar = iframeDoc.getElementById('btnBuscar');
+        
+        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
+          var matchPin = query.match(/pin=([^&]+)/i);
+          if (matchPin && matchPin[1]) {
+            var pinVal = decodeURIComponent(matchPin[1]);
+            pinInput.value = pinVal;
+            pinInput.dispatchEvent(new Event('input', { bubbles: true }));
+            setTimeout(function() {
+              btnIngresar.click();
+            }, 150);
+          }
+        }
+      } catch(err) {}
 
-    // 4. LÓGICA DE ARRASTRE DE WHATSAPP CON IMÁN LATERAL
+      setTimeout(ocultarSplash, 350);
+    };
+
+    setTimeout(ocultarSplash, esApple ? 5000 : 3500);
+
+    // FÍSICA DE ARRASTRE DE WHATSAPP CON IMÁN LATERAL
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -352,7 +408,8 @@
         var maxTop = window.innerHeight - btn.offsetHeight - 80;
 
         newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        newTop = Math.max(70, Math.min(newTop, maxTop));
+        var minTop = (esApple && esPWA) ? 80 : 70;
+        newTop = Math.max(minTop, Math.min(newTop, maxTop));
 
         btn.style.left = newLeft + 'px';
         btn.style.top = newTop + 'px';
@@ -386,38 +443,13 @@
       window.addEventListener('mouseup', stopDrag);
     })();
 
-    // 5. AUTOINGRESO DEL PIN Y APAGADO DEL SPLASH AL CARGAR EL IFRAME
-    frame.onload = function() {
-      ocultarSplashSeguro();
-
-      try {
-        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
-        var pinInput = iframeDoc.getElementById('inputPin');
-        var btnIngresar = iframeDoc.getElementById('btnBuscar');
-        
-        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
-          var matchPin = query.match(/pin=([^&]+)/i);
-          if (matchPin && matchPin[1]) {
-            var pinVal = decodeURIComponent(matchPin[1]);
-            pinInput.value = pinVal;
-            pinInput.dispatchEvent(new Event('input', { bubbles: true }));
-            setTimeout(function() {
-              btnIngresar.click();
-            }, 150);
-          }
-        }
-      } catch(err) {}
-    };
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
 
-    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-    if (!esPWA) {
+    if (!esPWA && tieneCredenciales) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
 
