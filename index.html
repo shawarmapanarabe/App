@@ -306,31 +306,6 @@
       } catch(e) {}
     }
 
-    // PUENTE: Si en la memoria fija de la PWA ya figura como unido, se pasa al iframe
-    var estaUnidoEnPwa = false;
-    try {
-      estaUnidoEnPwa = localStorage.getItem('panarabe_unido_global') === '1';
-    } catch(e) {}
-
-    if (estaUnidoEnPwa) {
-      if (query) {
-        if (query.indexOf('unido=1') === -1) {
-          query += '&unido=1';
-        }
-      } else {
-        query = '?unido=1';
-      }
-    }
-
-    // RECEPTOR: Escucha cuando el cliente toca "¡Unirme!" dentro del iframe
-    window.addEventListener('message', function(ev) {
-      if (ev && ev.data === 'panarabe_marcar_unido') {
-        try {
-          localStorage.setItem('panarabe_unido_global', '1');
-        } catch(e) {}
-      }
-    });
-
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
@@ -523,4 +498,3 @@
   </script>
 </body>
 </html>
-
