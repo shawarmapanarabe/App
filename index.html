@@ -38,10 +38,16 @@
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* EN IPHONE (TANTO EN WEB COMO EN APP) BAJA POR DEBAJO DE LA ISLA DINÁMICA */
-    body.is-apple-device iframe {
+    /* EN IPHONE INSTALADO (PWA): BAJA SEGÚN EL SAFE-AREA DINÁMICO */
+    body.is-apple-installed iframe {
       top: env(safe-area-inset-top, 0px);
       height: calc(100% - env(safe-area-inset-top, 0px));
+    }
+
+    /* EN SAFARI WEB EN IPHONE: BAJA 48PX FORZADOS PARA NO QUEDAR BAJO LA ISLA */
+    body.is-apple-web iframe {
+      top: 48px;
+      height: calc(100% - 48px);
     }
 
     /* FRANJA BLANCA SUPERIOR EN IPHONE */
@@ -51,12 +57,16 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: env(safe-area-inset-top, 0px);
       background-color: #FFFFFF;
       z-index: 99990;
     }
-    body.is-apple-device #iosTopBar {
+    body.is-apple-installed #iosTopBar {
       display: block;
+      height: env(safe-area-inset-top, 0px);
+    }
+    body.is-apple-web #iosTopBar {
+      display: block;
+      height: 48px;
     }
 
     /* BOTÓN WHATSAPP: VISIBLE EN TODO MOMENTO Y CALIBRADO */
@@ -77,9 +87,14 @@
       text-decoration: none;
     }
 
-    /* IPHONE: ALINEADO AL SALTO DE LA ISLA */
-    body.is-apple-device #btnWaFlotante {
+    /* ALINEACIÓN EN IPHONE INSTALADO */
+    body.is-apple-installed #btnWaFlotante {
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
+    }
+
+    /* ALINEACIÓN EN SAFARI WEB */
+    body.is-apple-web #btnWaFlotante {
+      top: calc(clamp(282px, 78vw, 335px) + 48px);
     }
 
     #btnWaFlotante:active {
@@ -282,9 +297,13 @@
 
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // EN CUALQUIER DISPOSITIVO APPLE SE APLICA LA CLASE PARA DESPEJAR LA ISLA
+    // SEPARACIÓN SEGÚN SEA APP INSTALADA O SAFARI WEB EN IPHONE
     if (esApple) {
-      document.body.classList.add('is-apple-device');
+      if (esPWA) {
+        document.body.classList.add('is-apple-installed');
+      } else {
+        document.body.classList.add('is-apple-web');
+      }
     }
 
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
@@ -343,7 +362,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // FÍSICA DE ARRASTRE Y APERTURA DE WHATSAPP SIN PROTOCOLO BLOQUEANTE
+    // FÍSICA DE ARRASTRE Y APERTURA DE WHATSAPP CON PROTECCIÓN ANTI DOBLE DISPARO
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -352,6 +371,7 @@
       var hasMoved = false;
       var startX, startY;
       var initialLeft, initialTop;
+      var waBloqueoClick = false;
 
       function startDrag(e) {
         var touch = e.touches ? e.touches[0] : e;
@@ -387,20 +407,27 @@
         var maxTop = window.innerHeight - btn.offsetHeight - 80;
 
         newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        var minTop = esApple ? 80 : 70;
+        var minTop = esApple ? (esPWA ? 80 : 96) : 70;
         newTop = Math.max(minTop, Math.min(newTop, maxTop));
 
         btn.style.left = newLeft + 'px';
         btn.style.top = newTop + 'px';
       }
 
-      function stopDrag() {
+      function abrirWhatsAppSeguro() {
+        if (waBloqueoClick) return;
+        waBloqueoClick = true;
+        setTimeout(function() { waBloqueoClick = false; }, 1000);
+        window.open('https://wa.me/51906769744', '_blank');
+      }
+
+      function stopDrag(e) {
         if (!isDragging) return;
         isDragging = false;
 
         if (!hasMoved) {
-          // APERTURA WEB LIMPIA: EVITA EL DIÁLOGO DEL SISTEMA Y LA RECARGA DE SAFARI
-          window.open('https://wa.me/51906769744', '_blank');
+          if (e && e.cancelable) e.preventDefault();
+          abrirWhatsAppSeguro();
         } else {
           btn.style.transition = 'left 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
           var centroPantalla = window.innerWidth / 2;
@@ -416,7 +443,7 @@
 
       btn.addEventListener('touchstart', startDrag, { passive: false });
       window.addEventListener('touchmove', onDrag, { passive: false });
-      window.addEventListener('touchend', stopDrag);
+      window.addEventListener('touchend', stopDrag, { passive: false });
 
       btn.addEventListener('mousedown', startDrag);
       window.addEventListener('mousemove', onDrag);
