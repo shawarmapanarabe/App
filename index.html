@@ -18,9 +18,14 @@
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // SOLO SE MARCA SI ESTÁ INSTALADA EN IPHONE
+    // MARCA PARA LA APP INSTALADA
     if (esApple && esPWA) {
       document.documentElement.classList.add('is-apple-installed');
+    }
+
+    // MARCA EXCLUSIVA PARA LA WEB EN IPHONE (SAFARI O CHROME)
+    if (esApple && !esPWA) {
+      document.documentElement.classList.add('is-apple-web');
     }
 
     if (!esApple || !qInit || qInit.length < 4) {
@@ -66,7 +71,7 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* BOTÓN WHATSAPP: POSICIÓN BASE (EN WEB Y ANDROID) */
+    /* BOTÓN WHATSAPP: POSICIÓN BASE (ANDROID WEB Y APP) */
     #btnWaFlotante {
       display: flex;
       position: fixed;
@@ -84,7 +89,12 @@
       text-decoration: none;
     }
 
-    /* SOLO EN IPHONE INSTALADO BAJA POR EL SAFE-AREA */
+    /* EXCLUSIVO: WEB EN IPHONE (SAFARI / CHROME) - CENTRADO DINÁMICO EN LA FRANJA BLANCA */
+    html.is-apple-web #btnWaFlotante {
+      top: clamp(248px, 68vw, 305px);
+    }
+
+    /* EXCLUSIVO: APP INSTALADA EN IPHONE (INTACTO, NO SE TOCA) */
     html.is-apple-installed #btnWaFlotante {
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
