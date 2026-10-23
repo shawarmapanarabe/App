@@ -524,7 +524,9 @@
 
 
 
-<!-- TEMPORIZADOR AUTOMÁTICO HALLOWEEN ANIMADO -->
+
+
+<!-- EXPERIENCIA HALLOWEEN REALISTA (CUEVA DEL TERROR) -->
 <script>
   (function() {
     var ahora = new Date();
@@ -532,74 +534,75 @@
     var dia = ahora.getDate();
 
     if (mes === 9 && dia >= 23 && dia <= 31) {
-      // 1. Estilos y animaciones
-      var estiloH = document.createElement('style');
-      estiloH.id = 'decoracion-halloween-animada';
-      estiloH.innerHTML = 
-        '/* Contenedor fantasma que no bloquea clics */' +
-        '.hw-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99996; overflow: hidden; }' +
+      var estiloCueva = document.createElement('style');
+      estiloCueva.id = 'estilos-cueva-terror';
+      estiloCueva.innerHTML = 
+        '/* Capa general flotante que no estorba toques */' +
+        '.terror-stage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99996; overflow: hidden; }' +
         
-        '/* Telaraña con balanceo suave */' +
-        '.hw-web-left { position: absolute; top: -5px; left: -5px; font-size: 42px; transform-origin: top left; animation: oscilarWeb 4s ease-in-out infinite alternate; opacity: 0.9; }' +
-        '.hw-web-right { position: absolute; top: -5px; right: -5px; font-size: 42px; transform: scaleX(-1); transform-origin: top right; animation: oscilarWeb 4.5s ease-in-out infinite alternate; opacity: 0.9; }' +
+        '/* Telarañas de esquina de alta definición */' +
+        '.web-corner { position: absolute; width: 125px; height: 125px; opacity: 0.65; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }' +
+        '.web-left { top: 0; left: 0; }' +
+        '.web-right { top: 0; right: 0; transform: scaleX(-1); }' +
         
-        '/* Araña descolgándose de un hilo invisible */' +
-        '.hw-spider { position: absolute; top: -30px; left: 24px; font-size: 20px; animation: bajarSubirArana 7s ease-in-out infinite; }' +
+        '/* Shawarmas que caen de hilos y se desvanecen */' +
+        '.hilo-caida { position: absolute; top: -60px; display: flex; flex-direction: column; align-items: center; }' +
+        '.linea-seda { width: 1px; height: 50px; background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0.15)); }' +
+        '.item-shawarma { font-size: 26px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }' +
         
-        '/* Fantasma flotante que cruza la pantalla */' +
-        '.hw-ghost { position: absolute; top: 28%; left: -60px; font-size: 34px; opacity: 0; animation: cruzarFantasma 14s ease-in-out infinite; }' +
+        '.caida-1 { left: 16%; animation: descensoDesvanecer 9s cubic-bezier(0.4, 0, 0.2, 1) infinite; }' +
+        '.caida-2 { right: 18%; animation: descensoDesvanecer 11s cubic-bezier(0.4, 0, 0.2, 1) infinite 4.5s; }' +
         
-        '/* Murciélagos aleteando */' +
-        '.hw-bat-1 { position: absolute; top: 12%; right: -50px; font-size: 26px; animation: volarMurcielago1 10s linear infinite 2s; }' +
-        '.hw-bat-2 { position: absolute; top: 58%; left: -50px; font-size: 22px; animation: volarMurcielago2 12s linear infinite 5s; }' +
-
-        '/* FÍSICAS DE ANIMACIÓN */' +
-        '@keyframes oscilarWeb { 0% { transform: rotate(0deg); } 100% { transform: rotate(4deg); } }' +
-        '@keyframes bajarSubirArana {' +
-          '0%, 100% { transform: translateY(0); opacity: 0; }' +
-          '15% { opacity: 1; }' +
-          '50% { transform: translateY(90px) rotate(15deg); opacity: 1; }' +
-          '55% { transform: translateY(85px) rotate(-15deg); opacity: 1; }' +
-          '85% { opacity: 1; }' +
+        '@keyframes descensoDesvanecer {' +
+          '0% { transform: translateY(0) rotate(0deg); opacity: 0; }' +
+          '15% { opacity: 0.95; }' +
+          '50% { transform: translateY(140px) rotate(8deg); opacity: 0.85; }' +
+          '75% { transform: translateY(220px) rotate(-6deg); opacity: 0.4; }' +
+          '100% { transform: translateY(280px) rotate(4deg); opacity: 0; }' +
         '}' +
-        '@keyframes cruzarFantasma {' +
-          '0% { transform: translate(0, 0) scale(0.9); opacity: 0; }' +
-          '10% { opacity: 0.75; }' +
-          '30% { transform: translate(30vw, -25px) scale(1.1); }' +
-          '60% { transform: translate(65vw, 20px) scale(1); }' +
-          '85% { opacity: 0.75; }' +
-          '100% { transform: translate(110vw, -15px) scale(0.8); opacity: 0; }' +
-        '}' +
-        '@keyframes volarMurcielago1 {' +
-          '0% { transform: translate(0, 0) scaleX(1); opacity: 0; }' +
-          '10% { opacity: 0.85; }' +
-          '25% { transform: translate(-30vw, 30px); }' +
-          '50% { transform: translate(-60vw, -15px); }' +
-          '75% { transform: translate(-90vw, 25px); }' +
-          '95% { opacity: 0.85; }' +
-          '100% { transform: translate(-120vw, 0); opacity: 0; }' +
-        '}' +
-        '@keyframes volarMurcielago2 {' +
-          '0% { transform: translate(0, 0) scaleX(-1); opacity: 0; }' +
-          '10% { opacity: 0.8; }' +
-          '40% { transform: translate(45vw, -35px) scaleX(-1); }' +
-          '70% { transform: translate(80vw, 20px) scaleX(-1); }' +
-          '95% { opacity: 0.8; }' +
-          '100% { transform: translate(115vw, -10px) scaleX(-1); opacity: 0; }' +
+        
+        '/* Aparición del fantasma de sombras */' +
+        '.aparicion-fantasma { position: absolute; top: 32%; left: -80px; width: 70px; height: 80px; opacity: 0; animation: cruceEspectral 18s ease-in-out infinite 3s; filter: blur(0.6px); }' +
+        
+        '@keyframes cruceEspectral {' +
+          '0% { transform: translate(0, 0) scale(0.7); opacity: 0; }' +
+          '12% { opacity: 0.55; }' +
+          '35% { transform: translate(45vw, -30px) scale(1.15) rotate(4deg); opacity: 0.7; }' +
+          '65% { transform: translate(75vw, 25px) scale(0.95) rotate(-5deg); opacity: 0.55; }' +
+          '85% { opacity: 0.2; }' +
+          '100% { transform: translate(115vw, -10px) scale(0.7); opacity: 0; }' +
         '}';
-      document.head.appendChild(estiloH);
+      document.head.appendChild(estiloCueva);
 
-      // 2. Elementos en pantalla
-      var cont = document.createElement('div');
-      cont.className = 'hw-overlay';
-      cont.innerHTML = 
-        '<div class="hw-web-left">🕸️</div>' +
-        '<div class="hw-web-right">🕸️</div>' +
-        '<div class="hw-spider">🕷️</div>' +
-        '<div class="hw-ghost">👻</div>' +
-        '<div class="hw-bat-1">🦇</div>' +
-        '<div class="hw-bat-2">🦇</div>';
-      document.body.appendChild(cont);
+      // Telaraña vectorial realista en SVG
+      var svgWeb = 
+        '<svg viewBox="0 0 100 100" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="0.8">' +
+          '<path d="M0,0 L100,0 M0,0 L0,100 M0,0 L85,35 M0,0 L70,70 M0,0 L35,85" />' +
+          '<path d="M0,25 Q15,22 25,0 M0,45 Q28,40 45,0 M0,70 Q45,62 70,0 M0,95 Q65,85 95,0" />' +
+          '<path d="M12,18 Q20,20 22,12 M25,32 Q38,36 40,22 M40,52 Q60,56 62,35 M55,75 Q82,80 84,50" />' +
+        '</svg>';
+
+      // Espectro con ojos brillantes
+      var svgFantasma = 
+        '<svg viewBox="0 0 100 120" fill="rgba(240, 245, 255, 0.75)" style="filter: drop-shadow(0 0 10px rgba(180, 215, 255, 0.8));">' +
+          '<path d="M50,10 C25,10 15,35 15,65 C15,95 8,115 25,110 C35,106 42,118 52,112 C62,106 72,116 82,108 C95,98 85,85 85,65 C85,35 75,10 50,10 Z" />' +
+          '<circle cx="38" cy="46" r="4.5" fill="#0b132b" />' +
+          '<circle cx="62" cy="46" r="4.5" fill="#0b132b" />' +
+          '<circle cx="40" cy="45" r="1.5" fill="#00f2fe" />' +
+          '<circle cx="64" cy="45" r="1.5" fill="#00f2fe" />' +
+          '<ellipse cx="50" cy="64" rx="5" ry="8" fill="#0b132b" />' +
+        '</svg>';
+
+      var escenario = document.createElement('div');
+      escenario.className = 'terror-stage';
+      escenario.innerHTML = 
+        '<div class="web-corner web-left">' + svgWeb + '</div>' +
+        '<div class="web-corner web-right">' + svgWeb + '</div>' +
+        '<div class="hilo-caida caida-1"><div class="linea-seda"></div><div class="item-shawarma">🌯</div></div>' +
+        '<div class="hilo-caida caida-2"><div class="linea-seda"></div><div class="item-shawarma">🌯</div></div>' +
+        '<div class="aparicion-fantasma">' + svgFantasma + '</div>';
+        
+      document.body.appendChild(escenario);
     }
   })();
 </script>
