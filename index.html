@@ -311,8 +311,35 @@
       } catch(e) {}
     }
 
+    // --- BLOQUE AGREGADO: PUENTE DE MEMORIA PARA TOUR EN GITHUB ---
+    var codActual = "";
+    if (query) {
+      var mCod = query.match(/[?&]search=([^&]+)/i) || query.match(/[?&]([0-9]{4}[A-Z])/i);
+      if (mCod && mCod[1]) codActual = decodeURIComponent(mCod[1]).replace(/^CP/i, '').trim().toUpperCase();
+    }
+    var yaUnidoEnGitHub = false;
+    try {
+      if (codActual && localStorage.getItem('unido_comunidad_' + codActual) === '1') {
+        yaUnidoEnGitHub = true;
+      }
+    } catch(e) {}
+
+    window.addEventListener('message', function(ev) {
+      if (ev && ev.data && ev.data.tipo === 'UNIDO_TOUR_OK') {
+        var c = (ev.data.cod || codActual || '').toUpperCase();
+        if (c) {
+          try { localStorage.setItem('unido_comunidad_' + c, '1'); } catch(e) {}
+        }
+      }
+    });
+
     var frame = document.getElementById("appFrame");
-    frame.src = urlBase + (query ? query : "");
+    var qFinal = query ? query : "";
+    if (yaUnidoEnGitHub && qFinal.indexOf('tour_visto=1') === -1) {
+      qFinal += (qFinal.indexOf('?') !== -1 ? '&' : '?') + 'tour_visto=1';
+    }
+    frame.src = urlBase + qFinal;
+    // --- FIN BLOQUE AGREGADO ---
 
     function ocultarSplash() {
       var splash = document.getElementById("splashScreen");
