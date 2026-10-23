@@ -399,10 +399,11 @@
         if (waBloqueoClick) return;
         waBloqueoClick = true;
         setTimeout(function() { waBloqueoClick = false; }, 1000);
+        var targetUrl = 'https://api.whatsapp.com/send?phone=51906769744';
         if (esApple && esPWA) {
-          window.location.href = 'whatsapp://send?phone=51906769744';
+          window.location.href = targetUrl;
         } else {
-          window.open('https://wa.me/51906769744', '_blank');
+          window.open(targetUrl, '_blank');
         }
       }
 
@@ -502,4 +503,3 @@
   </script>
 </body>
 </html>
-
