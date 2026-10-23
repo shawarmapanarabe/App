@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#FFFFFF">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SP!">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
@@ -18,9 +18,9 @@
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // APLICADO EN EL MILISEGUNDO CERO AL ELEMENTO RAÍZ (HTML)
-    if (esApple) {
-      document.documentElement.classList.add(esPWA ? 'is-apple-installed' : 'is-apple-web');
+    // SOLO SE MARCA SI ESTÁ INSTALADA EN IPHONE
+    if (esApple && esPWA) {
+      document.documentElement.classList.add('is-apple-installed');
     }
 
     if (!esApple || !qInit || qInit.length < 4) {
@@ -39,25 +39,19 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
-    /* IFRAME: BASE ANDROID */
+    /* EN LA WEB SUBE TODO AL TOPE (TOP: 0, 100% PANTALLA) */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* IPHONE INSTALADO: BAJA POR EL SAFE-AREA DINÁMICO */
+    /* SOLO CUANDO ESTÁ AGREGADA A INICIO EN IPHONE RESPETA EL SAFE-AREA */
     html.is-apple-installed iframe {
       top: env(safe-area-inset-top, 0px) !important;
       height: calc(100% - env(safe-area-inset-top, 0px)) !important;
     }
 
-    /* SAFARI WEB IPHONE: BAJA DE FORMA DIRECTA 50PX PARA DESPEJAR LA ISLA */
-    html.is-apple-web iframe {
-      top: 50px !important;
-      height: calc(100% - 50px) !important;
-    }
-
-    /* FRANJA BLANCA SUPERIOR EN IPHONE */
+    /* FRANJA BLANCA: APAGADA EN LA WEB, SOLO VISIBLE EN APP INSTALADA */
     #iosTopBar {
       display: none;
       position: fixed;
@@ -71,12 +65,8 @@
       display: block;
       height: env(safe-area-inset-top, 0px);
     }
-    html.is-apple-web #iosTopBar {
-      display: block;
-      height: 50px;
-    }
 
-    /* BOTÓN WHATSAPP: VISIBLE EN TODO MOMENTO Y CALIBRADO */
+    /* BOTÓN WHATSAPP: POSICIÓN BASE (EN WEB Y ANDROID) */
     #btnWaFlotante {
       display: flex;
       position: fixed;
@@ -94,14 +84,9 @@
       text-decoration: none;
     }
 
-    /* ALINEACIÓN EN IPHONE INSTALADO */
+    /* SOLO EN IPHONE INSTALADO BAJA POR EL SAFE-AREA */
     html.is-apple-installed #btnWaFlotante {
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
-    }
-
-    /* ALINEACIÓN EN SAFARI WEB */
-    html.is-apple-web #btnWaFlotante {
-      top: calc(clamp(282px, 78vw, 335px) + 50px);
     }
 
     #btnWaFlotante:active {
@@ -236,7 +221,7 @@
 </head>
 <body>
 
-  <!-- FRANJA SUPERIOR BLANCA EN IPHONE -->
+  <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA -->
   <div id="iosTopBar"></div>
 
   <!-- BOTÓN FLOTANTE WHATSAPP -->
@@ -358,7 +343,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // FÍSICA DE ARRASTRE Y APERTURA DE WHATSAPP CON PROTECCIÓN ANTI DOBLE DISPARO
+    // FÍSICA DE ARRASTRE Y APERTURA DE WHATSAPP
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -403,7 +388,7 @@
         var maxTop = window.innerHeight - btn.offsetHeight - 80;
 
         newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        var minTop = esApple ? (esPWA ? 80 : 96) : 70;
+        var minTop = (esApple && esPWA) ? 80 : 70;
         newTop = Math.max(minTop, Math.min(newTop, maxTop));
 
         btn.style.left = newLeft + 'px';
