@@ -16,6 +16,13 @@
   <script>
     var qInit = window.location.search;
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    // APLICADO EN EL MILISEGUNDO CERO AL ELEMENTO RAÍZ (HTML)
+    if (esApple) {
+      document.documentElement.classList.add(esPWA ? 'is-apple-installed' : 'is-apple-web');
+    }
+
     if (!esApple || !qInit || qInit.length < 4) {
       var mLink = document.createElement('link');
       mLink.rel = 'manifest';
@@ -32,22 +39,22 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
-    /* IFRAME: EN ANDROID CORRE COMPLETO */
+    /* IFRAME: BASE ANDROID */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* EN IPHONE INSTALADO (PWA): BAJA SEGÚN EL SAFE-AREA DINÁMICO */
-    body.is-apple-installed iframe {
-      top: env(safe-area-inset-top, 0px);
-      height: calc(100% - env(safe-area-inset-top, 0px));
+    /* IPHONE INSTALADO: BAJA POR EL SAFE-AREA DINÁMICO */
+    html.is-apple-installed iframe {
+      top: env(safe-area-inset-top, 0px) !important;
+      height: calc(100% - env(safe-area-inset-top, 0px)) !important;
     }
 
-    /* EN SAFARI WEB EN IPHONE: BAJA 48PX FORZADOS PARA NO QUEDAR BAJO LA ISLA */
-    body.is-apple-web iframe {
-      top: 48px;
-      height: calc(100% - 48px);
+    /* SAFARI WEB IPHONE: BAJA DE FORMA DIRECTA 50PX PARA DESPEJAR LA ISLA */
+    html.is-apple-web iframe {
+      top: 50px !important;
+      height: calc(100% - 50px) !important;
     }
 
     /* FRANJA BLANCA SUPERIOR EN IPHONE */
@@ -60,13 +67,13 @@
       background-color: #FFFFFF;
       z-index: 99990;
     }
-    body.is-apple-installed #iosTopBar {
+    html.is-apple-installed #iosTopBar {
       display: block;
       height: env(safe-area-inset-top, 0px);
     }
-    body.is-apple-web #iosTopBar {
+    html.is-apple-web #iosTopBar {
       display: block;
-      height: 48px;
+      height: 50px;
     }
 
     /* BOTÓN WHATSAPP: VISIBLE EN TODO MOMENTO Y CALIBRADO */
@@ -88,13 +95,13 @@
     }
 
     /* ALINEACIÓN EN IPHONE INSTALADO */
-    body.is-apple-installed #btnWaFlotante {
+    html.is-apple-installed #btnWaFlotante {
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
 
     /* ALINEACIÓN EN SAFARI WEB */
-    body.is-apple-web #btnWaFlotante {
-      top: calc(clamp(282px, 78vw, 335px) + 48px);
+    html.is-apple-web #btnWaFlotante {
+      top: calc(clamp(282px, 78vw, 335px) + 50px);
     }
 
     #btnWaFlotante:active {
@@ -294,17 +301,6 @@
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search;
     var tieneCredenciales = false;
-
-    var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
-    // SEPARACIÓN SEGÚN SEA APP INSTALADA O SAFARI WEB EN IPHONE
-    if (esApple) {
-      if (esPWA) {
-        document.body.classList.add('is-apple-installed');
-      } else {
-        document.body.classList.add('is-apple-web');
-      }
-    }
 
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
