@@ -66,6 +66,7 @@
       height: env(safe-area-inset-top, 0px);
     }
 
+    /* BOTÓN WHATSAPP */
     #btnWaFlotante {
       display: flex;
       position: fixed;
@@ -75,12 +76,13 @@
       width: 46px;
       height: 46px;
       border-radius: 50%;
-      touch-action: none;
+      touch-action: pan-y;
       user-select: none;
       -webkit-user-select: none;
-      cursor: grab;
+      cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       text-decoration: none;
+      transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease, left 0.28s ease;
     }
 
     html.is-apple-web #btnWaFlotante {
@@ -91,8 +93,15 @@
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
 
-    #btnWaFlotante:active {
-      cursor: grabbing;
+    /* ESTADO MINIMIZADO EN EL BORDE DERECHO (PESTAÑA EDGE) */
+    #btnWaFlotante.docked-edge {
+      left: calc(100% - 14px) !important;
+      opacity: 0.55;
+      transform: scale(0.92);
+    }
+    #btnWaFlotante.docked-edge:hover,
+    #btnWaFlotante.docked-edge:active {
+      opacity: 0.85;
     }
 
     .burbuja-wa-inner {
@@ -124,6 +133,7 @@
       }
     }
 
+    /* PANTALLA SPLASH */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -150,6 +160,7 @@
       100% { transform: scale(1.03); }
     }
 
+    /* BARRA INFERIOR CON PÁLPITO EN BOTÓN GUARDAR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
@@ -175,10 +186,17 @@
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
       font-family: 'Poppins', sans-serif; transition: transform 0.1s ease;
+      animation: palpitarBotonGuardar 1.8s infinite ease-in-out;
+    }
+    @keyframes palpitarBotonGuardar {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233, 80, 66, 0.6); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(233, 80, 66, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233, 80, 66, 0); }
     }
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
+    /* MODAL DE GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -222,6 +240,7 @@
 
   <div id="iosTopBar"></div>
 
+  <!-- BOTÓN FLOTANTE WHATSAPP CON EDGE DOCKING -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -300,28 +319,6 @@
       } catch(e) {}
     }
 
-    // VERIFICACIÓN ESTRICTA: OCULTAR BOTÓN WHATSAPP PARA ADMIN
-    function verificarOcultarWa() {
-      var btn = document.getElementById('btnWaFlotante');
-      if (!btn) return;
-      var qCheck = (query || '') + (window.location.search || '');
-      try {
-        qCheck += (localStorage.getItem('panarabe_final_query') || '');
-      } catch(e) {}
-      if (qCheck.indexOf('906769744') !== -1) {
-        btn.style.display = 'none';
-      }
-    }
-    verificarOcultarWa();
-
-    // ESCUCHAR COMUNICACIÓN DESDE EL IFRAME
-    window.addEventListener('message', function(e) {
-      if (e.data === 'ocultar_wa_admin') {
-        var btn = document.getElementById('btnWaFlotante');
-        if (btn) btn.style.display = 'none';
-      }
-    });
-
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
@@ -336,7 +333,6 @@
     }
 
     frame.onload = function() {
-      verificarOcultarWa();
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
@@ -360,57 +356,14 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // FÍSICA DE ARRASTRE Y APERTURA DE WHATSAPP
+    // FÍSICA DE DESLIZAMIENTO: EDGE DOCKING (MINIMIZAR AL BORDE LATERAL)
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
 
-      var isDragging = false;
-      var hasMoved = false;
-      var startX, startY;
-      var initialLeft, initialTop;
+      var startX = 0, startY = 0;
+      var estaAcoplado = false;
       var waBloqueoClick = false;
-
-      function startDrag(e) {
-        var touch = e.touches ? e.touches[0] : e;
-        isDragging = true;
-        hasMoved = false;
-        startX = touch.clientX;
-        startY = touch.clientY;
-
-        var rect = btn.getBoundingClientRect();
-        initialLeft = rect.left;
-        initialTop = rect.top;
-
-        btn.style.left = initialLeft + 'px';
-        btn.style.top = initialTop + 'px';
-        btn.style.margin = '0';
-        btn.style.transition = 'none';
-      }
-
-      function onDrag(e) {
-        if (!isDragging) return;
-        var touch = e.touches ? e.touches[0] : e;
-        var deltaX = touch.clientX - startX;
-        var deltaY = touch.clientY - startY;
-
-        if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-          hasMoved = true;
-        }
-
-        var newLeft = initialLeft + deltaX;
-        var newTop = initialTop + deltaY;
-
-        var maxLeft = window.innerWidth - btn.offsetWidth - 12;
-        var maxTop = window.innerHeight - btn.offsetHeight - 80;
-
-        newLeft = Math.max(12, Math.min(newLeft, maxLeft));
-        var minTop = (esApple && esPWA) ? 80 : 70;
-        newTop = Math.max(minTop, Math.min(newTop, maxTop));
-
-        btn.style.left = newLeft + 'px';
-        btn.style.top = newTop + 'px';
-      }
 
       function abrirWhatsAppSeguro() {
         if (waBloqueoClick) return;
@@ -424,33 +377,45 @@
         }
       }
 
-      function stopDrag(e) {
-        if (!isDragging) return;
-        isDragging = false;
+      btn.addEventListener('touchstart', function(e) {
+        var t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+      }, { passive: true });
 
-        if (!hasMoved) {
-          if (e && e.cancelable) e.preventDefault();
-          abrirWhatsAppSeguro();
-        } else {
-          btn.style.transition = 'left 0.25s cubic-bezier(0.25, 1, 0.5, 1)';
-          var centroPantalla = window.innerWidth / 2;
-          var rect = btn.getBoundingClientRect();
+      btn.addEventListener('touchend', function(e) {
+        var t = e.changedTouches[0];
+        var deltaX = t.clientX - startX;
+        var deltaY = t.clientY - startY;
 
-          if ((rect.left + rect.width / 2) < centroPantalla) {
-            btn.style.left = '12px';
-          } else {
-            btn.style.left = (window.innerWidth - btn.offsetWidth - 12) + 'px';
-          }
+        // Si fue un deslizamiento hacia la derecha (swipe horizontal)
+        if (deltaX > 25 && Math.abs(deltaY) < 40) {
+          btn.classList.add('docked-edge');
+          estaAcoplado = true;
+          return;
         }
-      }
 
-      btn.addEventListener('touchstart', startDrag, { passive: false });
-      window.addEventListener('touchmove', onDrag, { passive: false });
-      window.addEventListener('touchend', stopDrag, { passive: false });
+        // Si estaba acoplado y se toca o se desliza hacia la izquierda
+        if (estaAcoplado) {
+          btn.classList.remove('docked-edge');
+          estaAcoplado = false;
+          return;
+        }
 
-      btn.addEventListener('mousedown', startDrag);
-      window.addEventListener('mousemove', onDrag);
-      window.addEventListener('mouseup', stopDrag);
+        // Si fue un toque limpio sin mover
+        if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+          abrirWhatsAppSeguro();
+        }
+      });
+
+      btn.addEventListener('click', function(e) {
+        if (estaAcoplado) {
+          btn.classList.remove('docked-edge');
+          estaAcoplado = false;
+          return;
+        }
+        abrirWhatsAppSeguro();
+      });
     })();
 
     if ('serviceWorker' in navigator) {
