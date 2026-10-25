@@ -18,10 +18,12 @@
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
+    // MARCA PARA LA APP INSTALADA
     if (esApple && esPWA) {
       document.documentElement.classList.add('is-apple-installed');
     }
 
+    // MARCA EXCLUSIVA PARA LA WEB EN IPHONE (SAFARI O CHROME)
     if (esApple && !esPWA) {
       document.documentElement.classList.add('is-apple-web');
     }
@@ -42,16 +44,19 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
+    /* EN LA WEB SUBE TODO AL TOPE (TOP: 0, 100% PANTALLA) */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
+    /* SOLO CUANDO ESTÁ AGREGADA A INICIO EN IPHONE RESPETA EL SAFE-AREA */
     html.is-apple-installed iframe {
       top: env(safe-area-inset-top, 0px) !important;
       height: calc(100% - env(safe-area-inset-top, 0px)) !important;
     }
 
+    /* FRANJA BLANCA: APAGADA EN LA WEB, SOLO VISIBLE EN APP INSTALADA */
     #iosTopBar {
       display: none;
       position: fixed;
@@ -66,7 +71,7 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* BOTÓN WHATSAPP */
+    /* BOTÓN WHATSAPP: POSICIÓN BASE */
     #btnWaFlotante {
       display: flex;
       position: fixed;
@@ -85,10 +90,12 @@
       transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease, left 0.28s ease;
     }
 
+    /* EXCLUSIVO: WEB EN IPHONE (SAFARI / CHROME) */
     html.is-apple-web #btnWaFlotante {
       top: clamp(248px, 68vw, 305px);
     }
 
+    /* EXCLUSIVO: APP INSTALADA EN IPHONE */
     html.is-apple-installed #btnWaFlotante {
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
@@ -238,6 +245,7 @@
 </head>
 <body>
 
+  <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA -->
   <div id="iosTopBar"></div>
 
   <!-- BOTÓN FLOTANTE WHATSAPP CON EDGE DOCKING -->
@@ -249,6 +257,7 @@
     </div>
   </div>
 
+  <!-- PANTALLA SPLASH -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -260,6 +269,7 @@
     allow="downloads; clipboard-write" 
   ></iframe>
 
+  <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -274,6 +284,7 @@
     </div>
   </div>
 
+  <!-- GUÍA DE GUARDADO RÁPIDO PUNTUAL -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
@@ -356,17 +367,18 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // FÍSICA DE DESLIZAMIENTO: EDGE DOCKING (MINIMIZAR AL BORDE LATERAL)
+    // FÍSICA DE DESLIZAMIENTO: EDGE DOCKING (CORREGIDO APERTURA ACCIDENTAL)
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
 
       var startX = 0, startY = 0;
       var estaAcoplado = false;
+      var bloqueoApertura = false;
       var waBloqueoClick = false;
 
       function abrirWhatsAppSeguro() {
-        if (waBloqueoClick) return;
+        if (waBloqueoClick || bloqueoApertura) return;
         waBloqueoClick = true;
         setTimeout(function() { waBloqueoClick = false; }, 1000);
         var targetUrl = 'https://api.whatsapp.com/send?phone=51906769744';
@@ -388,30 +400,37 @@
         var deltaX = t.clientX - startX;
         var deltaY = t.clientY - startY;
 
-        // Si fue un deslizamiento hacia la derecha (swipe horizontal)
-        if (deltaX > 25 && Math.abs(deltaY) < 40) {
+        // Si se desliza hacia la derecha: SE ESCONDE
+        if (deltaX > 20 && Math.abs(deltaY) < 45) {
           btn.classList.add('docked-edge');
           estaAcoplado = true;
+          bloqueoApertura = true;
+          setTimeout(function() { bloqueoApertura = false; }, 400);
           return;
         }
 
-        // Si estaba acoplado y se toca o se desliza hacia la izquierda
+        // Si estaba escondido y se toca: SOLO SE DESPLIEGA (NO ABRE WHATSAPP)
         if (estaAcoplado) {
+          if (e.cancelable) e.preventDefault();
           btn.classList.remove('docked-edge');
           estaAcoplado = false;
+          bloqueoApertura = true;
+          setTimeout(function() { bloqueoApertura = false; }, 500);
           return;
         }
 
-        // Si fue un toque limpio sin mover
+        // Si no estaba escondido y fue un tap limpio: ABRE WHATSAPP
         if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
-          abrirWhatsAppSeguro();
+          if (!bloqueoApertura) {
+            abrirWhatsAppSeguro();
+          }
         }
       });
 
       btn.addEventListener('click', function(e) {
-        if (estaAcoplado) {
-          btn.classList.remove('docked-edge');
-          estaAcoplado = false;
+        if (estaAcoplado || bloqueoApertura) {
+          e.preventDefault();
+          e.stopPropagation();
           return;
         }
         abrirWhatsAppSeguro();
@@ -424,6 +443,7 @@
       });
     }
 
+    // CONTROL INTELIGENTE DE BARRA INFERIOR POR SESIÓN
     var yaCerroBarraSesion = false;
     try {
       yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
