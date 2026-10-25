@@ -175,21 +175,6 @@
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
       font-family: 'Poppins', sans-serif; transition: transform 0.1s ease;
-      animation: palpitarGuardar 1.8s infinite ease-in-out;
-    }
-    @keyframes palpitarGuardar {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(233, 80, 66, 0.6);
-      }
-      70% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px rgba(233, 80, 66, 0);
-      }
-      100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(233, 80, 66, 0);
-      }
     }
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
@@ -315,12 +300,27 @@
       } catch(e) {}
     }
 
-    // OCULTAR WHATSAPP FLOTANTE AL ADMINISTRADOR
-    var checkQueryAdmin = (query || '') + (localStorage.getItem('panarabe_final_query') || '');
-    if (checkQueryAdmin.indexOf('906769744') !== -1) {
-      var btnWa = document.getElementById('btnWaFlotante');
-      if (btnWa) btnWa.style.display = 'none';
+    // VERIFICACIÓN ESTRICTA: OCULTAR BOTÓN WHATSAPP PARA ADMIN
+    function verificarOcultarWa() {
+      var btn = document.getElementById('btnWaFlotante');
+      if (!btn) return;
+      var qCheck = (query || '') + (window.location.search || '');
+      try {
+        qCheck += (localStorage.getItem('panarabe_final_query') || '');
+      } catch(e) {}
+      if (qCheck.indexOf('906769744') !== -1) {
+        btn.style.display = 'none';
+      }
     }
+    verificarOcultarWa();
+
+    // ESCUCHAR COMUNICACIÓN DESDE EL IFRAME
+    window.addEventListener('message', function(e) {
+      if (e.data === 'ocultar_wa_admin') {
+        var btn = document.getElementById('btnWaFlotante');
+        if (btn) btn.style.display = 'none';
+      }
+    });
 
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
@@ -336,6 +336,7 @@
     }
 
     frame.onload = function() {
+      verificarOcultarWa();
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
@@ -359,6 +360,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
+    // FÍSICA DE ARRASTRE Y APERTURA DE WHATSAPP
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -516,5 +518,4 @@
     });
   </script>
 </body>
-  </html>
-  
+</html>
