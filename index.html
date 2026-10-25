@@ -304,11 +304,10 @@
       tieneCredenciales = true;
       try { 
         localStorage.setItem('panarabe_final_query', query); 
-        sessionStorage.setItem('panarabe_session_query', query);
       } catch(e) {}
     } else {
       try {
-        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
+        var guardado = localStorage.getItem('panarabe_final_query');
         if (guardado) {
           query = guardado;
           tieneCredenciales = true;
@@ -455,7 +454,7 @@
     // CONTROL INTELIGENTE DE BARRA INFERIOR POR SESIÓN
     var yaCerroBarraSesion = false;
     try {
-      yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
+      yaCerroBarraSesion = localStorage.getItem('pwa_barra_descartada') === '1';
     } catch(e) {}
 
     if (!esPWA && tieneCredenciales && !yaCerroBarraSesion) {
@@ -470,7 +469,7 @@
         btnInstalar.onclick = function() {
           document.getElementById('iosGuideModal').style.display = 'flex';
           barra.style.display = 'none';
-          try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+          try { localStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
         };
       } else {
         var promptDiferido;
@@ -485,7 +484,7 @@
               promptDiferido.userChoice.then(function(choice) {
                 if (choice.outcome === 'accepted') {
                   barra.style.display = 'none';
-                  try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+                  try { localStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
                 }
                 promptDiferido = null;
               });
@@ -497,23 +496,19 @@
 
     function cerrarBarraDefinitivo() {
       document.getElementById('pwaBarBottom').style.display = 'none';
-      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+      try { localStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
     function cerrarGuiaIos() {
       document.getElementById('iosGuideModal').style.display = 'none';
       document.getElementById('pwaBarBottom').style.display = 'none';
-      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+      try { localStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
     window.addEventListener('appinstalled', function() {
       document.getElementById('pwaBarBottom').style.display = 'none';
-      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+      try { localStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     });
   </script>
 </body>
 </html>
-
-
-
-
