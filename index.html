@@ -167,7 +167,7 @@
       100% { transform: scale(1.03); }
     }
 
-    /* BARRA INFERIOR CON PÁLPITO EN BOTÓN GUARDAR */
+    /* BARRA INFERIOR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
@@ -189,16 +189,35 @@
     .bar-sub { font-size: 11px; color: #F2B647; margin: 0; font-weight: 500; }
     .bar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     
+    /* BOTÓN GUARDAR CON DESTELLO SHIMMER DISCRETO (NO COMPITE CON WHATSAPP) */
     .btn-bar-save { 
+      position: relative;
+      overflow: hidden;
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
       font-family: 'Poppins', sans-serif; transition: transform 0.1s ease;
-      animation: palpitarBotonGuardar 1.8s infinite ease-in-out;
     }
-    @keyframes palpitarBotonGuardar {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233, 80, 66, 0.6); }
-      70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(233, 80, 66, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(233, 80, 66, 0); }
+    .btn-bar-save::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -120%;
+      width: 55%;
+      height: 200%;
+      background: linear-gradient(
+        120deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.42) 50%, 
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: brilloShimmerSave 3.2s infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes brilloShimmerSave {
+      0% { left: -120%; }
+      25% { left: 160%; }
+      100% { left: 160%; }
     }
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
