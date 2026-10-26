@@ -28,7 +28,7 @@
       document.documentElement.classList.add('is-apple-web');
     }
 
-    if (!esApple || !qInit) {
+    if (!esApple || !qInit || qInit.length < 4) {
       var mLink = document.createElement('link');
       mLink.rel = 'manifest';
       mLink.href = './manifest.json';
@@ -516,5 +516,4 @@
     });
   </script>
 </body>
-  </html>
-  
+</html>
