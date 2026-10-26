@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -82,7 +81,6 @@
       width: 46px;
       height: 46px;
       border-radius: 50%;
-      touch-action: pan-y;
       user-select: none;
       -webkit-user-select: none;
       cursor: pointer;
@@ -101,71 +99,15 @@
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
 
-    /* ALMA / FANTASMA QUE SALE HACIA LA DERECHA (CADA ~3.2 SEGUNDOS CUANDO ESTÁ AFUERA) */
-    #btnWaFlotante::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: #25D366;
-      opacity: 0;
-      pointer-events: none;
-      z-index: -1;
-      animation: fantasmaHaciaDerecha 3.2s infinite cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    @keyframes fantasmaHaciaDerecha {
-      0% {
-        transform: translate3d(0, 0, 0) scale(1);
-        opacity: 0.65;
-      }
-      35% {
-        transform: translate3d(38px, 0, 0) scale(0.85);
-        opacity: 0;
-      }
-      100% {
-        transform: translate3d(38px, 0, 0) scale(0.85);
-        opacity: 0;
-      }
-    }
-
-    /* ESTADO MINIMIZADO EN EL BORDE DERECHO (PESTAÑA EDGE ASOMADA 24px Y TENUE) */
+    /* ESTADO MINIMIZADO EN EL BORDE DERECHO (ASOMADO 24PX) */
     #btnWaFlotante.docked-edge {
       left: calc(100% - 24px) !important;
-      opacity: 0.45;
+      opacity: 0.65;
       transform: scale(0.92);
-      touch-action: none !important;
     }
     #btnWaFlotante.docked-edge:hover,
     #btnWaFlotante.docked-edge:active {
-      opacity: 0.85;
-    }
-
-    /* DESACTIVAR EL FANTASMA CUANDO YA ESTÁ GUARDADO */
-    #btnWaFlotante.docked-edge::before {
-      animation: none !important;
-      display: none;
-    }
-
-    /* ANIMACIÓN CUANDO ESTÁ GUARDADO: PALPITAR TENUE + DESTELLO DE TOQUE */
-    #btnWaFlotante.docked-edge .burbuja-wa-inner {
-      animation: palpitarYDestelloGuardado 2.6s infinite ease-in-out !important;
-    }
-
-    @keyframes palpitarYDestelloGuardado {
-      0%, 100% {
-        transform: scale(0.94);
-        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
-        filter: brightness(0.95);
-      }
-      50% {
-        transform: scale(1.04);
-        box-shadow: -4px 0 14px rgba(37, 211, 102, 0.7);
-        filter: brightness(1.2);
-      }
+      opacity: 0.95;
     }
 
     .burbuja-wa-inner {
@@ -180,7 +122,6 @@
       border: 2px solid #ffffff;
       animation: palpitarWa 1.5s ease-in-out infinite alternate;
       pointer-events: none;
-      position: relative;
     }
     .burbuja-wa-inner svg {
       width: 26px;
@@ -325,7 +266,7 @@
   <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA -->
   <div id="iosTopBar"></div>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP: INICIA OCULTO EN EL BORDE -->
+  <!-- BOTÓN FLOTANTE WHATSAPP QUE INICIA ASOMADO -->
   <div id="btnWaFlotante" class="docked-edge" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -444,13 +385,12 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // FÍSICA INTELIGENTE: PESTAÑA EDGE (PROTEGIDA CONTRA GESTOS DEL SISTEMA)
+    // CONTROL POR TOQUES: TAP PARA DESPLEGAR Y CLIC EXTERIOR PARA OCULTAR
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
 
-      var startX = 0, startY = 0;
-      var estaAcoplado = true; // Inicia acoplado/oculto
+      var estaAcoplado = true;
       var bloqueoApertura = false;
       var waBloqueoClick = false;
 
@@ -466,51 +406,45 @@
         }
       }
 
-      btn.addEventListener('touchstart', function(e) {
-        var t = e.touches[0];
-        startX = t.clientX;
-        startY = t.clientY;
-      }, { passive: true });
-
-      btn.addEventListener('touchend', function(e) {
-        var t = e.changedTouches[0];
-        var deltaX = t.clientX - startX;
-        var deltaY = t.clientY - startY;
-
-        // 1. SI ESTÁ ACOPLADO EN EL BORDE: TOQUE O DESLIZAMIENTO LO DESPLIEGA
-        if (estaAcoplado) {
-          if (e.cancelable) e.preventDefault();
-          btn.classList.remove('docked-edge');
-          estaAcoplado = false;
-          bloqueoApertura = true;
-          setTimeout(function() { bloqueoApertura = false; }, 450);
-          return;
-        }
-
-        // 2. SI ESTÁ VISIBLE Y SE DESLIZA A LA DERECHA: SE OCULTA
-        if (deltaX > 20 && Math.abs(deltaY) < 45) {
+      function guardarBoton() {
+        if (!estaAcoplado) {
           btn.classList.add('docked-edge');
           estaAcoplado = true;
-          bloqueoApertura = true;
-          setTimeout(function() { bloqueoApertura = false; }, 400);
+        }
+      }
+
+      function desplegarBoton() {
+        btn.classList.remove('docked-edge');
+        estaAcoplado = false;
+        bloqueoApertura = true;
+        setTimeout(function() { bloqueoApertura = false; }, 400);
+      }
+
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (estaAcoplado) {
+          desplegarBoton();
           return;
         }
-
-        // 3. TOQUE LIMPIO CUANDO ESTÁ VISIBLE: ABRE WHATSAPP
-        if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
-          if (!bloqueoApertura) {
-            abrirWhatsAppSeguro();
-          }
+        if (!bloqueoApertura) {
+          abrirWhatsAppSeguro();
         }
       });
 
-      btn.addEventListener('click', function(e) {
-        if (estaAcoplado || bloqueoApertura) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
+      window.addEventListener('click', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
         }
-        abrirWhatsAppSeguro();
+      });
+
+      window.addEventListener('touchstart', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
+        }
+      }, { passive: true });
+
+      window.addEventListener('blur', function() {
+        setTimeout(guardarBoton, 100);
       });
     })();
 
@@ -549,7 +483,8 @@
 
           btnInstalar.onclick = function() {
             if (promptDiferido) {
-              promptDiferido.prompt();              promptDiferido.userChoice.then(function(choice) {
+              promptDiferido.prompt();
+              promptDiferido.userChoice.then(function(choice) {
                 if (choice.outcome === 'accepted') {
                   barra.style.display = 'none';
                   try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
@@ -581,4 +516,3 @@
 </body>
 </html>
 
-         
