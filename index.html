@@ -71,6 +71,19 @@
       height: env(safe-area-inset-top, 0px);
     }
 
+    /* CAPA TRANSPARENTE DETECTORA DE TOQUES EN PANTALLA */
+    #capaBackdropWa {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 99980;
+      background: transparent;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     /* BOTÓN WHATSAPP: POSICIÓN BASE */
     #btnWaFlotante {
       display: flex;
@@ -266,6 +279,9 @@
   <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA -->
   <div id="iosTopBar"></div>
 
+  <!-- CAPA INVISIBLE DETECTORA PARA GUARDAR AL TOCAR CUALQUIER PARTE -->
+  <div id="capaBackdropWa"></div>
+
   <!-- BOTÓN FLOTANTE WHATSAPP: INICIA VISIBLE -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
@@ -385,9 +401,10 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // CONTROL POR TOQUES: INICIA VISIBLE Y SE OCULTA AL TOCAR CUALQUIER PARTE
+    // CONTROL INTELIGENTE DE TOQUES CON BACKDROP INVISIBLE
     (function() {
       var btn = document.getElementById('btnWaFlotante');
+      var backdrop = document.getElementById('capaBackdropWa');
       if (!btn) return;
 
       var estaAcoplado = false; // Inicia completo y visible
@@ -410,6 +427,7 @@
         if (!estaAcoplado) {
           btn.classList.add('docked-edge');
           estaAcoplado = true;
+          if (backdrop) backdrop.style.display = 'none'; // Libera la pantalla
         }
       }
 
@@ -417,9 +435,11 @@
         btn.classList.remove('docked-edge');
         estaAcoplado = false;
         bloqueoApertura = true;
+        if (backdrop) backdrop.style.display = 'block'; // Activa la detección en pantalla
         setTimeout(function() { bloqueoApertura = false; }, 400);
       }
 
+      // Toque directo en WhatsApp
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (estaAcoplado) {
@@ -431,23 +451,16 @@
         }
       });
 
-      // Si tocan cualquier parte fuera del botón en la ventana, se repliega
-      window.addEventListener('click', function(e) {
-        if (!btn.contains(e.target)) {
+      // Tocar cualquier parte de la pantalla (fondo, tarjeta o botones) lo repliega de inmediato
+      if (backdrop) {
+        backdrop.addEventListener('touchstart', function(e) {
           guardarBoton();
-        }
-      });
+        }, { passive: true });
 
-      window.addEventListener('touchstart', function(e) {
-        if (!btn.contains(e.target)) {
+        backdrop.addEventListener('click', function(e) {
           guardarBoton();
-        }
-      }, { passive: true });
-
-      // Si interactúan dentro del iframe (la tarjeta), también se repliega
-      window.addEventListener('blur', function() {
-        setTimeout(guardarBoton, 100);
-      });
+        });
+      }
     })();
 
     if ('serviceWorker' in navigator) {
@@ -517,4 +530,3 @@
   </script>
 </body>
 </html>
-
