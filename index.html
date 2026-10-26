@@ -390,7 +390,7 @@
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
 
-      var estaAcoplado = false;
+      var estaAcoplado = false; // Inicia completo y visible
       var bloqueoApertura = false;
       var waBloqueoClick = false;
 
@@ -420,6 +420,7 @@
         setTimeout(function() { bloqueoApertura = false; }, 400);
       }
 
+      // Toque en el botón
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (estaAcoplado) {
@@ -431,19 +432,27 @@
         }
       });
 
-      // Manejo de toques en la máscara padre
-      function toqueEnPadre(e) {
+      // Toques en el marco externo
+      window.addEventListener('click', function(e) {
         if (!btn.contains(e.target)) {
           guardarBoton();
         }
-      }
+      });
 
-      window.addEventListener('touchstart', toqueEnPadre, { capture: true, passive: true });
-      window.addEventListener('click', toqueEnPadre, { capture: true });
+      window.addEventListener('touchstart', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
+        }
+      }, { passive: true });
 
-      // Mensaje emitido desde el interior del iframe
+      // Repliegue al interactuar con el iframe
+      window.addEventListener('blur', function() {
+        setTimeout(guardarBoton, 120);
+      });
+
+      // Mensaje de respaldo desde el panel administrativo si se ejecuta un despacho
       window.addEventListener('message', function(ev) {
-        if (ev.data === 'ocultar_wa_externo' || ev.data === 'ocultar_wa_admin') {
+        if (ev.data === 'ocultar_wa_admin') {
           guardarBoton();
         }
       });
