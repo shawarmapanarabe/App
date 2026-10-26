@@ -380,25 +380,12 @@
         }
       } catch(err) {}
 
-      // ENLAZAR EVENTOS DEL IFRAME PARA OCULTAR SIN BLOQUEAR CLICS
-      try {
-        var doc = frame.contentDocument || frame.contentWindow.document;
-        if (doc) {
-          doc.addEventListener('touchstart', function() {
-            window.postMessage('ocultar_wa_externo', '*');
-          }, { passive: true });
-          doc.addEventListener('click', function() {
-            window.postMessage('ocultar_wa_externo', '*');
-          }, { passive: true });
-        }
-      } catch(e) {}
-
       setTimeout(ocultarSplash, 350);
     };
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // CONTROL DEL BOTÓN WHATSAPP SIN INTERFERIR EN EL PRIMER TOQUE
+    // CONTROL DEL BOTÓN WHATSAPP POR MENSAJES DIRECTOS (IPHONE Y ANDROID)
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -445,23 +432,18 @@
         }
       });
 
-      // Si tocan cualquier área de la ventana principal
+      // Toques en cualquier zona propia de la máscara
       window.addEventListener('click', function(e) {
         if (!btn.contains(e.target)) {
           guardarBoton();
         }
       });
 
-      // Mensajes desde el iframe o el script del sistema
+      // RECEPCIÓN DE MENSAJES DESDE EL IFRAME (0 ms DE RETRASO EN CUALQUIER TOQUE)
       window.addEventListener('message', function(ev) {
-        if (ev.data === 'ocultar_wa_externo' || ev.data === 'ocultar_wa_admin'){
+        if (ev.data === 'ocultar_wa_externo' || ev.data === 'ocultar_wa_admin') {
           guardarBoton();
         }
-      });
-
-      // Al cambiar el foco al iframe, replegar suavemente
-      window.addEventListener('blur', function() {
-        setTimeout(guardarBoton, 150);
       });
     })();
 
@@ -532,4 +514,3 @@
   </script>
 </body>
 </html>
-
