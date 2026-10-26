@@ -71,19 +71,6 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* CAPA TRANSPARENTE DETECTORA DE TOQUES EN PANTALLA */
-    #capaBackdropWa {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 99980;
-      background: transparent;
-      -webkit-tap-highlight-color: transparent;
-    }
-
     /* BOTÓN WHATSAPP: POSICIÓN BASE */
     #btnWaFlotante {
       display: flex;
@@ -279,9 +266,6 @@
   <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA -->
   <div id="iosTopBar"></div>
 
-  <!-- CAPA INVISIBLE DETECTORA PARA GUARDAR AL TOCAR CUALQUIER PARTE -->
-  <div id="capaBackdropWa"></div>
-
   <!-- BOTÓN FLOTANTE WHATSAPP: INICIA VISIBLE -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
@@ -396,18 +380,30 @@
         }
       } catch(err) {}
 
+      // ENLAZAR EVENTOS DEL IFRAME PARA OCULTAR SIN BLOQUEAR CLICS
+      try {
+        var doc = frame.contentDocument || frame.contentWindow.document;
+        if (doc) {
+          doc.addEventListener('touchstart', function() {
+            window.postMessage('ocultar_wa_externo', '*');
+          }, { passive: true });
+          doc.addEventListener('click', function() {
+            window.postMessage('ocultar_wa_externo', '*');
+          }, { passive: true });
+        }
+      } catch(e) {}
+
       setTimeout(ocultarSplash, 350);
     };
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // CONTROL INTELIGENTE DE TOQUES CON BACKDROP INVISIBLE
+    // CONTROL DEL BOTÓN WHATSAPP SIN INTERFERIR EN EL PRIMER TOQUE
     (function() {
       var btn = document.getElementById('btnWaFlotante');
-      var backdrop = document.getElementById('capaBackdropWa');
       if (!btn) return;
 
-      var estaAcoplado = false; // Inicia completo y visible
+      var estaAcoplado = false;
       var bloqueoApertura = false;
       var waBloqueoClick = false;
 
@@ -427,7 +423,6 @@
         if (!estaAcoplado) {
           btn.classList.add('docked-edge');
           estaAcoplado = true;
-          if (backdrop) backdrop.style.display = 'none'; // Libera la pantalla
         }
       }
 
@@ -435,11 +430,10 @@
         btn.classList.remove('docked-edge');
         estaAcoplado = false;
         bloqueoApertura = true;
-        if (backdrop) backdrop.style.display = 'block'; // Activa la detección en pantalla
         setTimeout(function() { bloqueoApertura = false; }, 400);
       }
 
-      // Toque directo en WhatsApp
+      // Toque en el botón de WhatsApp
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (estaAcoplado) {
@@ -451,16 +445,24 @@
         }
       });
 
-      // Tocar cualquier parte de la pantalla (fondo, tarjeta o botones) lo repliega de inmediato
-      if (backdrop) {
-        backdrop.addEventListener('touchstart', function(e) {
+      // Si tocan cualquier área de la ventana principal
+      window.addEventListener('click', function(e) {
+        if (!btn.contains(e.target)) {
           guardarBoton();
-        }, { passive: true });
+        }
+      });
 
-        backdrop.addEventListener('click', function(e) {
+      // Mensajes desde el iframe o el script del sistema
+      window.addEventListener('message', function(ev) {
+        if (ev.data === 'ocultar_wa_externo' || ev.data === 'ocultar_wa_admin'){
           guardarBoton();
-        });
-      }
+        }
+      });
+
+      // Al cambiar el foco al iframe, replegar suavemente
+      window.addEventListener('blur', function() {
+        setTimeout(guardarBoton, 150);
+      });
     })();
 
     if ('serviceWorker' in navigator) {
@@ -530,3 +532,4 @@
   </script>
 </body>
 </html>
+
