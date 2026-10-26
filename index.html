@@ -385,7 +385,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // CONTROL DEL BOTÓN WHATSAPP POR MENSAJES DIRECTOS (IPHONE Y ANDROID)
+    // CONTROL DEL BOTÓN WHATSAPP
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -420,7 +420,6 @@
         setTimeout(function() { bloqueoApertura = false; }, 400);
       }
 
-      // Toque en el botón de WhatsApp
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (estaAcoplado) {
@@ -432,14 +431,17 @@
         }
       });
 
-      // Toques en cualquier zona propia de la máscara
-      window.addEventListener('click', function(e) {
+      // Manejo de toques en la máscara padre
+      function toqueEnPadre(e) {
         if (!btn.contains(e.target)) {
           guardarBoton();
         }
-      });
+      }
 
-      // RECEPCIÓN DE MENSAJES DESDE EL IFRAME (0 ms DE RETRASO EN CUALQUIER TOQUE)
+      window.addEventListener('touchstart', toqueEnPadre, { capture: true, passive: true });
+      window.addEventListener('click', toqueEnPadre, { capture: true });
+
+      // Mensaje emitido desde el interior del iframe
       window.addEventListener('message', function(ev) {
         if (ev.data === 'ocultar_wa_externo' || ev.data === 'ocultar_wa_admin') {
           guardarBoton();
