@@ -28,7 +28,7 @@
       document.documentElement.classList.add('is-apple-web');
     }
 
-    if (!esApple || !qInit || qInit.length < 4) {
+    if (!esApple || !qInit) {
       var mLink = document.createElement('link');
       mLink.rel = 'manifest';
       mLink.href = './manifest.json';
@@ -385,7 +385,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // CONTROL DEL BOTÓN WHATSAPP
+    // CONTROL POR TOQUES: INICIA VISIBLE Y SE OCULTA AL TOCAR CUALQUIER PARTE
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -420,7 +420,6 @@
         setTimeout(function() { bloqueoApertura = false; }, 400);
       }
 
-      // Toque en el botón
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (estaAcoplado) {
@@ -432,7 +431,7 @@
         }
       });
 
-      // Toques en el marco externo
+      // Si tocan cualquier parte fuera del botón en la ventana, se repliega
       window.addEventListener('click', function(e) {
         if (!btn.contains(e.target)) {
           guardarBoton();
@@ -445,16 +444,9 @@
         }
       }, { passive: true });
 
-      // Repliegue al interactuar con el iframe
+      // Si interactúan dentro del iframe (la tarjeta), también se repliega
       window.addEventListener('blur', function() {
-        setTimeout(guardarBoton, 120);
-      });
-
-      // Mensaje de respaldo desde el panel administrativo si se ejecuta un despacho
-      window.addEventListener('message', function(ev) {
-        if (ev.data === 'ocultar_wa_admin') {
-          guardarBoton();
-        }
+        setTimeout(guardarBoton, 100);
       });
     })();
 
@@ -524,4 +516,5 @@
     });
   </script>
 </body>
-</html>
+  </html>
+  
