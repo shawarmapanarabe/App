@@ -100,15 +100,71 @@
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
 
-    /* ESTADO MINIMIZADO EN EL BORDE DERECHO (PESTAÑA EDGE) */
+    /* ALMA / FANTASMA QUE SALE HACIA LA DERECHA (CADA ~3.2 SEGUNDOS) */
+    #btnWaFlotante::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #25D366;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+      animation: fantasmaHaciaDerecha 3.2s infinite cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes fantasmaHaciaDerecha {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 0.65;
+      }
+      35% {
+        transform: translate3d(38px, 0, 0) scale(0.85);
+        opacity: 0;
+      }
+      100% {
+        transform: translate3d(38px, 0, 0) scale(0.85);
+        opacity: 0;
+      }
+    }
+
+    /* ESTADO MINIMIZADO EN EL BORDE DERECHO (PESTAÑA EDGE ASOMADA Y TENUE) */
     #btnWaFlotante.docked-edge {
-      left: calc(100% - 14px) !important;
-      opacity: 0.55;
+      left: calc(100% - 24px) !important;
+      opacity: 0.45;
       transform: scale(0.92);
+      touch-action: none !important;
     }
     #btnWaFlotante.docked-edge:hover,
     #btnWaFlotante.docked-edge:active {
       opacity: 0.85;
+    }
+
+    /* DESACTIVAR EL FANTASMA CUANDO YA ESTÁ GUARDADO */
+    #btnWaFlotante.docked-edge::before {
+      animation: none !important;
+      display: none;
+    }
+
+    /* ANIMACIÓN CUANDO ESTÁ GUARDADO: PALPITAR TENUE + DESTELLO DE TOQUE */
+    #btnWaFlotante.docked-edge .burbuja-wa-inner {
+      animation: palpitarYDestelloGuardado 2.6s infinite ease-in-out !important;
+    }
+
+    @keyframes palpitarYDestelloGuardado {
+      0%, 100% {
+        transform: scale(0.94);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+        filter: brightness(0.95);
+      }
+      50% {
+        transform: scale(1.04);
+        box-shadow: -4px 0 14px rgba(37, 211, 102, 0.7);
+        filter: brightness(1.2);
+      }
     }
 
     .burbuja-wa-inner {
@@ -123,6 +179,7 @@
       border: 2px solid #ffffff;
       animation: palpitarWa 1.5s ease-in-out infinite alternate;
       pointer-events: none;
+      position: relative;
     }
     .burbuja-wa-inner svg {
       width: 26px;
@@ -189,7 +246,7 @@
     .bar-sub { font-size: 11px; color: #F2B647; margin: 0; font-weight: 500; }
     .bar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     
-    /* BOTÓN GUARDAR CON DESTELLO SHIMMER DISCRETO (NO COMPITE CON WHATSAPP) */
+    /* BOTÓN GUARDAR CON DESTELLO SHIMMER DISCRETO */
     .btn-bar-save { 
       position: relative;
       overflow: hidden;
@@ -386,7 +443,7 @@
 
     setTimeout(ocultarSplash, esApple ? 5000 : 3500);
 
-    // FÍSICA DE DESLIZAMIENTO: EDGE DOCKING (CORREGIDO APERTURA ACCIDENTAL)
+    // FÍSICA INTELIGENTE: PESTAÑA EDGE (PROTEGIDA CONTRA GESTOS DEL SISTEMA)
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -419,7 +476,17 @@
         var deltaX = t.clientX - startX;
         var deltaY = t.clientY - startY;
 
-        // Si se desliza hacia la derecha: SE ESCONDE
+        // 1. SI ESTÁ ACOPLADO EN EL BORDE: TOQUE O DESLIZAMIENTO LO DESPLIEGA
+        if (estaAcoplado) {
+          if (e.cancelable) e.preventDefault();
+          btn.classList.remove('docked-edge');
+          estaAcoplado = false;
+          bloqueoApertura = true;
+          setTimeout(function() { bloqueoApertura = false; }, 450);
+          return;
+        }
+
+        // 2. SI ESTÁ VISIBLE Y SE DESLIZA A LA DERECHA: SE OCULTA
         if (deltaX > 20 && Math.abs(deltaY) < 45) {
           btn.classList.add('docked-edge');
           estaAcoplado = true;
@@ -428,17 +495,7 @@
           return;
         }
 
-        // Si estaba escondido y se toca: SOLO SE DESPLIEGA (NO ABRE WHATSAPP)
-        if (estaAcoplado) {
-          if (e.cancelable) e.preventDefault();
-          btn.classList.remove('docked-edge');
-          estaAcoplado = false;
-          bloqueoApertura = true;
-          setTimeout(function() { bloqueoApertura = false; }, 500);
-          return;
-        }
-
-        // Si no estaba escondido y fue un tap limpio: ABRE WHATSAPP
+        // 3. TOQUE LIMPIO CUANDO ESTÁ VISIBLE: ABRE WHATSAPP
         if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
           if (!bloqueoApertura) {
             abrirWhatsAppSeguro();
