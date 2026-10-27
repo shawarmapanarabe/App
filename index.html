@@ -134,8 +134,8 @@
     }
 
     .splash-logo {
-      width: 57vw;
-      max-width: 260px;
+      width: 68vw;
+      max-width: 310px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 0;
@@ -168,7 +168,7 @@
         opacity: 0.85;
       }
       90%, 100% {
-        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.47);
+        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.39);
         opacity: 0;
       }
     }
@@ -326,145 +326,145 @@
   </div>
 
   <script>
-    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";[span_0](start_span)[span_0](end_span)
-    var query = window.location.search;[span_1](start_span)[span_1](end_span)
-    var tieneCredenciales = false;[span_2](start_span)[span_2](end_span)
+    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
+    var query = window.location.search;
+    var tieneCredenciales = false;
 
-    if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {[span_3](start_span)[span_3](end_span)
-      if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {[span_4](start_span)[span_4](end_span)
-        query = '?search=' + query.substring(1);[span_5](start_span)[span_5](end_span)
+    if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
+      if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
+        query = '?search=' + query.substring(1);
       }
-      tieneCredenciales = true;[span_6](start_span)[span_6](end_span)
+      tieneCredenciales = true;
       try { 
-        localStorage.setItem('panarabe_final_query', query);[span_7](start_span)[span_7](end_span) 
-        sessionStorage.setItem('panarabe_session_query', query);[span_8](start_span)[span_8](end_span)
+        localStorage.setItem('panarabe_final_query', query); 
+        sessionStorage.setItem('panarabe_session_query', query);
       } catch(e) {}
     } else {
       try {
-        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');[span_9](start_span)[span_9](end_span)
-        if (guardado) {[span_10](start_span)[span_10](end_span)
-          query = guardado;[span_11](start_span)[span_11](end_span)
-          tieneCredenciales = true;[span_12](start_span)[span_12](end_span)
+        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
+        if (guardado) {
+          query = guardado;
+          tieneCredenciales = true;
         }
       } catch(e) {}
     }
 
-    var frame = document.getElementById("appFrame");[span_13](start_span)[span_13](end_span)
-    frame.src = urlBase + (query ? query : "");[span_14](start_span)[span_14](end_span)
+    var frame = document.getElementById("appFrame");
+    frame.src = urlBase + (query ? query : "");
 
-    var splashAnimado = false;[span_15](start_span)[span_15](end_span)
-    function ocultarSplashConVuelo() {[span_16](start_span)[span_16](end_span)
-      if (splashAnimado) return;[span_17](start_span)[span_17](end_span)
-      splashAnimado = true;[span_18](start_span)[span_18](end_span)
+    var splashAnimado = false;
+    function ocultarSplashConVuelo() {
+      if (splashAnimado) return;
+      splashAnimado = true;
 
-      var splash = document.getElementById("splashScreen");[span_19](start_span)[span_19](end_span)
-      var img = document.getElementById("splashImg");[span_20](start_span)[span_20](end_span)
+      var splash = document.getElementById("splashScreen");
+      var img = document.getElementById("splashImg");
 
-      if (img && splash) {[span_21](start_span)[span_21](end_span)
-        img.classList.add("en-vuelo");[span_22](start_span)[span_22](end_span)
+      if (img && splash) {
+        img.classList.add("en-vuelo");
         
-        // El fondo blanco se abre al instante en que despega el vuelo
-        splash.style.opacity = "0";[span_23](start_span)[span_23](end_span)
+        splash.style.opacity = "0";
 
-        setTimeout(function() {[span_24](start_span)[span_24](end_span)
-          splash.style.display = "none";[span_25](start_span)[span_25](end_span)
-        }, 1500);[span_26](start_span)[span_26](end_span)
+        setTimeout(function() {
+          splash.style.display = "none";
+        }, 1500);
       }
     }
 
-    frame.onload = function() {[span_27](start_span)[span_27](end_span)
+    frame.onload = function() {
+      // Garantizar que la animación arranque sin importar lo que haga el DOM interno
+      setTimeout(ocultarSplashConVuelo, 1800);
+
       try {
-        var iframeDoc = frame.contentDocument || frame.contentWindow.document;[span_28](start_span)[span_28](end_span)
-        var pinInput = iframeDoc.getElementById('inputPin');[span_29](start_span)[span_29](end_span)
-        var btnIngresar = iframeDoc.getElementById('btnBuscar');[span_30](start_span)[span_30](end_span)
+        var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+        var pinInput = iframeDoc.getElementById('inputPin');
+        var btnIngresar = iframeDoc.getElementById('btnBuscar');
         
-        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {[span_31](start_span)[span_31](end_span)
-          var matchPin = query.match(/pin=([^&]+)/i);[span_32](start_span)[span_32](end_span)
-          if (matchPin && matchPin[1]) {[span_33](start_span)[span_33](end_span)
-            var pinVal = decodeURIComponent(matchPin[1]);[span_34](start_span)[span_34](end_span)
-            pinInput.value = pinVal;[span_35](start_span)[span_35](end_span)
-            pinInput.dispatchEvent(new Event('input', { bubbles: true }));[span_36](start_span)[span_36](end_span)
-            setTimeout(function() {[span_37](start_span)[span_37](end_span)
-              btnIngresar.click();[span_38](start_span)[span_38](end_span)
-            }, 150);[span_39](start_span)[span_39](end_span)
+        if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
+          var matchPin = query.match(/pin=([^&]+)/i);
+          if (matchPin && matchPin[1]) {
+            var pinVal = decodeURIComponent(matchPin[1]);
+            pinInput.value = pinVal;
+            pinInput.dispatchEvent(new Event('input', { bubbles: true }));
+            setTimeout(function() {
+              btnIngresar.click();
+            }, 150);
           }
         }
       } catch(err) {}
-
-      setTimeout(ocultarSplashConVuelo, 1800);[span_40](start_span)[span_40](end_span)
     };
 
-    setTimeout(ocultarSplashConVuelo, 6000);[span_41](start_span)[span_41](end_span)
+    setTimeout(ocultarSplashConVuelo, 5000);
 
-    (function() {[span_42](start_span)[span_42](end_span)
-      var btn = document.getElementById('btnWaFlotante');[span_43](start_span)[span_43](end_span)
-      if (!btn) return;[span_44](start_span)[span_44](end_span)
+    (function() {
+      var btn = document.getElementById('btnWaFlotante');
+      if (!btn) return;
 
-      var estaAcoplado = false;[span_45](start_span)[span_45](end_span)
-      var bloqueoApertura = false;[span_46](start_span)[span_46](end_span)
-      var waBloqueoClick = false;[span_47](start_span)[span_47](end_span)
+      var estaAcoplado = false;
+      var bloqueoApertura = false;
+      var waBloqueoClick = false;
 
-      function abrirWhatsAppSeguro() {[span_48](start_span)[span_48](end_span)
-        if (waBloqueoClick || bloqueoApertura) return;[span_49](start_span)[span_49](end_span)
-        waBloqueoClick = true;[span_50](start_span)[span_50](end_span)
-        setTimeout(function() { waBloqueoClick = false; }, 1000);[span_51](start_span)[span_51](end_span)
-        var targetUrl = 'https://api.whatsapp.com/send?phone=51906769744';[span_52](start_span)[span_52](end_span)
-        if (esApple && esPWA) {[span_53](start_span)[span_53](end_span)
-          window.location.href = targetUrl;[span_54](start_span)[span_54](end_span)
+      function abrirWhatsAppSeguro() {
+        if (waBloqueoClick || bloqueoApertura) return;
+        waBloqueoClick = true;
+        setTimeout(function() { waBloqueoClick = false; }, 1000);
+        var targetUrl = 'https://api.whatsapp.com/send?phone=51906769744';
+        if (esApple && esPWA) {
+          window.location.href = targetUrl;
         } else {
-          window.open(targetUrl, '_blank');[span_55](start_span)[span_55](end_span)
+          window.open(targetUrl, '_blank');
         }
       }
 
-      function guardarBoton() {[span_56](start_span)[span_56](end_span)
-        if (!estaAcoplado) {[span_57](start_span)[span_57](end_span)
-          btn.classList.add('docked-edge');[span_58](start_span)[span_58](end_span)
-          estaAcoplado = true;[span_59](start_span)[span_59](end_span)
+      function guardarBoton() {
+        if (!estaAcoplado) {
+          btn.classList.add('docked-edge');
+          estaAcoplado = true;
         }
       }
 
-      function desplegarBoton() {[span_60](start_span)[span_60](end_span)
-        btn.classList.remove('docked-edge');[span_61](start_span)[span_61](end_span)
-        estaAcoplado = false;[span_62](start_span)[span_62](end_span)
-        bloqueoApertura = true;[span_63](start_span)[span_63](end_span)
-        setTimeout(function() { bloqueoApertura = false; }, 400);[span_64](start_span)[span_64](end_span)
+      function desplegarBoton() {
+        btn.classList.remove('docked-edge');
+        estaAcoplado = false;
+        bloqueoApertura = true;
+        setTimeout(function() { bloqueoApertura = false; }, 400);
       }
 
-      btn.addEventListener('click', function(e) {[span_65](start_span)[span_65](end_span)
-        e.stopPropagation();[span_66](start_span)[span_66](end_span)
-        if (estaAcoplado) {[span_67](start_span)[span_67](end_span)
-          desplegarBoton();[span_68](start_span)[span_68](end_span)
-          return;[span_69](start_span)[span_69](end_span)
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (estaAcoplado) {
+          desplegarBoton();
+          return;
         }
-        if (!bloqueoApertura) {[span_70](start_span)[span_70](end_span)
-          abrirWhatsAppSeguro();[span_71](start_span)[span_71](end_span)
+        if (!bloqueoApertura) {
+          abrirWhatsAppSeguro();
         }
       });
 
-      window.addEventListener('click', function(e) {[span_72](start_span)[span_72](end_span)
-        if (!btn.contains(e.target)) {[span_73](start_span)[span_73](end_span)
-          guardarBoton();[span_74](start_span)[span_74](end_span)
+      window.addEventListener('click', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
         }
       });
 
-      window.addEventListener('touchstart', function(e) {[span_75](start_span)[span_75](end_span)
-        if (!btn.contains(e.target)) {[span_76](start_span)[span_76](end_span)
-          guardarBoton();[span_77](start_span)[span_77](end_span)
+      window.addEventListener('touchstart', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
         }
-      }, { passive: true });[span_78](start_span)[span_78](end_span)
+      }, { passive: true });
 
-      window.addEventListener('blur', function() {[span_79](start_span)[span_79](end_span)
-        setTimeout(guardarBoton, 100);[span_80](start_span)[span_80](end_span)
+      window.addEventListener('blur', function() {
+        setTimeout(guardarBoton, 100);
       });
     })();
 
-    if ('serviceWorker' in navigator) {[span_81](start_span)[span_81](end_span)
-      window.addEventListener('load', function() {[span_82](start_span)[span_82](end_span)
-        navigator.serviceWorker.register('./sw.js').catch(function(){});[span_83](start_span)[span_83](end_span)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(){});
       });
     }
 
-    var yaCerroBarraSesion = false;[span_84](start_    var yaCerroBarraSesion = false;
+    var yaCerroBarraSesion = false;
     try {
       yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
     } catch(e) {}
@@ -524,3 +524,26 @@
   </script>
 </body>
 </html>
+
+
+    /* ATERRIZAJE EXCLUSIVO PARA IPHONE AL FINAL DEL CSS */
+    html.is-apple-installed .splash-logo.en-vuelo,
+    html.is-apple-web .splash-logo.en-vuelo {
+      animation: aterrizajeSuaveIos 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    }
+
+    @keyframes aterrizajeSuaveIos {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      70% {
+        opacity: 0.85;
+      }
+      90%, 100% {
+        transform: translate(calc(-50vw + 24vw - 10px), calc(-50vh + 290px)) scale(0.39);
+        opacity: 0;
+      }
+    }
+</style>
+
