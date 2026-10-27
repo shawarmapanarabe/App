@@ -129,7 +129,7 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 1.3s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: opacity 1.2s ease-out;
       pointer-events: none;
     }
 
@@ -154,7 +154,7 @@
       100% { transform: scale(1.025); }
     }
 
-    /* ATERRIZAJE CALIBRADO EN EL SELLO DEL PERFIL */
+    /* ATERRIZAJE CALIBRADO */
     .splash-logo.en-vuelo {
       animation: aterrizajeSuave 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
     }
@@ -292,7 +292,7 @@
 
   <div id="pwaBarBottom">
     <div class="bar-left">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP[span_0](start_span)[span_1](start_span)!"[span_0](end_span)[span_1](end_span)>
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP[span_0](start_span)[span_1](start_span)[span_2](start_span)!"[span_0](end_span)[span_1](end_span)[span_2](end_span)>
       <div class="bar-text-group">
         <p class="bar-title">Guardar Tarjeta</p>
         <p class="bar-sub">Acceso directo a tu saldo</p>
@@ -306,7 +306,7 @@
 
   <div id="iosGuideModal">
     <div class="modal-card">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe[span_2](start_span)[span_3](start_span)"[span_2](end_span)[span_3](end_span)>
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe[span_3](start_span)[span_4](start_span)[span_5](start_span)"[span_3](end_span)[span_4](end_span)[span_5](end_span)>
       <h3 class="modal-title">Guardar Tarjeta</h3>
       
       <div class="modal-instruction">
@@ -326,7 +326,7 @@
   </div>
 
   <script>
-    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";[span_4](start_span)[span_4](end_span)
+    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)
     var query = window.location.search;
     var tieneCredenciales = false;
 
@@ -363,16 +363,19 @@
       if (img && splash) {
         img.classList.add("en-vuelo");
         
+        // Empieza a aclarar suavemente el fondo blanco mientras el logo viaja
         setTimeout(function() {
           splash.style.opacity = "0";
-        }, 500);
+        }, 400);
 
+        // Remueve el splash por completo del DOM tras completar el viaje
         setTimeout(function() {
           splash.style.display = "none";
         }, 1900);
       }
     }
 
+    // Disparador al cargar el iframe
     frame.onload = function() {
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -392,10 +395,12 @@
         }
       } catch(err) {}
 
-      setTimeout(ocultarSplashConVuelo, 1800);
+      // Da tiempo prudencial para asegurar renderizado visual y despega
+      setTimeout(ocultarSplashConVuelo, 1200);
     };
 
-    setTimeout(ocultarSplashConVuelo, 6000);
+    // Temporizador de respaldo absoluto: si por red o Google Apps Script se demora, no se queda pegado
+    setTimeout(ocultarSplashConVuelo, 4000);
 
     (function() {
       var btn = document.getElementById('btnWaFlotante');
