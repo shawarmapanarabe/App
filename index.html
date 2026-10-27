@@ -134,8 +134,8 @@
     }
 
     .splash-logo {
-      width: 82vw;
-      max-width: 360px;
+      width: 44vw;
+      max-width: 195px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 0;
@@ -168,7 +168,27 @@
         opacity: 0.85;
       }
       90%, 100% {
-        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.33);
+        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.61);
+        opacity: 0;
+      }
+    }
+
+    /* ATERRIZAJE EXCLUSIVO PARA IPHONE */
+    html.is-apple-installed .splash-logo.en-vuelo,
+    html.is-apple-web .splash-logo.en-vuelo {
+      animation: aterrizajeSuaveIos 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    }
+
+    @keyframes aterrizajeSuaveIos {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      70% {
+        opacity: 0.85;
+      }
+      90%, 100% {
+        transform: translate(calc(-50vw + 24vw - 10px), calc(-50vh + 290px)) scale(0.61);
         opacity: 0;
       }
     }
@@ -363,7 +383,6 @@
       if (img && splash) {
         img.classList.add("en-vuelo");
         
-        // El fondo blanco se abre al instante en que despega el vuelo
         splash.style.opacity = "0";
 
         setTimeout(function() {
