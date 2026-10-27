@@ -139,17 +139,18 @@
       }
     }
 
-    /* PANTALLA SPLASH CLONADA AL TAMAÑO NATIVO DE ANDROID */
+    /* PANTALLA SPLASH CON SECUENCIA DINÁMICA */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+      transition: background-color 0.4s ease-out;
       pointer-events: none;
     }
+
     .splash-logo {
-      width: 192px;
-      max-width: 50vw;
+      width: 82vw;
+      max-width: 360px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 0;
@@ -159,11 +160,30 @@
       user-select: none;
       -webkit-user-select: none;
       margin-top: 0;
-      animation: palpitarLogo 1.4s ease-in-out infinite alternate;
+      transform-origin: center center;
+      /* Inicia en la escala chica del logo nativo y se abre fluidamente a su tamaño completo */
+      animation: aparecerCrecer 0.65s cubic-bezier(0.2, 0.8, 0.25, 1) forwards, 
+                 palpitarContinuo 1.4s ease-in-out 0.65s infinite alternate;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease-in;
     }
-    @keyframes palpitarLogo {
+
+    /* FASE 1: De pequeño (Android nativo) a grande */
+    @keyframes aparecerCrecer {
+      0% { transform: scale(0.60); }
+      100% { transform: scale(1); }
+    }
+
+    /* FASE 2: Palpitación mientras espera datos */
+    @keyframes palpitarContinuo {
       0% { transform: scale(1); }
-      100% { transform: scale(1.03); }
+      100% { transform: scale(1.035); }
+    }
+
+    /* FASE 3: Vuela, se encoge y aterriza en el sello circular de la tarjeta */
+    .splash-logo.aterrizar-perfil {
+      animation: none !important;
+      transform: translate(calc(-50vw + 24vw + 16px), calc(-50vh + 35vw + 38px)) scale(0.36) !important;
+      opacity: 0;
     }
 
     /* BARRA INFERIOR */
@@ -275,9 +295,9 @@
     </div>
   </div>
 
-  <!-- PANTALLA SPLASH CON TAMAÑO EXACTO NATIVO -->
+  <!-- PANTALLA SPLASH CON ANIMACIÓN HACIA EL PERFIL -->
   <div id="splashScreen">
-    <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="splash-logo" alt="Shawarma Panárabe">
+    <img id="splashImg" src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="splash-logo" alt="Shawarma Panárabe">
   </div>
 
   <iframe 
@@ -287,7 +307,7 @@
     allow="downloads; clipboard-write" 
   ></iframe>
 
-  <!-- BARRA INFERIOR (MANTIENE LOGO ORIGINAL) -->
+  <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -302,7 +322,7 @@
     </div>
   </div>
 
-  <!-- GUÍA DE GUARDADO RÁPIDO PUNTUAL (MANTIENE LOGO ORIGINAL) -->
+  <!-- GUÍA DE GUARDADO RÁPIDO PUNTUAL -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
@@ -351,13 +371,22 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    function ocultarSplash() {
+    var splashAnimado = false;
+    function ocultarSplashConVuelo() {
+      if (splashAnimado) return;
+      splashAnimado = true;
+
       var splash = document.getElementById("splashScreen");
-      if (splash && splash.style.display !== "none") {
-        splash.style.opacity = "0";
+      var img = document.getElementById("splashImg");
+
+      if (img && splash) {
+        // Ejecuta la animación de encogerse y volar hacia el logo del perfil
+        img.classList.add("aterrizar-perfil");
+        splash.style.backgroundColor = "transparent";
+
         setTimeout(function() {
           splash.style.display = "none";
-        }, 400);
+        }, 550);
       }
     }
 
@@ -380,10 +409,11 @@
         }
       } catch(err) {}
 
-      setTimeout(ocultarSplash, 350);
+      // Al cargar los datos del perfil, vuela y se guarda en el estampado
+      setTimeout(ocultarSplashConVuelo, 400);
     };
 
-    setTimeout(ocultarSplash, esApple ? 5000 : 3500);
+    setTimeout(ocultarSplashConVuelo, esApple ? 5000 : 3500);
 
     // CONTROL POR TOQUES: INICIA VISIBLE Y SE OCULTA AL TOCAR CUALQUIER PARTE
     (function() {
@@ -515,4 +545,3 @@
   </script>
 </body>
 </html>
-
