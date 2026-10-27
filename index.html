@@ -134,8 +134,8 @@
     }
 
     .splash-logo {
-      width: 68vw;
-      max-width: 310px;
+      width: 46vw;
+      max-width: 210px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 0;
@@ -154,7 +154,7 @@
       100% { transform: scale(1.025); }
     }
 
-    /* ATERRIZAJE FLUIDO Y SINCRONIZADO */
+    /* ATERRIZAJE ANDROID */
     .splash-logo.en-vuelo {
       animation: aterrizajeSuave 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
     }
@@ -168,7 +168,27 @@
         opacity: 0.85;
       }
       90%, 100% {
-        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.39);
+        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.58);
+        opacity: 0;
+      }
+    }
+
+    /* ATERRIZAJE EXCLUSIVO PARA IPHONE */
+    html.is-apple-installed .splash-logo.en-vuelo,
+    html.is-apple-web .splash-logo.en-vuelo {
+      animation: aterrizajeSuaveIos 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    }
+
+    @keyframes aterrizajeSuaveIos {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      70% {
+        opacity: 0.85;
+      }
+      90%, 100% {
+        transform: translate(calc(-50vw + 24vw - 10px), calc(-50vh + 290px)) scale(0.58);
         opacity: 0;
       }
     }
@@ -265,8 +285,8 @@
       box-shadow: 0 4px 12px rgba(233, 80, 66, 0.25);
     }
     .modal-btn-ok:active { transform: scale(0.96); }
-  </style>
-</head>
+      </style>
+  </head>
 <body>
 
   <div id="iosTopBar"></div>
@@ -372,7 +392,6 @@
     }
 
     frame.onload = function() {
-      // Garantizar que la animación arranque sin importar lo que haga el DOM interno
       setTimeout(ocultarSplashConVuelo, 1800);
 
       try {
@@ -524,26 +543,3 @@
   </script>
 </body>
 </html>
-
-
-    /* ATERRIZAJE EXCLUSIVO PARA IPHONE AL FINAL DEL CSS */
-    html.is-apple-installed .splash-logo.en-vuelo,
-    html.is-apple-web .splash-logo.en-vuelo {
-      animation: aterrizajeSuaveIos 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-    }
-
-    @keyframes aterrizajeSuaveIos {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      70% {
-        opacity: 0.85;
-      }
-      90%, 100% {
-        transform: translate(calc(-50vw + 24vw - 10px), calc(-50vh + 290px)) scale(0.39);
-        opacity: 0;
-      }
-    }
-</style>
-
