@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SP!">
-  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
   <script>
@@ -129,7 +129,7 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.4s ease-out;
+      transition: opacity 1.6s cubic-bezier(0.25, 1, 0.5, 1);
       pointer-events: none;
     }
 
@@ -146,13 +146,14 @@
       -webkit-user-select: none;
       margin-top: 0;
       transform-origin: center center;
-      animation: aparecerCrecer 0.6s cubic-bezier(0.2, 0.8, 0.25, 1) forwards, 
-                 palpitarContinuo 1.4s ease-in-out 0.6s infinite alternate;
-      transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease-in;
+      animation: aparecerCrecer 0.8s cubic-bezier(0.2, 0.8, 0.25, 1) forwards, 
+                 palpitarContinuo 1.5s ease-in-out 0.8s infinite alternate;
+      /* Transición de vuelo extendida a 1.8 segundos suaves */
+      transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 1.8s ease-in;
     }
 
     @keyframes aparecerCrecer {
-      0% { transform: scale(0.58); }
+      0% { transform: scale(0.55); }
       100% { transform: scale(1); }
     }
 
@@ -161,10 +162,10 @@
       100% { transform: scale(1.035); }
     }
 
-    /* VUELO HACIA EL SELLO CIRCULAR DEL PERFIL */
+    /* ATERRIZAJE SUAVE AL SELLO DEL PERFIL */
     .splash-logo.aterrizar-perfil {
       animation: none !important;
-      transform: translate(calc(-50vw + 24vw + 14px), calc(-50vh + 35vw + 34px)) scale(0.35) !important;
+      transform: translate(calc(-50vw + 24vw + 26px), calc(-50vh + 230px)) scale(0.32) !important;
       opacity: 0 !important;
     }
 
@@ -356,16 +357,17 @@
       var img = document.getElementById("splashImg");
 
       if (img && splash) {
+        // Dispara el vuelo suave de 1.8 segundos
         img.classList.add("aterrizar-perfil");
         
-        // El fondo blanco se va desvaneciendo suavemente a mitad del vuelo
+        // El fondo blanco se va aclarando lentamente en paralelo
         setTimeout(function() {
           splash.style.opacity = "0";
-        }, 220);
+        }, 150);
 
         setTimeout(function() {
           splash.style.display = "none";
-        }, 650);
+        }, 2000);
       }
     }
 
@@ -388,10 +390,11 @@
         }
       } catch(err) {}
 
-      setTimeout(ocultarSplashConVuelo, 400);
+      // Espera de seguridad para asegurar que el perfil esté 100% renderizado
+      setTimeout(ocultarSplashConVuelo, 1800);
     };
 
-    setTimeout(ocultarSplashConVuelo, esApple ? 5000 : 3500);
+    setTimeout(ocultarSplashConVuelo, 6000);
 
     (function() {
       var btn = document.getElementById('btnWaFlotante');
