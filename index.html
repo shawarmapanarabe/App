@@ -139,7 +139,7 @@
       }
     }
 
-    /* PANTALLA SPLASH CALIBRADA */
+    /* PANTALLA SPLASH EXACTA */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
@@ -148,7 +148,8 @@
       pointer-events: none;
     }
     .splash-logo {
-      width: clamp(160px, 48vw, 192px);
+      width: 66vw;
+      max-width: 280px;
       height: auto;
       aspect-ratio: 1/1;
       border-radius: 0;
@@ -157,7 +158,7 @@
       background: transparent;
       user-select: none;
       -webkit-user-select: none;
-      margin-top: 0;
+      margin-top: -24px;
       animation: palpitarLogo 1.4s ease-in-out infinite alternate;
     }
     @keyframes palpitarLogo {
@@ -274,7 +275,7 @@
     </div>
   </div>
 
-  <!-- PANTALLA SPLASH -->
+  <!-- PANTALLA SPLASH CON LA MISMA IMAGEN 1:1 -->
   <div id="splashScreen">
     <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="splash-logo" alt="Shawarma Panárabe">
   </div>
