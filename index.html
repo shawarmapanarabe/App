@@ -154,7 +154,7 @@
       100% { transform: scale(1.025); }
     }
 
-    /* ATERRIZAJE CALIBRADO EN EL SELLO */
+    /* ATERRIZAJE CALIBRADO CON DESVANECIMIENTO ANTICIPADO */
     .splash-logo.en-vuelo {
       animation: aterrizajeSuave 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
     }
@@ -164,11 +164,14 @@
         transform: translate(0, 0) scale(1);
         opacity: 1;
       }
-      70% {
-        opacity: 0.95;
+      55% {
+        opacity: 0.9;
       }
-      100% {
-        transform: translate(calc(-50vw + 24vw + 2px), calc(-50vh + 285px)) scale(0.33);
+      75% {
+        opacity: 0.25;
+      }
+      88%, 100% {
+        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.33);
         opacity: 0;
       }
     }
@@ -292,7 +295,7 @@
 
   <div id="pwaBarBottom">
     <div class="bar-left">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP[span_2](start_span)[span_3](start_span)[span_4](start_span)[span_5](start_span)!"[span_2](end_span)[span_3](end_span)[span_4](end_span)[span_5](end_span)>
       <div class="bar-text-group">
         <p class="bar-title">Guardar Tarjeta</p>
         <p class="bar-sub">Acceso directo a tu saldo</p>
@@ -306,7 +309,7 @@
 
   <div id="iosGuideModal">
     <div class="modal-card">
-      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
+      <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe[span_6](start_span)[span_7](start_span)[span_8](start_span)[span_9](start_span)"[span_6](end_span)[span_7](end_span)[span_8](end_span)[span_9](end_span)>
       <h3 class="modal-title">Guardar Tarjeta</h3>
       
       <div class="modal-instruction">
@@ -326,7 +329,7 @@
   </div>
 
   <script>
-    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
+    var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";[span_10](start_span)[span_10](end_span)[span_11](start_span)[span_11](end_span)[span_12](start_span)[span_12](end_span)
     var query = window.location.search;
     var tieneCredenciales = false;
 
