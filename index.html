@@ -18,12 +18,10 @@
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    // MARCA PARA LA APP INSTALADA
     if (esApple && esPWA) {
       document.documentElement.classList.add('is-apple-installed');
     }
 
-    // MARCA EXCLUSIVA PARA LA WEB EN IPHONE (SAFARI O CHROME)
     if (esApple && !esPWA) {
       document.documentElement.classList.add('is-apple-web');
     }
@@ -44,19 +42,16 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
-    /* EN LA WEB SUBE TODO AL TOPE (TOP: 0, 100% PANTALLA) */
     iframe { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       border: 0; display: block; background-color: #F9F9F9; 
     }
 
-    /* SOLO CUANDO ESTÁ AGREGADA A INICIO EN IPHONE RESPETA EL SAFE-AREA */
     html.is-apple-installed iframe {
       top: env(safe-area-inset-top, 0px) !important;
       height: calc(100% - env(safe-area-inset-top, 0px)) !important;
     }
 
-    /* FRANJA BLANCA: APAGADA EN LA WEB, SOLO VISIBLE EN APP INSTALADA */
     #iosTopBar {
       display: none;
       position: fixed;
@@ -71,7 +66,6 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* BOTÓN WHATSAPP: POSICIÓN BASE */
     #btnWaFlotante {
       display: flex;
       position: fixed;
@@ -89,17 +83,14 @@
       transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease, left 0.28s ease;
     }
 
-    /* EXCLUSIVO: WEB EN IPHONE (SAFARI / CHROME) */
     html.is-apple-web #btnWaFlotante {
       top: clamp(248px, 68vw, 305px);
     }
 
-    /* EXCLUSIVO: APP INSTALADA EN IPHONE */
     html.is-apple-installed #btnWaFlotante {
       top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
     }
 
-    /* ESTADO MINIMIZADO EN EL BORDE DERECHO (ASOMADO 24PX) */
     #btnWaFlotante.docked-edge {
       left: calc(100% - 24px) !important;
       opacity: 0.65;
@@ -129,22 +120,16 @@
       fill: #ffffff;
     }
     @keyframes palpitarWa {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-      }
-      100% {
-        transform: scale(1.1);
-        box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7);
-      }
+      0% { transform: scale(1); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); }
+      100% { transform: scale(1.1); box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7); }
     }
 
-    /* PANTALLA SPLASH CON SECUENCIA DINÁMICA */
+    /* PANTALLA SPLASH */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: background-color 0.4s ease-out;
+      transition: opacity 0.4s ease-out;
       pointer-events: none;
     }
 
@@ -161,29 +146,26 @@
       -webkit-user-select: none;
       margin-top: 0;
       transform-origin: center center;
-      /* Inicia en la escala chica del logo nativo y se abre fluidamente a su tamaño completo */
-      animation: aparecerCrecer 0.65s cubic-bezier(0.2, 0.8, 0.25, 1) forwards, 
-                 palpitarContinuo 1.4s ease-in-out 0.65s infinite alternate;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease-in;
+      animation: aparecerCrecer 0.6s cubic-bezier(0.2, 0.8, 0.25, 1) forwards, 
+                 palpitarContinuo 1.4s ease-in-out 0.6s infinite alternate;
+      transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease-in;
     }
 
-    /* FASE 1: De pequeño (Android nativo) a grande */
     @keyframes aparecerCrecer {
-      0% { transform: scale(0.60); }
+      0% { transform: scale(0.58); }
       100% { transform: scale(1); }
     }
 
-    /* FASE 2: Palpitación mientras espera datos */
     @keyframes palpitarContinuo {
       0% { transform: scale(1); }
       100% { transform: scale(1.035); }
     }
 
-    /* FASE 3: Vuela, se encoge y aterriza en el sello circular de la tarjeta */
+    /* VUELO HACIA EL SELLO CIRCULAR DEL PERFIL */
     .splash-logo.aterrizar-perfil {
       animation: none !important;
-      transform: translate(calc(-50vw + 24vw + 16px), calc(-50vh + 35vw + 38px)) scale(0.36) !important;
-      opacity: 0;
+      transform: translate(calc(-50vw + 24vw + 14px), calc(-50vh + 35vw + 34px)) scale(0.35) !important;
+      opacity: 0 !important;
     }
 
     /* BARRA INFERIOR */
@@ -208,7 +190,6 @@
     .bar-sub { font-size: 11px; color: #F2B647; margin: 0; font-weight: 500; }
     .bar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     
-    /* BOTÓN GUARDAR CON DESTELLO SHIMMER DISCRETO */
     .btn-bar-save { 
       position: relative;
       overflow: hidden;
@@ -283,10 +264,8 @@
 </head>
 <body>
 
-  <!-- FRANJA SUPERIOR BLANCA SOLO EN APP INSTALADA -->
   <div id="iosTopBar"></div>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP: INICIA VISIBLE -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -295,7 +274,6 @@
     </div>
   </div>
 
-  <!-- PANTALLA SPLASH CON ANIMACIÓN HACIA EL PERFIL -->
   <div id="splashScreen">
     <img id="splashImg" src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="splash-logo" alt="Shawarma Panárabe">
   </div>
@@ -307,7 +285,6 @@
     allow="downloads; clipboard-write" 
   ></iframe>
 
-  <!-- BARRA INFERIOR -->
   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="bar-icon" alt="SP!">
@@ -322,7 +299,6 @@
     </div>
   </div>
 
-  <!-- GUÍA DE GUARDADO RÁPIDO PUNTUAL -->
   <div id="iosGuideModal">
     <div class="modal-card">
       <img src="https://lh3.googleusercontent.com/d/1yo4GNS2jeYfQC9-ZCTCbS13K-SxG-T91" class="modal-logo" alt="Shawarma Panárabe">
@@ -380,13 +356,16 @@
       var img = document.getElementById("splashImg");
 
       if (img && splash) {
-        // Ejecuta la animación de encogerse y volar hacia el logo del perfil
         img.classList.add("aterrizar-perfil");
-        splash.style.backgroundColor = "transparent";
+        
+        // El fondo blanco se va desvaneciendo suavemente a mitad del vuelo
+        setTimeout(function() {
+          splash.style.opacity = "0";
+        }, 220);
 
         setTimeout(function() {
           splash.style.display = "none";
-        }, 550);
+        }, 650);
       }
     }
 
@@ -409,13 +388,11 @@
         }
       } catch(err) {}
 
-      // Al cargar los datos del perfil, vuela y se guarda en el estampado
       setTimeout(ocultarSplashConVuelo, 400);
     };
 
     setTimeout(ocultarSplashConVuelo, esApple ? 5000 : 3500);
 
-    // CONTROL POR TOQUES: INICIA VISIBLE Y SE OCULTA AL TOCAR CUALQUIER PARTE
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -484,7 +461,6 @@
       });
     }
 
-    // CONTROL INTELIGENTE DE BARRA INFERIOR POR SESIÓN
     var yaCerroBarraSesion = false;
     try {
       yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
