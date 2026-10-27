@@ -129,13 +129,13 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.8s ease-out;
+      transition: opacity 0.4s ease-out;
       pointer-events: none;
     }
 
     .splash-logo {
-      width: 46vw;
-      max-width: 210px;
+      width: 82vw;
+      max-width: 360px;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 0;
@@ -145,52 +145,12 @@
       user-select: none;
       -webkit-user-select: none;
       margin-top: 0;
-      transform-origin: center center;
       animation: entrarYpalpitar 1.4s ease-in-out infinite alternate;
     }
 
     @keyframes entrarYpalpitar {
       0% { transform: scale(0.97); }
       100% { transform: scale(1.025); }
-    }
-
-    /* ATERRIZAJE ANDROID */
-    .splash-logo.en-vuelo {
-      animation: aterrizajeSuave 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-    }
-
-    @keyframes aterrizajeSuave {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      70% {
-        opacity: 0.85;
-      }
-      90%, 100% {
-        transform: translate(calc(-50vw + 24vw), calc(-50vh + 275px)) scale(0.58);
-        opacity: 0;
-      }
-    }
-
-    /* ATERRIZAJE EXCLUSIVO PARA IPHONE */
-    html.is-apple-installed .splash-logo.en-vuelo,
-    html.is-apple-web .splash-logo.en-vuelo {
-      animation: aterrizajeSuaveIos 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-    }
-
-    @keyframes aterrizajeSuaveIos {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      70% {
-        opacity: 0.85;
-      }
-      90%, 100% {
-        transform: translate(calc(-50vw + 24vw - 10px), calc(-50vh + 290px)) scale(0.58);
-        opacity: 0;
-      }
     }
 
     /* BARRA INFERIOR */
@@ -285,8 +245,8 @@
       box-shadow: 0 4px 12px rgba(233, 80, 66, 0.25);
     }
     .modal-btn-ok:active { transform: scale(0.96); }
-      </style>
-  </head>
+  </style>
+</head>
 <body>
 
   <div id="iosTopBar"></div>
@@ -372,27 +332,18 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    var splashAnimado = false;
-    function ocultarSplashConVuelo() {
-      if (splashAnimado) return;
-      splashAnimado = true;
-
+    function ocultarSplash() {
       var splash = document.getElementById("splashScreen");
-      var img = document.getElementById("splashImg");
-
-      if (img && splash) {
-        img.classList.add("en-vuelo");
-        
+      if (splash && splash.style.display !== "none") {
         splash.style.opacity = "0";
-
         setTimeout(function() {
           splash.style.display = "none";
-        }, 1500);
+        }, 400);
       }
     }
 
     frame.onload = function() {
-      setTimeout(ocultarSplashConVuelo, 1800);
+      setTimeout(ocultarSplash, 400);
 
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -413,7 +364,7 @@
       } catch(err) {}
     };
 
-    setTimeout(ocultarSplashConVuelo, 5000);
+    setTimeout(ocultarSplash, 4000);
 
     (function() {
       var btn = document.getElementById('btnWaFlotante');
