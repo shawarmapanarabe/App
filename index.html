@@ -20,7 +20,10 @@
     var ONESIGNAL_APP_ID = "TU_ONESIGNAL_APP_ID_AQUI";
     OneSignalDeferred.push(async function(OneSignal) {
       if (ONESIGNAL_APP_ID && ONESIGNAL_APP_ID !== "TU_ONESIGNAL_APP_ID_AQUI") {
-        await OneSignal.init({ appId: ONESIGNAL_APP_ID, notifyButton: { enable: false } });
+        await OneSignal.init({
+          appId: ONESIGNAL_APP_ID,
+          notifyButton: { enable: false }
+        });
       }
     });
   </script>
@@ -47,12 +50,11 @@
   </script>
 
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
-      user-select: none; -webkit-user-select: none;
     }
 
     iframe { 
@@ -79,280 +81,102 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* BARRA SUPERIOR RETRÁCTIL DE PROMO */
-    #notifBarTop {
+    /* FRANJA ESTÁNDAR PWA (SOLO SALE SI NO TIENE NOTIFICACIONES) */
+    #notifSaldoTop {
+      display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 380px;
       background: #1E2743;
       color: #ffffff;
-      z-index: 99995;
       padding: 10px 14px;
-      box-shadow: 0 4px 16px rgba(30, 39, 67, 0.35);
-      display: none;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
+      z-index: 99995;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      border: 1.5px solid #F2B647;
       box-sizing: border-box;
-      border-bottom: 2px solid #F2B647;
+      animation: bajarNotifSaldo 0.3s ease-out;
     }
-    html.is-apple-installed #notifBarTop {
-      top: env(safe-area-inset-top, 0px);
+    html.is-apple-installed #notifSaldoTop {
+      top: calc(12px + env(safe-area-inset-top, 0px));
     }
-    .notif-content-area {
-      flex: 1;
-      min-width: 0;
-      cursor: pointer;
+    @keyframes bajarNotifSaldo {
+      from { transform: translate(-50%, -40px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
     }
-    .notif-title-row {
+    .notif-saldo-left {
       display: flex;
       align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
     }
-    .notif-icon-tag { font-size: 15px; flex-shrink: 0; }
-    .notif-title-text {
+    .notif-saldo-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .notif-saldo-text-group {
+      min-width: 0;
+      flex: 1;
+    }
+    .notif-saldo-tit {
       font-size: 12.5px;
       font-weight: 700;
       color: #F2B647;
       margin: 0;
+      line-height: 1.2;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      line-height: 1.25;
     }
-    .notif-sub-text {
-      display: none;
+    .notif-saldo-sub {
       font-size: 11px;
       color: #ffffff;
-      opacity: 0.92;
-      margin-top: 4px;
-      line-height: 1.35;
-      word-break: break-word;
+      margin: 2px 0 0 0;
+      opacity: 0.9;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .notif-btn-check {
-      background: #E95042;
-      color: #ffffff;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+    .notif-saldo-actions {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
+      gap: 6px;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(233, 80, 66, 0.4);
-      touch-action: manipulation;
     }
-    .notif-btn-check:active { transform: scale(0.92); }
-
-    /* PÍLDORA COMPACTA NATIVA ULTRA-FLUIDA */
-    #miniPildoraPromo {
-      display: flex;
-      position: fixed;
-      top: 14px;
-      right: 0;
-      z-index: 99994;
-      background: #1E2743;
-      border: 1.5px solid #F2B647;
-      border-right: none;
-      border-radius: 20px 0 0 20px;
-      padding: 5px 12px 5px 9px;
-      box-shadow: -2px 4px 12px rgba(30, 39, 67, 0.35);
-      cursor: pointer;
-      align-items: center;
-      gap: 5px;
-      color: #F2B647;
-      font-family: 'Poppins', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      outline: none;
-      touch-action: manipulation;
-      transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
-      opacity: 0.95;
-    }
-    html.is-apple-installed #miniPildoraPromo {
-      top: calc(14px + env(safe-area-inset-top, 0px));
-    }
-    #miniPildoraPromo.docked-pildora {
-      transform: translateX(44px);
-      opacity: 0.7;
-    }
-    #miniPildoraPromo.docked-pildora:active {
-      opacity: 1;
-      transform: translateX(44px) scale(0.95);
-    }
-    .pildora-fuego { font-size: 14px; line-height: 1; pointer-events: none; }
-    .pildora-texto { pointer-events: none; }
-
-    /* MODAL DE FLYER FLOTANTE */
-    #modalFlyerPromo {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(30, 39, 67, 0.78);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      z-index: 99999;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .flyer-card {
-      background: #ffffff;
-      border-radius: 24px;
-      max-width: 360px;
-      width: 100%;
-      overflow: hidden;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      animation: zoomFlyer 0.24s cubic-bezier(0.2, 0.8, 0.3, 1);
-    }
-    @keyframes zoomFlyer {
-      from { transform: scale(0.88); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    .flyer-img {
-      width: 100%;
-      height: auto;
-      max-height: 58vh;
-      object-fit: cover;
-      display: block;
-      background: #f8fafc;
-    }
-    .flyer-footer {
-      padding: 16px 20px;
-      background: #ffffff;
-      text-align: center;
-    }
-    .flyer-tit {
-      font-size: 16px;
-      font-weight: 800;
-      color: #1E2743;
-      margin: 0 0 6px 0;
-      line-height: 1.25;
-    }
-    .flyer-sub {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 14px 0;
-      line-height: 1.4;
-    }
-    .flyer-btn-close {
-      width: 100%;
+    .btn-notif-activar {
       background: #E95042;
       color: #ffffff;
       border: none;
-      padding: 12px;
+      padding: 6px 12px;
       border-radius: 12px;
-      font-weight: 700;
-      font-size: 13.5px;
-      cursor: pointer;
-      font-family: 'Poppins', sans-serif;
-      box-shadow: 0 4px 12px rgba(233, 80, 66, 0.3);
-      touch-action: manipulation;
-    }
-
-    /* MODAL CLAVE MAESTRA */
-    #modalClaveMaster {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(4px);
-      z-index: 100001;
-      align-items: center;
-      justify-content: center;
-      padding: 15px;
-      box-sizing: border-box;
-    }
-    .clave-box {
-      background: white;
-      padding: 24px 20px;
-      width: 100%;
-      max-width: 330px;
-      border-radius: 24px;
-      text-align: center;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    }
-
-    /* MODAL PANEL DE CAMPAÑAS (ADMIN) */
-    #modalPanelPush {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 100000;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-    .panel-push-card {
-      background: #ffffff;
-      padding: 22px 18px;
-      width: 100%;
-      max-width: 380px;
-      border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      max-height: 92vh;
-      overflow-y: auto;
-      text-align: left;
-    }
-    .push-lbl {
       font-size: 11px;
       font-weight: 700;
-      color: #475569;
-      display: block;
-      margin-bottom: 3px;
-    }
-    .push-inp {
-      width: 100%;
-      padding: 10px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      font-size: 12.5px;
       font-family: 'Poppins', sans-serif;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-      outline: none;
+      cursor: pointer;
+      touch-action: manipulation;
     }
-    .push-preview-box {
-      width: 100%;
-      height: 120px;
-      border: 1.5px dashed #cbd5e1;
-      border-radius: 10px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      margin-bottom: 12px;
-      background: #f8fafc;
+    .btn-notif-activar:active {
+      transform: scale(0.95);
     }
-    .push-preview-img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
+    .btn-notif-cerrar {
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 2px 4px;
+      line-height: 1;
     }
-      #btnWaFlotante {
+
+    #btnWaFlotante {
       display: flex;
       position: fixed;
       top: clamp(282px, 78vw, 335px);
@@ -537,78 +361,21 @@
 
   <div id="iosTopBar"></div>
 
-  <!-- BARRA DE NOTIFICACIÓN SUPERIOR -->
-  <div id="notifBarTop">
-    <div class="notif-content-area" onclick="alternarSubNotif()">
-      <div class="notif-title-row">
-        <span class="notif-icon-tag" id="notifIcon">🔥</span>
-        <p class="notif-title-text" id="notifTitleTxt">Atento a tu siguiente promoción</p>
-      </div>
-      <div class="notif-sub-text" id="notifSubTxt"></div>
-    </div>
-    <button class="notif-btn-check" onclick="cerrarYColapsarNotif()">✓</button>
-  </div>
-
-  <!-- PÍLDORA COMPACTA NATIVA -->
-  <button id="miniPildoraPromo" type="button">
-    <span class="pildora-fuego">🔥</span>
-    <span class="pildora-texto">Promo</span>
-  </button>
-
-  <!-- MODAL DE FLYER FLOTANTE -->
-  <div id="modalFlyerPromo">
-    <div class="flyer-card">
-      <img id="imgFlyerPromo" class="flyer-img" src="" alt="Promoción">
-      <div class="flyer-footer">
-        <h3 id="titFlyerPromo" class="flyer-tit">¡Promoción Especial!</h3>
-        <p id="subFlyerPromo" class="flyer-sub"></p>
-        <button class="flyer-btn-close" onclick="cerrarModalFlyer()">¡Entendido!</button>
+  <!-- FRANJA DE ACTIVACIÓN DIRECTA DE NOTIFICACIONES PWA -->
+  <div id="notifSaldoTop">
+    <div class="notif-saldo-left">
+      <span class="notif-saldo-icon">🔔</span>
+      <div class="notif-saldo-text-group">
+        <p class="notif-saldo-tit">Activa tus notificaciones</p>
+        <p class="notif-saldo-sub">Recibe avisos de saldo y promociones</p>
       </div>
     </div>
-  </div>
-
-  <!-- MODAL CLAVE MAESTRA -->
-  <div id="modalClaveMaster">
-    <div class="clave-box">
-      <h3 style="margin:0 0 14px 0;color:#1e2743;font-size:16px;font-weight:800;">ADMINISTRACIÓN</h3>
-      <input type="password" id="inputMasterPin" placeholder="Clave Maestra" maxlength="8" class="push-inp" style="text-align:center;font-size:18px;">
-      <div style="display:flex;gap:8px;">
-        <button onclick="cerrarModalClave()" style="flex:1;background:#f1f5f9;color:#64748b;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;">Atrás</button>
-        <button onclick="validarPinLocal()" style="flex:1;background:#1E2743;color:white;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;">Entrar</button>
-      </div>
+    <div class="notif-saldo-actions">
+      <button class="btn-notif-activar" onclick="activarPushDesdeFranja()">Activar</button>
+      <button class="btn-notif-cerrar" onclick="cerrarFranjaSaldo()">✕</button>
     </div>
   </div>
-
-  <!-- MODAL PANEL DE CAMPAÑAS (ADMIN) -->
-  <div id="modalPanelPush">
-    <div class="panel-push-card">
-      <h3 style="margin:0 0 14px 0;color:#1E2743;font-size:16px;font-weight:800;text-align:center;">CAMPAÑAS Y NOTIFICACIONES</h3>
-      
-      <label class="push-lbl">TÍTULO (MÁX. 1 LÍNEA):</label>
-      <input type="text" id="inpCampTitulo" class="push-inp" maxlength="42" placeholder="Ej: ¡Hoy 2do shawarma a mitad de precio!">
-
-      <label class="push-lbl">SUBTÍTULO / DETALLE (OPCIONAL):</label>
-      <textarea id="inpCampSub" class="push-inp" rows="2" style="resize:none;" placeholder="Detalles de la promo al tocar el título..."></textarea>
-
-      <label class="push-lbl">ENLACE DE IMAGEN / FLYER (GOOGLE DRIVE):</label>
-      <input type="text" id="inpCampImgDrive" class="push-inp" oninput="procesarEnlaceDriveInput(this.value)" placeholder="Pega el link de Google Drive aquí...">
-      
-      <div id="previewBoxDrive" class="push-preview-box">
-        <img id="imgPreviewDrive" class="push-preview-img" src="" alt="Vista previa">
-      </div>
-
-      <label class="push-lbl">FECHA Y HORA DE EXPIRACIÓN:</label>
-      <input type="datetime-local" id="inpCampExpiracion" class="push-inp">
-
-      <label class="push-lbl">MENSAJE CUANDO NO HAYA PROMOS ACTIVAS:</label>
-      <input type="text" id="inpCampSinPromo" class="push-inp" value="Atento a tu siguiente promoción" placeholder="Atento a tu siguiente promoción">
-
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button onclick="guardarYLanzarCampanaPush()" style="flex:1;background:#1E2743;color:white;border:none;padding:12px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;">🚀 Enviar</button>
-        <button onclick="cerrarPanelPushAdmin()" style="background:#f1f5f9;color:#64748b;border:none;padding:12px 16px;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;">Cerrar</button>
-      </div>
-    </div>
-  </div>
+  <!-- CORTE LIMPIO PARTE 1 -->
     <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -724,239 +491,43 @@
 
     setTimeout(ocultarSplash, 4000);
 
-    /* DETECCIÓN DE CAMPAÑAS GUARDADAS Y MENSAJE */
-    var campanaActivaMem = null;
-    var imagenFlyerUrlMem = "";
-
-    try {
-      var cGuardada = localStorage.getItem('sp_campana_guardada');
-      if (cGuardada) {
-        campanaActivaMem = JSON.parse(cGuardada);
-        if (campanaActivaMem && campanaActivaMem.exp) {
-          if (new Date() > new Date(campanaActivaMem.exp)) {
-            campanaActivaMem = null;
-            localStorage.removeItem('sp_campana_guardada');
-          }
-        }
-      }
-    } catch(e) {}
-
-    function extraerIdDrive(urlRaw) {
-      if (!urlRaw) return "";
-      var m = urlRaw.match(/[-\w]{25,}/);
-      return m ? m[0] : "";
+    /* CONTROL ESTÁNDAR DE PERMISOS PWA */
+    function tienePermisoPush() {
+      return ('Notification' in window && Notification.permission === 'granted');
     }
 
-    function procesarEnlaceDriveInput(val) {
-      var id = extraerIdDrive(val);
-      var box = document.getElementById('previewBoxDrive');
-      var img = document.getElementById('imgPreviewDrive');
-      if (id) {
-        var urlLh3 = 'https://lh3.googleusercontent.com/d/' + id;
-        img.src = urlLh3;
-        box.style.display = 'flex';
-      } else {
-        box.style.display = 'none';
-        img.src = '';
-      }
+    function cerrarFranjaSaldo() {
+      var f = document.getElementById('notifSaldoTop');
+      if (f) f.style.display = 'none';
+      try { sessionStorage.setItem('sp_notif_banner_descartado', '1'); } catch(e) {}
     }
 
-    function alternarSubNotif() {
-      var sub = document.getElementById('notifSubTxt');
-      if (sub && sub.textContent.trim().length > 0) {
-        sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
-      } else if (imagenFlyerUrlMem) {
-        abrirModalFlyer();
-      }
-    }
-
-    function mostrarNotifBar(icono, titulo, subtitulo, flyerUrl) {
-      var bar = document.getElementById('notifBarTop');
-      document.getElementById('notifIcon').textContent = icono || '🔥';
-      document.getElementById('notifTitleTxt').textContent = titulo || '';
-      var sub = document.getElementById('notifSubTxt');
-      sub.textContent = subtitulo || '';
-      sub.style.display = 'none';
-      imagenFlyerUrlMem = flyerUrl || "";
-      bar.style.display = 'flex';
-      document.getElementById('miniPildoraPromo').style.display = 'none';
-
-      // Disparo automático de permisos OneSignal con el toque del usuario
+    function activarPushDesdeFranja() {
+      cerrarFranjaSaldo();
       if (window.OneSignalDeferred) {
         OneSignalDeferred.push(async function(OneSignal) {
-          try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
+          try {
+            await OneSignal.Notifications.requestPermission();
+          } catch(err) {}
         });
       }
     }
 
-    function cerrarYColapsarNotif() {
-      document.getElementById('notifBarTop').style.display = 'none';
-      var pil = document.getElementById('miniPildoraPromo');
-      pil.style.display = 'flex';
-      desplegarPildora();
-    }
+    function evaluarBannerNotificaciones() {
+      var yaDescarto = false;
+      try { yaDescarto = sessionStorage.getItem('sp_notif_banner_descartado') === '1'; } catch(e) {}
 
-    function responderToquePildora() {
-      if (campanaActivaMem && campanaActivaMem.tit) {
-        if (campanaActivaMem.img) {
-          abrirModalFlyer();
-        } else {
-          mostrarNotifBar('🔥', campanaActivaMem.tit, campanaActivaMem.sub, '');
-        }
-      } else {
-        var msgSinPromo = (campanaActivaMem && campanaActivaMem.sinPromo) 
-          ? campanaActivaMem.sinPromo 
-          : 'Atento a tu siguiente promoción';
-        mostrarNotifBar('🔥', msgSinPromo, '', '');
+      // Solo si está en la PWA instalada, NO tiene permisos activos y NO descartó la franja en esta sesión
+      if (esPWA && !tienePermisoPush() && !yaDescarto) {
+        setTimeout(function() {
+          var franja = document.getElementById('notifSaldoTop');
+          if (franja) franja.style.display = 'flex';
+        }, 2000);
       }
     }
 
-    function abrirModalFlyer() {
-      var img = imagenFlyerUrlMem || (campanaActivaMem ? campanaActivaMem.img : '');
-      if (!img) return;
-      document.getElementById('imgFlyerPromo').src = img;
-      document.getElementById('titFlyerPromo').textContent = (campanaActivaMem && campanaActivaMem.tit) ? campanaActivaMem.tit : '¡Promoción Especial!';
-      document.getElementById('subFlyerPromo').textContent = (campanaActivaMem && campanaActivaMem.sub) ? campanaActivaMem.sub : '';
-      document.getElementById('modalFlyerPromo').style.display = 'flex';
-    }
+    window.addEventListener('load', evaluarBannerNotificaciones);
 
-    function cerrarModalFlyer() {
-      document.getElementById('modalFlyerPromo').style.display = 'none';
-      cerrarYColapsarNotif();
-    }
-
-    /* CONTROL TÁCTIL EXACTO DE LA PÍLDORA CON AUTO-CONTRACCIÓN A 5s */
-    var btnPromo = document.getElementById('miniPildoraPromo');
-    var timerAutoPildora = null;
-    var timer3s = null;
-    var esPulsacionLarga = false;
-
-    function iniciarTemporizadorPildora() {
-      if (timerAutoPildora) clearTimeout(timerAutoPildora);
-      timerAutoPildora = setTimeout(contraerPildora, 5000);
-    }
-
-    function contraerPildora() {
-      if (btnPromo) btnPromo.classList.add('docked-pildora');
-    }
-
-    function desplegarPildora() {
-      if (btnPromo) {
-        btnPromo.classList.remove('docked-pildora');
-        iniciarTemporizadorPildora();
-      }
-    }
-
-    btnPromo.addEventListener('pointerdown', function(e) {
-      esPulsacionLarga = false;
-      if (timer3s) clearTimeout(timer3s);
-      timer3s = setTimeout(function() {
-        esPulsacionLarga = true;
-        if (navigator.vibrate) navigator.vibrate(60);
-        abrirModalClave();
-      }, 3000);
-    });
-
-    btnPromo.addEventListener('pointerup', function(e) {
-      if (timer3s) { clearTimeout(timer3s); timer3s = null; }
-      if (!esPulsacionLarga) {
-        responderToquePildora();
-      }
-    });
-
-    btnPromo.addEventListener('pointercancel', function() {
-      if (timer3s) { clearTimeout(timer3s); timer3s = null; }
-    });
-
-    window.addEventListener('pointerdown', function(e) {
-      if (btnPromo && !btnPromo.contains(e.target)) contraerPildora();
-    });
-
-    iniciarTemporizadorPildora();
-
-    /* ESCUCHA DE SALDO DESDE EL IFRAME */
-    window.addEventListener('message', function(ev) {
-      if (!ev.data) return;
-      if (ev.data.tipo === 'saldo_cliente') {
-        var saldoActual = parseFloat(ev.data.saldo || 0);
-        var saldoPrevio = parseFloat(localStorage.getItem('sp_saldo_previo') || '-1');
-        var hoyIso = new Date().toISOString().slice(0, 10);
-
-        if (saldoPrevio >= 0 && saldoActual > saldoPrevio && ev.data.diasRestantes > 0) {
-          var ganancia = (saldoActual - saldoPrevio).toFixed(2);
-          mostrarNotifBar('🎉', '¡Ganaste S/ ' + ganancia + ' hoy!', 'Saldo acumulado disponible en tu tarjeta.', '');
-          localStorage.setItem('sp_fecha_aviso_saldo', hoyIso);
-        }
-        localStorage.setItem('sp_saldo_previo', String(saldoActual));
-      }
-    });
-
-    /* ADMINISTRACIÓN */
-    function abrirModalClave() {
-      document.getElementById('modalClaveMaster').style.display = 'flex';
-      setTimeout(function(){ document.getElementById('inputMasterPin').focus(); }, 150);
-    }
-
-    function cerrarModalClave() {
-      document.getElementById('modalClaveMaster').style.display = 'none';
-      document.getElementById('inputMasterPin').value = '';
-    }
-
-    function validarPinLocal() {
-      var pin = document.getElementById('inputMasterPin').value.trim();
-      if (pin === "2026" || pin === "1234") { 
-        cerrarModalClave();
-        abrirPanelPushAdmin();
-      } else {
-        alert('Clave incorrecta');
-        document.getElementById('inputMasterPin').value = '';
-      }
-    }
-
-    function abrirPanelPushAdmin() {
-      document.getElementById('modalPanelPush').style.display = 'flex';
-      if (campanaActivaMem) {
-        document.getElementById('inpCampTitulo').value = campanaActivaMem.tit || '';
-        document.getElementById('inpCampSub').value = campanaActivaMem.sub || '';
-        document.getElementById('inpCampImgDrive').value = campanaActivaMem.img || '';
-        document.getElementById('inpCampExpiracion').value = campanaActivaMem.exp || '';
-        document.getElementById('inpCampSinPromo').value = campanaActivaMem.sinPromo || 'Atento a tu siguiente promoción';
-        if (campanaActivaMem.img) {
-          procesarEnlaceDriveInput(campanaActivaMem.img);
-        }
-      }
-    }
-
-    function cerrarPanelPushAdmin() {
-      document.getElementById('modalPanelPush').style.display = 'none';
-    }
-
-    function guardarYLanzarCampanaPush() {
-      var tit = document.getElementById('inpCampTitulo').value.trim();
-      var sub = document.getElementById('inpCampSub').value.trim();
-      var dVal = document.getElementById('inpCampImgDrive').value.trim();
-      var exp = document.getElementById('inpCampExpiracion').value;
-      var sinP = document.getElementById('inpCampSinPromo').value.trim() || 'Atento a tu siguiente promoción';
-
-      if (!tit) {
-        alert('Ingresa el título de la campaña (máx. 1 línea)');
-        return;
-      }
-
-      var idDrive = extraerIdDrive(dVal);
-      var imgUrl = idDrive ? ('https://lh3.googleusercontent.com/d/' + idDrive) : '';
-
-      campanaActivaMem = { tit: tit, sub: sub, img: imgUrl, exp: exp, sinPromo: sinP };
-      try {
-        localStorage.setItem('sp_campana_guardada', JSON.stringify(campanaActivaMem));
-      } catch(e) {}
-
-      mostrarNotifBar('🔥', tit, sub, imgUrl);
-      cerrarPanelPushAdmin();
-      alert('¡Campaña guardada con éxito!');
-    }
-
-    /* WHATSAPP ORIGINAL CON AUTO-OCULTADO A LOS 5 SEGUNDOS */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -964,14 +535,6 @@
       var estaAcoplado = false;
       var bloqueoApertura = false;
       var waBloqueoClick = false;
-      var timerAutoOcultar = null;
-
-      function iniciarTemporizador5s() {
-        if (timerAutoOcultar) clearTimeout(timerAutoOcultar);
-        timerAutoOcultar = setTimeout(function() {
-          guardarBoton();
-        }, 5000);
-      }
 
       function abrirWhatsAppSeguro() {
         if (waBloqueoClick || bloqueoApertura) return;
@@ -990,7 +553,6 @@
           btn.classList.add('docked-edge');
           estaAcoplado = true;
         }
-        if (timerAutoOcultar) clearTimeout(timerAutoOcultar);
       }
 
       function desplegarBoton() {
@@ -998,7 +560,6 @@
         estaAcoplado = false;
         bloqueoApertura = true;
         setTimeout(function() { bloqueoApertura = false; }, 400);
-        iniciarTemporizador5s();
       }
 
       btn.addEventListener('click', function(e) {
@@ -1013,18 +574,20 @@
       });
 
       window.addEventListener('click', function(e) {
-        if (!btn.contains(e.target)) guardarBoton();
+        if (!btn.contains(e.target)) {
+          guardarBoton();
+        }
       });
 
       window.addEventListener('touchstart', function(e) {
-        if (!btn.contains(e.target)) guardarBoton();
+        if (!btn.contains(e.target)) {
+          guardarBoton();
+        }
       }, { passive: true });
 
       window.addEventListener('blur', function() {
         setTimeout(guardarBoton, 100);
       });
-
-      iniciarTemporizador5s();
     })();
 
     if ('serviceWorker' in navigator) {
