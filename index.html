@@ -17,7 +17,7 @@
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    var ONESIGNAL_APP_ID = "TU_ONESIGNAL_APP_ID_AQUI"; // Reemplaza con tu App ID de OneSignal
+    var ONESIGNAL_APP_ID = "TU_ONESIGNAL_APP_ID_AQUI";
     OneSignalDeferred.push(async function(OneSignal) {
       if (ONESIGNAL_APP_ID && ONESIGNAL_APP_ID !== "TU_ONESIGNAL_APP_ID_AQUI") {
         await OneSignal.init({
@@ -81,7 +81,7 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* BARRA SUPERIOR DE NOTIFICACIÓN */
+    /* BARRA SUPERIOR RETRÁCTIL */
     #notifBarTop {
       position: fixed;
       top: 0;
@@ -160,9 +160,9 @@
     }
     .notif-btn-check:active { transform: scale(0.92); }
 
-    /* MINI PÍLDORA RETRÁCTIL SUPERIOR */
+    /* MINI PÍLDORA SUPERIOR DERECHA */
     #miniPildoraPromo {
-      display: none;
+      display: flex;
       position: fixed;
       top: 14px;
       right: 0;
@@ -181,14 +181,13 @@
       -webkit-user-select: none;
       touch-action: manipulation;
       opacity: 0.65;
-      transform: translateX(18px);
+      transform: translateX(0);
     }
     html.is-apple-installed #miniPildoraPromo {
       top: calc(14px + env(safe-area-inset-top, 0px));
     }
     #miniPildoraPromo:hover,
     #miniPildoraPromo:active {
-      transform: translateX(0);
       opacity: 1;
     }
     .mini-pildora-txt {
@@ -198,7 +197,7 @@
       font-family: 'Poppins', sans-serif;
     }
 
-    /* MODAL DE FLYER FLOTANTE */
+    /* MODAL DE FLYER */
     #modalFlyerPromo {
       display: none;
       position: fixed;
@@ -532,7 +531,7 @@
     <button class="notif-btn-check" onclick="cerrarYColapsarNotif()">✓</button>
   </div>
 
-  <!-- MINI PÍLDORA SUPERIOR (Pulsación sostenida 3s = Admin) -->
+  <!-- MINI PÍLDORA SUPERIOR -->
   <div id="miniPildoraPromo">
     <span style="font-size:13px;">🎁</span>
     <span class="mini-pildora-txt" id="txtMiniPildora">Promo</span>
@@ -592,8 +591,7 @@
       </div>
     </div>
   </div>
-
-  <!-- BOTÓN FLOTANTE WHATSAPP -->
+    <!-- BOTÓN FLOTANTE WHATSAPP -->
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -803,7 +801,7 @@
       }
     });
 
-    /* PULSACIÓN SOSTENIDA 3 SEGUNDOS EN LA PÍLDORA (ACCESO ADMIN) */
+    /* PULSACIÓN SOSTENIDA 3 SEGUNDOS EN LA PÍLDORA (ADMIN) */
     (function() {
       var pil = document.getElementById('miniPildoraPromo');
       var timerHold = null;
@@ -900,7 +898,7 @@
       alert('¡Campaña guardada y lista para mostrar!');
     }
 
-    /* BOTÓN WHATSAPP INTERACTIVO */
+    /* BOTÓN WHATSAPP INTERACTIVO CON AUTO-OCULTADO A LOS 5 SEGUNDOS */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -908,6 +906,14 @@
       var estaAcoplado = false;
       var bloqueoApertura = false;
       var waBloqueoClick = false;
+      var timerAutoOcultar = null;
+
+      function iniciarTemporizador5s() {
+        if (timerAutoOcultar) clearTimeout(timerAutoOcultar);
+        timerAutoOcultar = setTimeout(function() {
+          guardarBoton();
+        }, 5000);
+      }
 
       function abrirWhatsAppSeguro() {
         if (waBloqueoClick || bloqueoApertura) return;
@@ -926,6 +932,7 @@
           btn.classList.add('docked-edge');
           estaAcoplado = true;
         }
+        if (timerAutoOcultar) clearTimeout(timerAutoOcultar);
       }
 
       function desplegarBoton() {
@@ -933,6 +940,7 @@
         estaAcoplado = false;
         bloqueoApertura = true;
         setTimeout(function() { bloqueoApertura = false; }, 400);
+        iniciarTemporizador5s();
       }
 
       btn.addEventListener('click', function(e) {
@@ -961,6 +969,8 @@
       window.addEventListener('blur', function() {
         setTimeout(guardarBoton, 100);
       });
+
+      iniciarTemporizador5s();
     })();
 
     if ('serviceWorker' in navigator) {
