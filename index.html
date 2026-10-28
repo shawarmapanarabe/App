@@ -13,21 +13,6 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
-  <!-- CONEXIÓN SDK ONESIGNAL -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    var ONESIGNAL_APP_ID = "TU_ONESIGNAL_APP_ID_AQUI";
-    OneSignalDeferred.push(async function(OneSignal) {
-      if (ONESIGNAL_APP_ID && ONESIGNAL_APP_ID !== "TU_ONESIGNAL_APP_ID_AQUI") {
-        await OneSignal.init({
-          appId: ONESIGNAL_APP_ID,
-          notifyButton: { enable: false }
-        });
-      }
-    });
-  </script>
-
   <script>
     var qInit = window.location.search;
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -79,101 +64,6 @@
     html.is-apple-installed #iosTopBar {
       display: block;
       height: env(safe-area-inset-top, 0px);
-    }
-
-    /* FRANJA ESTÁNDAR PWA (SOLO SALE SI NO TIENE NOTIFICACIONES) */
-    #notifSaldoTop {
-      display: none;
-      position: fixed;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 380px;
-      background: #1E2743;
-      color: #ffffff;
-      padding: 10px 14px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
-      z-index: 99995;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border: 1.5px solid #F2B647;
-      box-sizing: border-box;
-      animation: bajarNotifSaldo 0.3s ease-out;
-    }
-    html.is-apple-installed #notifSaldoTop {
-      top: calc(12px + env(safe-area-inset-top, 0px));
-    }
-    @keyframes bajarNotifSaldo {
-      from { transform: translate(-50%, -40px); opacity: 0; }
-      to { transform: translate(-50%, 0); opacity: 1; }
-    }
-    .notif-saldo-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-      flex: 1;
-    }
-    .notif-saldo-icon {
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-    .notif-saldo-text-group {
-      min-width: 0;
-      flex: 1;
-    }
-    .notif-saldo-tit {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #F2B647;
-      margin: 0;
-      line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .notif-saldo-sub {
-      font-size: 11px;
-      color: #ffffff;
-      margin: 2px 0 0 0;
-      opacity: 0.9;
-      line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .notif-saldo-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    .btn-notif-activar {
-      background: #E95042;
-      color: #ffffff;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: 'Poppins', sans-serif;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .btn-notif-activar:active {
-      transform: scale(0.95);
-    }
-    .btn-notif-cerrar {
-      background: transparent;
-      color: #94a3b8;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 2px 4px;
-      line-height: 1;
     }
 
     #btnWaFlotante {
@@ -361,22 +251,7 @@
 
   <div id="iosTopBar"></div>
 
-  <!-- FRANJA DE ACTIVACIÓN DIRECTA DE NOTIFICACIONES PWA -->
-  <div id="notifSaldoTop">
-    <div class="notif-saldo-left">
-      <span class="notif-saldo-icon">🔔</span>
-      <div class="notif-saldo-text-group">
-        <p class="notif-saldo-tit">Activa tus notificaciones</p>
-        <p class="notif-saldo-sub">Recibe avisos de saldo y promociones</p>
-      </div>
-    </div>
-    <div class="notif-saldo-actions">
-      <button class="btn-notif-activar" onclick="activarPushDesdeFranja()">Activar</button>
-      <button class="btn-notif-cerrar" onclick="cerrarFranjaSaldo()">✕</button>
-    </div>
-  </div>
-  <!-- CORTE LIMPIO PARTE 1 -->
-    <div id="btnWaFlotante" aria-label="WhatsApp">
+  <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
         <path d="M16 2C8.268 2 2 8.268 2 16c0 2.766.804 5.344 2.188 7.514L2.05 30.086l6.762-2.072A13.918 13.918 0 0 0 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.6c-2.316 0-4.484-.666-6.318-1.814l-.452-.284-4.228 1.296 1.306-4.134-.294-.468A11.535 11.535 0 0 1 4.4 16c0-6.408 5.192-11.6 11.6-11.6s11.6 5.192 11.6 11.6-5.192 11.6-11.6 11.6zm6.368-8.718c-.348-.174-2.062-1.018-2.382-1.134-.32-.116-.552-.174-.784.174s-.9 1.134-1.104 1.366-.406.262-.754.088c-.348-.174-1.47-.542-2.8-1.728-1.036-.924-1.736-2.064-1.94-2.412-.204-.348-.022-.536.152-.71.156-.156.348-.406.522-.61.174-.204.232-.348.348-.58.116-.232.058-.436-.03-.61-.088-.174-.784-1.89-1.074-2.588-.282-.68-.57-.588-.784-.6l-.668-.012c-.232 0-.61.088-.93.436s-1.22 1.192-1.22 2.908 1.25 3.372 1.424 3.604c.174.232 2.458 3.754 5.956 5.262.832.36 1.482.574 1.988.736.836.266 1.596.228 2.198.138.67-.1 2.062-.842 2.352-1.656.29-.814.29-1.512.204-1.656-.088-.146-.32-.232-.668-.406z"/>
@@ -491,43 +366,7 @@
 
     setTimeout(ocultarSplash, 4000);
 
-    /* CONTROL ESTÁNDAR DE PERMISOS PWA */
-    function tienePermisoPush() {
-      return ('Notification' in window && Notification.permission === 'granted');
-    }
-
-    function cerrarFranjaSaldo() {
-      var f = document.getElementById('notifSaldoTop');
-      if (f) f.style.display = 'none';
-      try { sessionStorage.setItem('sp_notif_banner_descartado', '1'); } catch(e) {}
-    }
-
-    function activarPushDesdeFranja() {
-      cerrarFranjaSaldo();
-      if (window.OneSignalDeferred) {
-        OneSignalDeferred.push(async function(OneSignal) {
-          try {
-            await OneSignal.Notifications.requestPermission();
-          } catch(err) {}
-        });
-      }
-    }
-
-    function evaluarBannerNotificaciones() {
-      var yaDescarto = false;
-      try { yaDescarto = sessionStorage.getItem('sp_notif_banner_descartado') === '1'; } catch(e) {}
-
-      // Solo si está en la PWA instalada, NO tiene permisos activos y NO descartó la franja en esta sesión
-      if (esPWA && !tienePermisoPush() && !yaDescarto) {
-        setTimeout(function() {
-          var franja = document.getElementById('notifSaldoTop');
-          if (franja) franja.style.display = 'flex';
-        }, 2000);
-      }
-    }
-
-    window.addEventListener('load', evaluarBannerNotificaciones);
-
+    /* WHATSAPP CON TEMPORIZADOR DE 7 SEGUNDOS Y OCULTADO INMEDIATO POR TOQUE */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -535,6 +374,12 @@
       var estaAcoplado = false;
       var bloqueoApertura = false;
       var waBloqueoClick = false;
+      var timerAuto7s = null;
+
+      function iniciarTemporizador7s() {
+        if (timerAuto7s) clearTimeout(timerAuto7s);
+        timerAuto7s = setTimeout(guardarBoton, 7000);
+      }
 
       function abrirWhatsAppSeguro() {
         if (waBloqueoClick || bloqueoApertura) return;
@@ -553,6 +398,7 @@
           btn.classList.add('docked-edge');
           estaAcoplado = true;
         }
+        if (timerAuto7s) clearTimeout(timerAuto7s);
       }
 
       function desplegarBoton() {
@@ -560,6 +406,7 @@
         estaAcoplado = false;
         bloqueoApertura = true;
         setTimeout(function() { bloqueoApertura = false; }, 400);
+        iniciarTemporizador7s();
       }
 
       btn.addEventListener('click', function(e) {
@@ -588,6 +435,8 @@
       window.addEventListener('blur', function() {
         setTimeout(guardarBoton, 100);
       });
+
+      iniciarTemporizador7s();
     })();
 
     if ('serviceWorker' in navigator) {
