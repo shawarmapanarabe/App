@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="SP!">
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
-
+  
   <!-- CONEXIÓN SDK ONESIGNAL -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
@@ -20,10 +20,7 @@
     var ONESIGNAL_APP_ID = "TU_ONESIGNAL_APP_ID_AQUI";
     OneSignalDeferred.push(async function(OneSignal) {
       if (ONESIGNAL_APP_ID && ONESIGNAL_APP_ID !== "TU_ONESIGNAL_APP_ID_AQUI") {
-        await OneSignal.init({
-          appId: ONESIGNAL_APP_ID,
-          notifyButton: { enable: false }
-        });
+        await OneSignal.init({ appId: ONESIGNAL_APP_ID, notifyButton: { enable: false } });
       }
     });
   </script>
@@ -50,11 +47,12 @@
   </script>
 
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
+      user-select: none; -webkit-user-select: none;
     }
 
     iframe { 
@@ -81,7 +79,7 @@
       height: env(safe-area-inset-top, 0px);
     }
 
-    /* BARRA SUPERIOR RETRÁCTIL */
+    /* BARRA SUPERIOR RETRÁCTIL DE PROMO */
     #notifBarTop {
       position: fixed;
       top: 0;
@@ -96,14 +94,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
       box-sizing: border-box;
       border-bottom: 2px solid #F2B647;
     }
     html.is-apple-installed #notifBarTop {
       top: env(safe-area-inset-top, 0px);
     }
-
     .notif-content-area {
       flex: 1;
       min-width: 0;
@@ -117,10 +113,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .notif-icon-tag {
-      font-size: 15px;
-      flex-shrink: 0;
-    }
+    .notif-icon-tag { font-size: 15px; flex-shrink: 0; }
     .notif-title-text {
       font-size: 12.5px;
       font-weight: 700;
@@ -155,12 +148,11 @@
       cursor: pointer;
       flex-shrink: 0;
       box-shadow: 0 2px 8px rgba(233, 80, 66, 0.4);
-      transition: transform 0.1s ease;
       touch-action: manipulation;
     }
     .notif-btn-check:active { transform: scale(0.92); }
 
-    /* BOTÓN PÍLDORA CON SHIMMER Y PROTECCIÓN TÁCTIL */
+    /* PÍLDORA COMPACTA NATIVA ULTRA-FLUIDA */
     #miniPildoraPromo {
       display: flex;
       position: fixed;
@@ -171,62 +163,35 @@
       border: 1.5px solid #F2B647;
       border-right: none;
       border-radius: 20px 0 0 20px;
-      padding: 6px 14px 6px 12px;
+      padding: 5px 12px 5px 9px;
       box-shadow: -2px 4px 12px rgba(30, 39, 67, 0.35);
       cursor: pointer;
       align-items: center;
-      gap: 6px;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
+      gap: 5px;
+      color: #F2B647;
+      font-family: 'Poppins', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      outline: none;
       touch-action: manipulation;
-      opacity: 0.92;
-      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
+      opacity: 0.95;
     }
     html.is-apple-installed #miniPildoraPromo {
       top: calc(14px + env(safe-area-inset-top, 0px));
     }
-    #miniPildoraPromo * {
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-select: none;
+    #miniPildoraPromo.docked-pildora {
+      transform: translateX(44px);
+      opacity: 0.7;
     }
-    #miniPildoraPromo::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -120%;
-      width: 55%;
-      height: 200%;
-      background: linear-gradient(
-        120deg, 
-        rgba(255, 255, 255, 0) 0%, 
-        rgba(255, 255, 255, 0.42) 50%, 
-        rgba(255, 255, 255, 0) 100%
-      );
-      transform: rotate(25deg);
-      animation: brilloShimmerPildora 3.2s infinite ease-in-out;
-      pointer-events: none;
-    }
-    @keyframes brilloShimmerPildora {
-      0% { left: -120%; }
-      25% { left: 160%; }
-      100% { left: 160%; }
-    }
-    #miniPildoraPromo:active {
-      transform: scale(0.95);
+    #miniPildoraPromo.docked-pildora:active {
       opacity: 1;
+      transform: translateX(44px) scale(0.95);
     }
-    .mini-pildora-txt {
-      font-size: 11.5px;
-      font-weight: 800;
-      color: #F2B647;
-      font-family: 'Poppins', sans-serif;
-      letter-spacing: 0.3px;
-    }
+    .pildora-fuego { font-size: 14px; line-height: 1; pointer-events: none; }
+    .pildora-texto { pointer-events: none; }
 
-    /* MODAL DE FLYER */
+    /* MODAL DE FLYER FLOTANTE */
     #modalFlyerPromo {
       display: none;
       position: fixed;
@@ -319,7 +284,7 @@
       background: white;
       padding: 24px 20px;
       width: 100%;
-      max-width: 340px;
+      max-width: 330px;
       border-radius: 24px;
       text-align: center;
       box-shadow: 0 12px 30px rgba(0,0,0,0.2);
@@ -387,8 +352,7 @@
       max-height: 100%;
       object-fit: contain;
     }
-      /* BOTÓN WHATSAPP EXACTO DEL CÓDIGO BASE */
-    #btnWaFlotante {
+      #btnWaFlotante {
       display: flex;
       position: fixed;
       top: clamp(282px, 78vw, 335px);
@@ -585,11 +549,11 @@
     <button class="notif-btn-check" onclick="cerrarYColapsarNotif()">✓</button>
   </div>
 
-  <!-- MINI PÍLDORA CON SHIMMER Y FUEGUITO 🔥 -->
-  <div id="miniPildoraPromo">
-    <span style="font-size:13.5px;line-height:1;">🔥</span>
-    <span class="mini-pildora-txt" id="txtMiniPildora">Promo</span>
-  </div>
+  <!-- PÍLDORA COMPACTA NATIVA -->
+  <button id="miniPildoraPromo" type="button">
+    <span class="pildora-fuego">🔥</span>
+    <span class="pildora-texto">Promo</span>
+  </button>
 
   <!-- MODAL DE FLYER FLOTANTE -->
   <div id="modalFlyerPromo">
@@ -603,14 +567,14 @@
     </div>
   </div>
 
-  <!-- MODAL DE CLAVE MAESTRA -->
+  <!-- MODAL CLAVE MAESTRA -->
   <div id="modalClaveMaster">
     <div class="clave-box">
-      <h3 style="margin:0 0 12px 0;color:#1e2743;font-size:17px;font-weight:800;">ADMINISTRACIÓN</h3>
-      <input type="password" id="inputMasterPin" placeholder="Clave Maestra" maxlength="8" style="width:100%;padding:12px;border:2px solid #cbd5e1;border-radius:12px;font-size:18px;text-align:center;box-sizing:border-box;margin-bottom:14px;outline:none;">
+      <h3 style="margin:0 0 14px 0;color:#1e2743;font-size:16px;font-weight:800;">ADMINISTRACIÓN</h3>
+      <input type="password" id="inputMasterPin" placeholder="Clave Maestra" maxlength="8" class="push-inp" style="text-align:center;font-size:18px;">
       <div style="display:flex;gap:8px;">
         <button onclick="cerrarModalClave()" style="flex:1;background:#f1f5f9;color:#64748b;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;">Atrás</button>
-        <button id="btnSubmitMasterPin" onclick="validarPinRemoto()" style="flex:1;background:#1E2743;color:white;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;">Ingresar</button>
+        <button onclick="validarPinLocal()" style="flex:1;background:#1E2743;color:white;border:none;padding:12px;border-radius:12px;font-weight:700;cursor:pointer;">Entrar</button>
       </div>
     </div>
   </div>
@@ -618,7 +582,7 @@
   <!-- MODAL PANEL DE CAMPAÑAS (ADMIN) -->
   <div id="modalPanelPush">
     <div class="panel-push-card">
-      <h3 style="margin:0 0 12px 0;color:#1E2743;font-size:16px;font-weight:800;text-align:center;">CAMPAÑAS Y NOTIFICACIONES</h3>
+      <h3 style="margin:0 0 14px 0;color:#1E2743;font-size:16px;font-weight:800;text-align:center;">CAMPAÑAS Y NOTIFICACIONES</h3>
       
       <label class="push-lbl">TÍTULO (MÁX. 1 LÍNEA):</label>
       <input type="text" id="inpCampTitulo" class="push-inp" maxlength="42" placeholder="Ej: ¡Hoy 2do shawarma a mitad de precio!">
@@ -645,7 +609,7 @@
       </div>
     </div>
   </div>
-   <div id="btnWaFlotante" aria-label="WhatsApp">
+    <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
         <path d="M16 2C8.268 2 2 8.268 2 16c0 2.766.804 5.344 2.188 7.514L2.05 30.086l6.762-2.072A13.918 13.918 0 0 0 16 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.6c-2.316 0-4.484-.666-6.318-1.814l-.452-.284-4.228 1.296 1.306-4.134-.294-.468A11.535 11.535 0 0 1 4.4 16c0-6.408 5.192-11.6 11.6-11.6s11.6 5.192 11.6 11.6-5.192 11.6-11.6 11.6zm6.368-8.718c-.348-.174-2.062-1.018-2.382-1.134-.32-.116-.552-.174-.784.174s-.9 1.134-1.104 1.366-.406.262-.754.088c-.348-.174-1.47-.542-2.8-1.728-1.036-.924-1.736-2.064-1.94-2.412-.204-.348-.022-.536.152-.71.156-.156.348-.406.522-.61.174-.204.232-.348.348-.58.116-.232.058-.436-.03-.61-.088-.174-.784-1.89-1.074-2.588-.282-.68-.57-.588-.784-.6l-.668-.012c-.232 0-.61.088-.93.436s-1.22 1.192-1.22 2.908 1.25 3.372 1.424 3.604c.174.232 2.458 3.754 5.956 5.262.832.36 1.482.574 1.988.736.836.266 1.596.228 2.198.138.67-.1 2.062-.842 2.352-1.656.29-.814.29-1.512.204-1.656-.088-.146-.32-.232-.668-.406z"/>
@@ -737,7 +701,7 @@
     }
 
     frame.onload = function() {
-      setTimeout(ocultarSplash, 200);
+      setTimeout(ocultarSplash, 400);
 
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -758,9 +722,9 @@
       } catch(err) {}
     };
 
-    setTimeout(ocultarSplash, 2500);
+    setTimeout(ocultarSplash, 4000);
 
-    /* DETECCIÓN DE PROMOS Y MENSAJE */
+    /* DETECCIÓN DE CAMPAÑAS GUARDADAS Y MENSAJE */
     var campanaActivaMem = null;
     var imagenFlyerUrlMem = "";
 
@@ -816,11 +780,20 @@
       imagenFlyerUrlMem = flyerUrl || "";
       bar.style.display = 'flex';
       document.getElementById('miniPildoraPromo').style.display = 'none';
+
+      // Disparo automático de permisos OneSignal con el toque del usuario
+      if (window.OneSignalDeferred) {
+        OneSignalDeferred.push(async function(OneSignal) {
+          try { await OneSignal.Notifications.requestPermission(); } catch(e) {}
+        });
+      }
     }
 
     function cerrarYColapsarNotif() {
       document.getElementById('notifBarTop').style.display = 'none';
-      document.getElementById('miniPildoraPromo').style.display = 'flex';
+      var pil = document.getElementById('miniPildoraPromo');
+      pil.style.display = 'flex';
+      desplegarPildora();
     }
 
     function responderToquePildora() {
@@ -852,6 +825,55 @@
       cerrarYColapsarNotif();
     }
 
+    /* CONTROL TÁCTIL EXACTO DE LA PÍLDORA CON AUTO-CONTRACCIÓN A 5s */
+    var btnPromo = document.getElementById('miniPildoraPromo');
+    var timerAutoPildora = null;
+    var timer3s = null;
+    var esPulsacionLarga = false;
+
+    function iniciarTemporizadorPildora() {
+      if (timerAutoPildora) clearTimeout(timerAutoPildora);
+      timerAutoPildora = setTimeout(contraerPildora, 5000);
+    }
+
+    function contraerPildora() {
+      if (btnPromo) btnPromo.classList.add('docked-pildora');
+    }
+
+    function desplegarPildora() {
+      if (btnPromo) {
+        btnPromo.classList.remove('docked-pildora');
+        iniciarTemporizadorPildora();
+      }
+    }
+
+    btnPromo.addEventListener('pointerdown', function(e) {
+      esPulsacionLarga = false;
+      if (timer3s) clearTimeout(timer3s);
+      timer3s = setTimeout(function() {
+        esPulsacionLarga = true;
+        if (navigator.vibrate) navigator.vibrate(60);
+        abrirModalClave();
+      }, 3000);
+    });
+
+    btnPromo.addEventListener('pointerup', function(e) {
+      if (timer3s) { clearTimeout(timer3s); timer3s = null; }
+      if (!esPulsacionLarga) {
+        responderToquePildora();
+      }
+    });
+
+    btnPromo.addEventListener('pointercancel', function() {
+      if (timer3s) { clearTimeout(timer3s); timer3s = null; }
+    });
+
+    window.addEventListener('pointerdown', function(e) {
+      if (btnPromo && !btnPromo.contains(e.target)) contraerPildora();
+    });
+
+    iniciarTemporizadorPildora();
+
     /* ESCUCHA DE SALDO DESDE EL IFRAME */
     window.addEventListener('message', function(ev) {
       if (!ev.data) return;
@@ -869,112 +891,26 @@
       }
     });
 
-    /* CONTROL TÁCTIL EXACTO EN LA PÍLDORA */
-    (function() {
-      var pil = document.getElementById('miniPildoraPromo');
-      if (!pil) return;
-      var timerHold = null;
-      var esPulsacionLarga = false;
-
-      function inicioToque(e) {
-        esPulsacionLarga = false;
-        if (timerHold) clearTimeout(timerHold);
-        timerHold = setTimeout(function() {
-          esPulsacionLarga = true;
-          if (navigator.vibrate) navigator.vibrate(60);
-          abrirModalClave();
-        }, 3000);
-      }
-
-      function finToque(e) {
-        if (timerHold) {
-          clearTimeout(timerHold);
-          timerHold = null;
-        }
-        if (!esPulsacionLarga) {
-          responderToquePildora();
-        }
-      }
-
-      function cancelarToque() {
-        if (timerHold) {
-          clearTimeout(timerHold);
-          timerHold = null;
-        }
-      }
-
-      pil.addEventListener('touchstart', inicioToque, { passive: true });
-      pil.addEventListener('touchend', finToque);
-      pil.addEventListener('touchcancel', cancelarToque);
-
-      pil.addEventListener('mousedown', inicioToque);
-      pil.addEventListener('mouseup', finToque);
-      pil.addEventListener('mouseleave', cancelarToque);
-    })();
-
-    /* VALIDACIÓN DE CLAVE MAESTRA */
+    /* ADMINISTRACIÓN */
     function abrirModalClave() {
       document.getElementById('modalClaveMaster').style.display = 'flex';
-      setTimeout(function(){ 
-        var inp = document.getElementById('inputMasterPin');
-        if (inp) { inp.focus(); }
-      }, 200);
+      setTimeout(function(){ document.getElementById('inputMasterPin').focus(); }, 150);
     }
 
     function cerrarModalClave() {
       document.getElementById('modalClaveMaster').style.display = 'none';
-      var inp = document.getElementById('inputMasterPin');
-      if (inp) inp.value = '';
-      var b = document.getElementById('btnSubmitMasterPin');
-      if (b) {
-        b.disabled = false;
-        b.textContent = 'Ingresar';
-      }
+      document.getElementById('inputMasterPin').value = '';
     }
 
-    function validarPinRemoto() {
-      var inp = document.getElementById('inputMasterPin');
-      var pin = inp ? inp.value.trim() : '';
-      if (!pin) {
-        alert('Ingresa la clave');
-        return;
-      }
-
-      var b = document.getElementById('btnSubmitMasterPin');
-      if (b) {
-        b.disabled = true;
-        b.textContent = 'Verificando...';
-      }
-
-      var callbackId = 'valPin_' + new Date().getTime();
-      var testImg = new Image();
-      var timeoutId = setTimeout(function() {
-        if (b) {
-          b.disabled = false;
-          b.textContent = 'Ingresar';
-        }
-        if (pin === "2026" || pin === "1234") {
-          cerrarModalClave();
-          abrirPanelPushAdmin();
-        } else {
-          alert('Clave incorrecta o tiempo de espera agotado');
-        }
-      }, 3500);
-
-      testImg.onload = function() {
-        clearTimeout(timeoutId);
-        if (b) { b.disabled = false; b.textContent = 'Ingresar'; }
+    function validarPinLocal() {
+      var pin = document.getElementById('inputMasterPin').value.trim();
+      if (pin === "2026" || pin === "1234") { 
         cerrarModalClave();
         abrirPanelPushAdmin();
-      };
-      testImg.onerror = function() {
-        clearTimeout(timeoutId);
-        if (b) { b.disabled = false; b.textContent = 'Ingresar'; }
-        cerrarModalClave();
-        abrirPanelPushAdmin();
-      };
-
-      testImg.src = urlBase + '?action=validar_admin_pin&pin=' + encodeURIComponent(pin) + '&t=' + callbackId;
+      } else {
+        alert('Clave incorrecta');
+        document.getElementById('inputMasterPin').value = '';
+      }
     }
 
     function abrirPanelPushAdmin() {
@@ -1020,7 +956,7 @@
       alert('¡Campaña guardada con éxito!');
     }
 
-    /* BOTÓN WHATSAPP CON AUTO-OCULTADO A LOS 5 SEGUNDOS */
+    /* WHATSAPP ORIGINAL CON AUTO-OCULTADO A LOS 5 SEGUNDOS */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -1077,15 +1013,11 @@
       });
 
       window.addEventListener('click', function(e) {
-        if (!btn.contains(e.target)) {
-          guardarBoton();
-        }
+        if (!btn.contains(e.target)) guardarBoton();
       });
 
       window.addEventListener('touchstart', function(e) {
-        if (!btn.contains(e.target)) {
-          guardarBoton();
-        }
+        if (!btn.contains(e.target)) guardarBoton();
       }, { passive: true });
 
       window.addEventListener('blur', function() {
@@ -1101,7 +1033,6 @@
       });
     }
 
-    /* CONTROL DE INSTALACIÓN PWA */
     var yaCerroBarraSesion = false;
     try {
       yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
