@@ -168,6 +168,7 @@
       background: #475569 !important;
       cursor: default;
       opacity: 0.9;
+      pointer-events: none;
     }
     .btn-bar-save.is-saving::after { display: none; }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
@@ -467,10 +468,8 @@
     }
 
     var yaCerroGuardarSesion = false;
-    var yaCerroAbrirSesion = false;
     try {
       yaCerroGuardarSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
-      yaCerroAbrirSesion = sessionStorage.getItem('pwa_abrir_descartada') === '1';
     } catch(e) {}
 
     var estaInstalada = false;
@@ -517,13 +516,15 @@
         btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = function() {
           if (promptObj) {
+            if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
+            if (txtSub) txtSub.textContent = "Un momento, por favor...";
+            btnInstalar.textContent = "Guardando...";
+            btnInstalar.classList.add('is-saving');
+
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
-              if (choice.outcome === 'accepted') {
-                if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
-                if (txtSub) txtSub.textContent = "Un momento, por favor...";
-                btnInstalar.textContent = "Guardando...";
-                btnInstalar.classList.add('is-saving');
+              if (choice.outcome !== 'accepted') {
+                configurarBotonGuardar(promptObj);
               }
             });
           }
@@ -548,7 +549,7 @@
           };
         }
       } else {
-        if (estaInstalada && !yaCerroAbrirSesion) {
+        if (estaInstalada) {
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
         }
@@ -571,11 +572,10 @@
     }
 
     function cerrarBarraClick() {
-      document.getElementById('pwaBarBottom').style.display = 'none';
+      var barra = document.getElementById('pwaBarBottom');
+      if (barra) barra.style.display = 'none';
       try {
-        if (estaInstalada) {
-          sessionStorage.setItem('pwa_abrir_descartada', '1');
-        } else {
+        if (!estaInstalada) {
           sessionStorage.setItem('pwa_barra_descartada', '1');
         }
       } catch(e) {}
@@ -590,7 +590,6 @@
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
       try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
-      try { sessionStorage.removeItem('pwa_abrir_descartada'); } catch(e) {}
       
       var barra = document.getElementById('pwaBarBottom');
       if (barra) {
