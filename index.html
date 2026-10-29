@@ -475,11 +475,7 @@
 
     var estaInstalada = false;
     try {
-      var dGuardado = localStorage.getItem('panarabe_pwa_owner');
-      var flagInst = localStorage.getItem('panarabe_app_instalada') === '1';
-      if (flagInst || (dGuardado && codEntrante && extraerCodParam(dGuardado) === codEntrante)) {
-        estaInstalada = true;
-      }
+      estaInstalada = localStorage.getItem('panarabe_app_instalada') === '1';
     } catch(e) {}
 
     function ejecutarAperturaPwa() {
@@ -508,11 +504,36 @@
       }
     }
 
-    if (!esPWA && tieneCredenciales) {
+    function configurarBotonGuardar(promptObj) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
       var txtTit = barra ? barra.querySelector('.bar-title') : null;
       var txtSub = barra ? barra.querySelector('.bar-sub') : null;
+
+      if (txtTit) txtTit.textContent = "Guardar Tarjeta";
+      if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
+      if (btnInstalar) {
+        btnInstalar.textContent = "Guardar";
+        btnInstalar.classList.remove('is-saving');
+        btnInstalar.onclick = function() {
+          if (promptObj) {
+            promptObj.prompt();
+            promptObj.userChoice.then(function(choice) {
+              if (choice.outcome === 'accepted') {
+                if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
+                if (txtSub) txtSub.textContent = "Un momento, por favor...";
+                btnInstalar.textContent = "Guardando...";
+                btnInstalar.classList.add('is-saving');
+              }
+            });
+          }
+        };
+      }
+    }
+
+    if (!esPWA && tieneCredenciales) {
+      var barra = document.getElementById('pwaBarBottom');
+      var btnInstalar = document.getElementById('btnBarInstall');
 
       if (esApple) {
         if (!yaCerroGuardarSesion) {
@@ -527,34 +548,25 @@
           };
         }
       } else {
-        if (estaInstalada) {
-          if (!yaCerroAbrirSesion) {
-            configurarBotonAbrirApp();
-            barra.style.display = 'flex';
-          }
-        } else if (!yaCerroGuardarSesion) {
-          var promptDiferido;
-          window.addEventListener('beforeinstallprompt', function(e) {
-            e.preventDefault();
-            promptDiferido = e;
-            barra.style.display = 'flex';
-
-            btnInstalar.onclick = function() {
-              if (promptDiferido) {
-                promptDiferido.prompt();
-                promptDiferido.userChoice.then(function(choice) {
-                  if (choice.outcome === 'accepted') {
-                    if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
-                    if (txtSub) txtSub.textContent = "Un momento, por favor...";
-                    btnInstalar.textContent = "Guardando...";
-                    btnInstalar.classList.add('is-saving');
-                  }
-                  promptDiferido = null;
-                });
-              }
-            };
-          });
+        if (estaInstalada && !yaCerroAbrirSesion) {
+          configurarBotonAbrirApp();
+          barra.style.display = 'flex';
         }
+
+        var promptDiferido;
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          promptDiferido = e;
+          estaInstalada = false;
+          try { localStorage.removeItem('panarabe_app_instalada'); } catch(err) {}
+
+          if (!yaCerroGuardarSesion) {
+            configurarBotonGuardar(promptDiferido);
+            barra.style.display = 'flex';
+          } else {
+            barra.style.display = 'none';
+          }
+        });
       }
     }
 
