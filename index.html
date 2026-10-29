@@ -487,7 +487,7 @@
       var txtSub = barra ? barra.querySelector('.bar-sub') : null;
 
       if (txtTit) txtTit.textContent = "Tarjeta Instalada";
-      if (txtSub) txtSub.textContent = "Búscala como SP! en tu teléfono";
+      if (txtSub) txtSub.textContent = "Búscala como SP!";
       if (btnInstalar) {
         btnInstalar.textContent = "Abrir App";
         btnInstalar.classList.remove('is-saving');
@@ -498,27 +498,31 @@
       }
     }
 
-    if (!esPWA && tieneCredenciales && !yaCerroBarraSesion) {
+    if (!esPWA && tieneCredenciales) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
       var txtTit = barra ? barra.querySelector('.bar-title') : null;
       var txtSub = barra ? barra.querySelector('.bar-sub') : null;
 
       if (esApple) {
-        setTimeout(function() {
-          barra.style.display = 'flex';
-        }, 1200);
+        if (!yaCerroBarraSesion) {
+          setTimeout(function() {
+            barra.style.display = 'flex';
+          }, 1200);
 
-        btnInstalar.onclick = function() {
-          document.getElementById('iosGuideModal').style.display = 'flex';
-          barra.style.display = 'none';
-          try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
-        };
+          btnInstalar.onclick = function() {
+            document.getElementById('iosGuideModal').style.display = 'flex';
+            barra.style.display = 'none';
+            try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+          };
+        }
       } else {
         if (estaInstalada) {
+          // Si ya está instalada: SIEMPRE se muestra la barra con Abrir App (con su X disponible)
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
-        } else {
+        } else if (!yaCerroBarraSesion) {
+          // Si no está instalada: solo se muestra si el usuario no tocó la X en esta pestaña
           var promptDiferido;
           window.addEventListener('beforeinstallprompt', function(e) {
             e.preventDefault();
@@ -565,8 +569,8 @@
       var txtSub = barra ? barra.querySelector('.bar-sub') : null;
 
       if (barra && btnInstalar) {
-        if (txtTit) txtTit.textContent = "¡Tarjeta Guardada! 🎉";
-        if (txtSub) txtSub.textContent = "Búscala como SP! en tu teléfono";
+        if (txtTit) txtTit.textContent = "Tarjeta Instalada";
+        if (txtSub) txtSub.textContent = "Búscala como SP!";
         btnInstalar.textContent = "Abrir App";
         btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = function() {
