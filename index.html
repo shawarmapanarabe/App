@@ -18,8 +18,13 @@
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var esPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-    if (esApple && esPWA) { document.documentElement.classList.add('is-apple-installed'); }
-    if (esApple && !esPWA) { document.documentElement.classList.add('is-apple-web'); }
+    if (esApple && esPWA) {
+      document.documentElement.classList.add('is-apple-installed');
+    }
+
+    if (esApple && !esPWA) {
+      document.documentElement.classList.add('is-apple-web');
+    }
 
     if (!esApple || !qInit || qInit.length < 4) {
       var mLink = document.createElement('link');
@@ -65,15 +70,22 @@
       transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease, left 0.28s ease;
     }
 
-    html.is-apple-web #btnWaFlotante { top: clamp(248px, 68vw, 305px); }
-    html.is-apple-installed #btnWaFlotante { top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px)); }
+    html.is-apple-web #btnWaFlotante {
+      top: clamp(248px, 68vw, 305px);
+    }
+
+    html.is-apple-installed #btnWaFlotante {
+      top: calc(clamp(282px, 78vw, 335px) + env(safe-area-inset-top, 0px));
+    }
 
     #btnWaFlotante.docked-edge {
       left: calc(100% - 24px) !important;
       opacity: 0.65; transform: scale(0.92);
     }
     #btnWaFlotante.docked-edge:hover,
-    #btnWaFlotante.docked-edge:active { opacity: 0.95; }
+    #btnWaFlotante.docked-edge:active {
+      opacity: 0.95;
+    }
 
     .burbuja-wa-inner {
       width: 100%; height: 100%; background: #25D366; border-radius: 50%;
@@ -88,19 +100,11 @@
       100% { transform: scale(1.1); box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7); }
     }
 
-    /* PANTALLA SPLASH CON FAIL-SAFE AUTOMÁTICO */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       transition: opacity 0.4s ease-out; pointer-events: none;
-      animation: autoCerrarSplash 0.4s ease-out 3s forwards;
-    }
-
-    @keyframes autoCerrarSplash {
-      0% { opacity: 1; }
-      99% { opacity: 0; pointer-events: none; }
-      100% { opacity: 0; pointer-events: none; display: none !important; visibility: hidden; }
     }
 
     .splash-logo {
@@ -115,7 +119,6 @@
       100% { transform: scale(1.025); }
     }
 
-    /* BARRA INFERIOR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
@@ -154,7 +157,6 @@
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
-    /* MODAL DE GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -166,8 +168,7 @@
       text-align: center; animation: zoomModal 0.22s ease-out;
     }
     @keyframes zoomModal {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; }
     }
     .modal-logo {
       width: 76px; height: 76px; border-radius: 0; margin: 0 auto 12px auto;
@@ -253,26 +254,10 @@
   </div>
 
   <script>
-    var splashTerminado = false;
-    function ocultarSplash() {
-      if (splashTerminado) return;
-      splashTerminado = true;
-      var splash = document.getElementById("splashScreen");
-      if (splash) {
-        splash.style.opacity = "0";
-        setTimeout(function() { splash.style.display = "none"; }, 420);
-      }
-    }
-
-    // Doble disparo de seguridad para apagar el splash
-    setTimeout(ocultarSplash, 2400);
-    window.addEventListener('load', function() { setTimeout(ocultarSplash, 500); });
-
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search || "";
     var tieneCredenciales = false;
 
-    // Normalizar a search= si viene directo desde acortador (?0001A&pin=1234)
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
@@ -280,93 +265,109 @@
       tieneCredenciales = true;
     }
 
-    function extraerCodigo(q) {
-      if (!q) return "";
+    function extraerCodParam(q) {
+      if (!q) return '';
       var m = q.match(/[?&]search=([^&]+)/i);
       if (m && m[1]) return decodeURIComponent(m[1]).toUpperCase();
-      var limpio = q.replace(/^\?/, '').split('&')[0];
-      return limpio ? limpio.toUpperCase() : "";
+      var p = q.replace(/^\?/, '').split('&')[0];
+      return p ? p.toUpperCase() : '';
     }
 
-    var codEntrante = extraerCodigo(query);
-    var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : "";
+    var codEntrante = extraerCodParam(query);
+    var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
 
-    // CONTROL DE USUARIO FIJO (BLINDAJE DE APP vs NAVEGADOR)
     if (esPWA) {
-      var duenoGuardado = "";
-      try { duenoGuardado = localStorage.getItem('panarabe_pwa_owner') || ""; } catch(e) {}
-      var codDueno = extraerCodigo(duenoGuardado);
+      var duenoPwa = '';
+      try { duenoPwa = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || ''; } catch(e) {}
+      var codDueno = extraerCodParam(duenoPwa);
 
-      if (duenoGuardado) {
-        // La app instalada ya tiene dueño: si abrieron con QR de este mismo dueño, permitimos abrir el QR
+      if (duenoPwa) {
         if (query && query.indexOf('autoqr=1') !== -1 && codEntrante && codEntrante === codDueno) {
-          query = duenoGuardado + (duenoGuardado.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
+          query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
         } else {
-          // Si abren otro link o el icono regular, siempre abre al dueño original
-          query = duenoGuardado;
+          query = duenoPwa;
         }
         tieneCredenciales = true;
       } else if (tieneCredenciales) {
-        // Primera apertura de la PWA instalada: fija a este cliente de por vida
-        try { localStorage.setItem('panarabe_pwa_owner', querySinQR); } catch(e) {}
+        try { 
+          localStorage.setItem('panarabe_pwa_owner', querySinQR); 
+          localStorage.setItem('panarabe_final_query', querySinQR); 
+        } catch(e) {}
       }
     } else {
-      // Modo navegador web: si aún no hay dueño registrado, lo pre-guarda para cuando presione instalar
       if (tieneCredenciales) {
-        try {
+        try { 
           var duenoActual = localStorage.getItem('panarabe_pwa_owner');
           if (!duenoActual) {
             localStorage.setItem('panarabe_pwa_owner', querySinQR);
+            localStorage.setItem('panarabe_final_query', querySinQR);
           }
-          sessionStorage.setItem('panarabe_web_session', query);
+          sessionStorage.setItem('panarabe_session_query', query); 
         } catch(e) {}
       } else {
         try {
-          var guardadoWeb = sessionStorage.getItem('panarabe_web_session') || localStorage.getItem('panarabe_pwa_owner');
-          if (guardadoWeb) {
-            query = guardadoWeb;
+          var guardado = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
+          if (guardado) {
+            query = guardado;
             tieneCredenciales = true;
           }
         } catch(e) {}
       }
     }
 
-    // LIMPIEZA DE URL VISIBLE: Si la página cargó con autoqr=1, lo borra de la barra
-    // para que cualquier instalación que haga el cliente tome siempre la pantalla principal limpia
     try {
       if (window.history && window.history.replaceState && window.location.search.indexOf('autoqr=1') !== -1) {
-        var qVisible = window.location.search.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '');
-        var urlLimpia = window.location.pathname + (qVisible ? qVisible : '');
-        window.history.replaceState({}, document.title, urlLimpia);
+        var queryVisual = window.location.search.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '');
+        var pathLimpio = window.location.pathname + (queryVisual ? queryVisual : '');
+        window.history.replaceState({}, document.title, pathLimpio);
       }
     } catch(e) {}
 
-    // CARGAR IFRAME CON LA SESIÓN DEFINIDA
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
+    function ocultarSplash() {
+      var splash = document.getElementById("splashScreen");
+      if (splash && splash.style.display !== "none") {
+        splash.style.opacity = "0";
+        setTimeout(function() {
+          splash.style.display = "none";
+        }, 400);
+      }
+    }
+
     frame.onload = function() {
-      setTimeout(ocultarSplash, 250);
+      setTimeout(ocultarSplash, 400);
+
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
         var pinInput = iframeDoc.getElementById('inputPin');
         var btnIngresar = iframeDoc.getElementById('btnBuscar');
+        
         if (pinInput && btnIngresar && query && query.indexOf('pin=') !== -1) {
           var matchPin = query.match(/pin=([^&]+)/i);
           if (matchPin && matchPin[1]) {
-            pinInput.value = decodeURIComponent(matchPin[1]);
+            var pinVal = decodeURIComponent(matchPin[1]);
+            pinInput.value = pinVal;
             pinInput.dispatchEvent(new Event('input', { bubbles: true }));
-            setTimeout(function() { btnIngresar.click(); }, 150);
+            setTimeout(function() {
+              btnIngresar.click();
+            }, 150);
           }
         }
       } catch(err) {}
     };
 
-    /* WHATSAPP FLOTANTE CON AUTO-REPLIEGUE A LOS 7 SEGUNDOS */
+    setTimeout(ocultarSplash, 4000);
+
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
-      var estaAcoplado = false, bloqueoApertura = false, waBloqueoClick = false, timerAuto7s = null;
+
+      var estaAcoplado = false;
+      var bloqueoApertura = false;
+      var waBloqueoClick = false;
+      var timerAuto7s = null;
 
       function iniciarTemporizador7s() {
         if (timerAuto7s) clearTimeout(timerAuto7s);
@@ -378,45 +379,79 @@
         waBloqueoClick = true;
         setTimeout(function() { waBloqueoClick = false; }, 1000);
         var targetUrl = 'https://api.whatsapp.com/send?phone=51906769744';
-        if (esApple && esPWA) { window.location.href = targetUrl; } else { window.open(targetUrl, '_blank'); }
+        if (esApple && esPWA) {
+          window.location.href = targetUrl;
+        } else {
+          window.open(targetUrl, '_blank');
+        }
       }
 
       function guardarBoton() {
-        if (!estaAcoplado) { btn.classList.add('docked-edge'); estaAcoplado = true; }
+        if (!estaAcoplado) {
+          btn.classList.add('docked-edge');
+          estaAcoplado = true;
+        }
         if (timerAuto7s) clearTimeout(timerAuto7s);
       }
 
       function desplegarBoton() {
-        btn.classList.remove('docked-edge'); estaAcoplado = false; bloqueoApertura = true;
+        btn.classList.remove('docked-edge');
+        estaAcoplado = false;
+        bloqueoApertura = true;
         setTimeout(function() { bloqueoApertura = false; }, 400);
         iniciarTemporizador7s();
       }
 
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        if (estaAcoplado) { desplegarBoton(); return; }
-        if (!bloqueoApertura) { abrirWhatsAppSeguro(); }
+        if (estaAcoplado) {
+          desplegarBoton();
+          return;
+        }
+        if (!bloqueoApertura) {
+          abrirWhatsAppSeguro();
+        }
       });
 
-      window.addEventListener('click', function(e) { if (!btn.contains(e.target)) { guardarBoton(); } });
-      window.addEventListener('touchstart', function(e) { if (!btn.contains(e.target)) { guardarBoton(); } }, { passive: true });
-      window.addEventListener('blur', function() { setTimeout(guardarBoton, 100); });
+      window.addEventListener('click', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
+        }
+      });
+
+      window.addEventListener('touchstart', function(e) {
+        if (!btn.contains(e.target)) {
+          guardarBoton();
+        }
+      }, { passive: true });
+
+      window.addEventListener('blur', function() {
+        setTimeout(guardarBoton, 100);
+      });
+
       iniciarTemporizador7s();
     })();
 
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() { navigator.serviceWorker.register('./sw.js').catch(function(){}); });
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function(){});
+      });
     }
 
     var yaCerroBarraSesion = false;
-    try { yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1'; } catch(e) {}
+    try {
+      yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
+    } catch(e) {}
 
     if (!esPWA && tieneCredenciales && !yaCerroBarraSesion) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
 
       if (esApple) {
-        setTimeout(function() { barra.style.display = 'flex'; }, 1200);
+        setTimeout(function() {
+          barra.style.display = 'flex';
+        }, 1200);
+
         btnInstalar.onclick = function() {
           document.getElementById('iosGuideModal').style.display = 'flex';
           barra.style.display = 'none';
@@ -425,7 +460,10 @@
       } else {
         var promptDiferido;
         window.addEventListener('beforeinstallprompt', function(e) {
-          e.preventDefault(); promptDiferido = e; barra.style.display = 'flex';
+          e.preventDefault();
+          promptDiferido = e;
+          barra.style.display = 'flex';
+
           btnInstalar.onclick = function() {
             if (promptDiferido) {
               promptDiferido.prompt();
@@ -434,17 +472,6 @@
                   barra.style.display = 'none';
                   try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
                 }
-                promptDiferido = null;
-              });
-            }
-          };
-        });
-      }
-    }
-
-    function cerrarBarraDefinitivo() {
-      document.getElementById('pwaBarBottom').style.display = 'none';
-      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}                 }
                 promptDiferido = null;
               });
             }
@@ -471,5 +498,3 @@
   </script>
 </body>
 </html>
-
- 
