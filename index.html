@@ -185,7 +185,7 @@
       overflow: hidden;
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
-      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease, background-color 0.2s ease, opacity 0.2s ease;
+      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease;
       outline: none !important;
       -webkit-tap-highlight-color: transparent !important;
       user-select: none; -webkit-user-select: none;
@@ -217,14 +217,6 @@
       100% { left: 160%; }
     }
     .btn-bar-save:active { transform: scale(0.95); }
-    .btn-bar-save.is-saving {
-      background: #475569 !important;
-      cursor: default;
-      opacity: 0.9;
-      pointer-events: none;
-    }
-    .btn-bar-save.is-saving::after { display: none; }
-
     .btn-bar-close { 
       background: transparent; color: #9aa0a6; border: none; font-size: 16px; 
       cursor: pointer; padding: 4px; line-height: 1;
@@ -337,8 +329,21 @@
   </div>
 
   <script>
+    var splashTerminado = false;
+    function ocultarSplash() {
+      if (splashTerminado) return;
+      splashTerminado = true;
+      var splash = document.getElementById("splashScreen");
+      if (splash) {
+        splash.style.opacity = "0";
+        setTimeout(function() { splash.style.display = "none"; }, 400);
+      }
+    }
+
+    setTimeout(ocultarSplash, 2200);
+
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
-    var query = window.location.search;
+    var query = window.location.search || "";
     var tieneCredenciales = false;
 
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
@@ -346,35 +351,83 @@
         query = '?search=' + query.substring(1);
       }
       tieneCredenciales = true;
-      try { 
-        localStorage.setItem('panarabe_final_query', query); 
-        sessionStorage.setItem('panarabe_session_query', query);
-      } catch(e) {}
-    } else {
-      try {
-        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
-        if (guardado) {
-          query = guardado;
+    }
+
+    function extraerCodParam(q) {
+      if (!q) return '';
+      var s = q;
+      if (s.indexOf('?') !== -1) s = s.split('?')[1];
+      var m = s.match(/(?:^|&)search=([^&]+)/i);
+      if (m && m[1]) return decodeURIComponent(m[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
+      var primer = s.split('&')[0];
+      if (primer.indexOf('=') !== -1) {
+        var p = primer.split('=');
+        if (p[0].toLowerCase() === 'search') return decodeURIComponent(p[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
+        return '';
+      }
+      return primer.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    var codEntrante = extraerCodParam(query);
+    var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
+
+    /* ANCLAJE Y PROTECCIÓN DE LA TARJETA DEL DUEÑO */
+    if (esPWA) {
+      var duenoPwa = '';
+      try { duenoPwa = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || ''; } catch(e) {}
+      var codDueno = extraerCodParam(duenoPwa);
+
+      if (duenoPwa && codDueno) {
+        if (codEntrante && codEntrante !== codDueno) {
+          tieneCredenciales = true;
+        } else if (query && query.indexOf('autoqr=1') !== -1) {
+          query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
+          tieneCredenciales = true;
+        } else {
+          query = duenoPwa;
           tieneCredenciales = true;
         }
-      } catch(e) {}
+      } else if (tieneCredenciales) {
+        try { 
+          localStorage.setItem('panarabe_pwa_owner', querySinQR); 
+          localStorage.setItem('panarabe_final_query', querySinQR); 
+          localStorage.setItem('panarabe_app_instalada', '1');
+        } catch(e) {}
+      }
+    } else {
+      if (tieneCredenciales) {
+        try { 
+          var duenoActual = localStorage.getItem('panarabe_pwa_owner');
+          if (!duenoActual) {
+            localStorage.setItem('panarabe_pwa_owner', querySinQR);
+            localStorage.setItem('panarabe_final_query', querySinQR);
+          }
+          sessionStorage.setItem('panarabe_session_query', query); 
+        } catch(e) {}
+      } else {
+        try {
+          var guardado = sessionStorage.getItem('panarabe_session_query') || localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query');
+          if (guardado) {
+            query = guardado;
+            tieneCredenciales = true;
+          }
+        } catch(e) {}
+      }
     }
+
+    try {
+      if (window.history && window.history.replaceState && window.location.search.indexOf('autoqr=1') !== -1) {
+        var queryVisual = window.location.search.replace(/([&?])autoqr=1(&|$)/gi, '$1').replace(/[?&]$/, '');
+        var pathLimpio = window.location.pathname + (queryVisual ? queryVisual : '');
+        window.history.replaceState({}, document.title, pathLimpio);
+      }
+    } catch(e) {}
 
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    function ocultarSplash() {
-      var splash = document.getElementById("splashScreen");
-      if (splash && splash.style.display !== "none") {
-        splash.style.opacity = "0";
-        setTimeout(function() {
-          splash.style.display = "none";
-        }, 400);
-      }
-    }
-
     frame.onload = function() {
-      setTimeout(ocultarSplash, 400);
+      setTimeout(ocultarSplash, 350);
 
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -395,9 +448,7 @@
       } catch(err) {}
     };
 
-    setTimeout(ocultarSplash, 4000);
-
-    /* WHATSAPP CON TEMPORIZADOR DE 7 SEGUNDOS Y OCULTADO INMEDIATO POR TOQUE */
+    /* BOTÓN WHATSAPP */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -486,9 +537,20 @@
       estaInstalada = localStorage.getItem('panarabe_app_instalada') === '1';
     } catch(e) {}
 
+    /* APERTURA DIRECTA CON LA TARJETA DEL DUEÑO EN LA APP INSTALADA */
     function ejecutarAperturaPwa() {
-      var destino = window.location.origin + window.location.pathname + (query ? query : "");
-      window.location.href = destino;
+      var queryDueno = '';
+      try {
+        queryDueno = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || query || '';
+      } catch(e) {}
+      var destino = window.location.origin + window.location.pathname + (queryDueno ? queryDueno : '');
+      var enlace = document.createElement('a');
+      enlace.href = destino;
+      enlace.target = '_blank';
+      enlace.rel = 'noopener noreferrer';
+      document.body.appendChild(enlace);
+      enlace.click();
+      document.body.removeChild(enlace);
     }
 
     function configurarBotonAbrirApp() {
@@ -501,7 +563,6 @@
       if (txtSub) txtSub.textContent = "Búscala como SP!";
       if (btnInstalar) {
         btnInstalar.textContent = "Abrir App";
-        btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = ejecutarAperturaPwa;
       }
     }
@@ -516,18 +577,13 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
-        btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = function() {
           if (promptObj) {
-            if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
-            if (txtSub) txtSub.textContent = "Un momento, por favor...";
-            btnInstalar.textContent = "Guardando...";
-            btnInstalar.classList.add('is-saving');
-
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
-              if (choice.outcome !== 'accepted') {
-                configurarBotonGuardar(promptObj);
+              if (choice.outcome === 'accepted') {
+                barra.style.display = 'none';
+                try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
               }
             });
           }
@@ -552,6 +608,7 @@
           };
         }
       } else {
+        // Si ya está instalada, SIEMPRE se muestra la barra invitando a abrir la App
         if (estaInstalada) {
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
@@ -564,6 +621,7 @@
           estaInstalada = false;
           try { localStorage.removeItem('panarabe_app_instalada'); } catch(err) {}
 
+          // Si el usuario no ha cerrado la barra en esta pestaña, se muestra
           if (!yaCerroGuardarSesion) {
             configurarBotonGuardar(promptDiferido);
             barra.style.display = 'flex';
@@ -578,11 +636,14 @@
       var barra = document.getElementById('pwaBarBottom');
       if (barra) barra.style.display = 'none';
       try {
+        // Solo guarda el descarte en sesión si estaba en modo "Guardar"
+        // Si está instalada ("Abrir App"), no se bloquea para futuros accesos
         if (!estaInstalada) {
           sessionStorage.setItem('pwa_barra_descartada', '1');
         }
       } catch(e) {}
     }
+    var cerrarBarraDefinitivo = cerrarBarraClick;
 
     function cerrarGuiaIos() {
       document.getElementById('iosGuideModal').style.display = 'none';
@@ -590,18 +651,24 @@
       try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
+    // Al confirmarse la instalación en segundo plano por Android:
+    // - Se asegura la tarjeta del dueño en almacenamiento local
+    // - Se mantiene la barra oculta en esta misma pestaña
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
-      try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
-      try { sessionStorage.removeItem('pwa_barra_descartada'); } catch(e) {}
+      try { 
+        localStorage.setItem('panarabe_app_instalada', '1'); 
+        if (querySinQR) {
+          localStorage.setItem('panarabe_pwa_owner', querySinQR);
+          localStorage.setItem('panarabe_final_query', querySinQR);
+        }
+      } catch(e) {}
       
       var barra = document.getElementById('pwaBarBottom');
       if (barra) {
-        configurarBotonAbrirApp();
-        barra.style.display = 'flex';
+        barra.style.display = 'none';
       }
     });
   </script>
 </body>
 </html>
-
