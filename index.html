@@ -100,11 +100,19 @@
       100% { transform: scale(1.1); box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7); }
     }
 
+    /* PANTALLA SPLASH CON FAIL-SAFE AUTOMÁTICO */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       transition: opacity 0.4s ease-out; pointer-events: none;
+      animation: autoCerrarSplash 0.4s ease-out 2.5s forwards;
+    }
+
+    @keyframes autoCerrarSplash {
+      0% { opacity: 1; }
+      99% { opacity: 0; pointer-events: none; }
+      100% { opacity: 0; pointer-events: none; display: none !important; visibility: hidden; }
     }
 
     .splash-logo {
@@ -119,6 +127,7 @@
       100% { transform: scale(1.025); }
     }
 
+    /* BARRA INFERIOR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
       width: calc(100% - 32px); max-width: 380px; background: #1E2743; color: #ffffff;
@@ -157,6 +166,7 @@
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
+    /* MODAL GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -265,7 +275,7 @@
       }
     }
 
-    setTimeout(ocultarSplash, 2800);
+    setTimeout(ocultarSplash, 2200);
 
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search || "";
@@ -280,13 +290,17 @@
 
     function extraerCodParam(q) {
       if (!q) return '';
-      var m = q.match(/[?&]search=([^&]+)/i);
+      var s = q;
+      if (s.indexOf('?') !== -1) s = s.split('?')[1];
+      var m = s.match(/(?:^|&)search=([^&]+)/i);
       if (m && m[1]) return decodeURIComponent(m[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
-      var p = q.replace(/^\?/, '').split('&')[0];
-      if (p && p.indexOf('=') === -1) {
-        return p.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      var primer = s.split('&')[0];
+      if (primer.indexOf('=') !== -1) {
+        var p = primer.split('=');
+        if (p[0].toLowerCase() === 'search') return decodeURIComponent(p[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
+        return '';
       }
-      return '';
+      return primer.toUpperCase().replace(/[^A-Z0-9]/g, '');
     }
 
     var codEntrante = extraerCodParam(query);
@@ -299,23 +313,26 @@
 
       if (duenoPwa && codDueno) {
         if (codEntrante && codEntrante !== codDueno) {
-          var urlChromeIntent = "intent://" + window.location.host + window.location.pathname + window.location.search + "#Intent;scheme=https;package=com.android.chrome;end";
-          window.location.replace(urlChromeIntent);
-          query = duenoPwa;
+          // Es otro cliente: abre su tarjeta/QR temporalmente sin tocar la memoria del dueño
+          tieneCredenciales = true;
         } else if (query && query.indexOf('autoqr=1') !== -1) {
+          // Es el dueño con su propio QR: abre con su QR
           query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
           tieneCredenciales = true;
         } else {
+          // Es el dueño abriendo normalmente
           query = duenoPwa;
           tieneCredenciales = true;
         }
       } else if (tieneCredenciales) {
+        // Primera instalación: se ancla este dueño en memoria permanente
         try { 
           localStorage.setItem('panarabe_pwa_owner', querySinQR); 
           localStorage.setItem('panarabe_final_query', querySinQR); 
         } catch(e) {}
       }
     } else {
+      // Modo Navegador Web: no altera la memoria del dueño
       if (tieneCredenciales) {
         try { 
           var duenoActual = localStorage.getItem('panarabe_pwa_owner');
@@ -507,3 +524,4 @@
   </script>
 </body>
 </html>
+
