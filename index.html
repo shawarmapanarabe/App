@@ -244,7 +244,7 @@
     </div>
     <div class="bar-right">
       <button class="btn-bar-save" id="btnBarInstall">Guardar</button>
-      <button class="btn-bar-close" onclick="cerrarBarraDefinitivo()">✕</button>
+      <button class="btn-bar-close" onclick="cerrarBarraClick()">✕</button>
     </div>
   </div>
 
@@ -466,9 +466,11 @@
       });
     }
 
-    var yaCerroBarraSesion = false;
+    var yaCerroGuardarSesion = false;
+    var yaCerroAbrirSesion = false;
     try {
-      yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
+      yaCerroGuardarSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
+      yaCerroAbrirSesion = sessionStorage.getItem('pwa_abrir_descartada') === '1';
     } catch(e) {}
 
     var estaInstalada = false;
@@ -479,6 +481,17 @@
         estaInstalada = true;
       }
     } catch(e) {}
+
+    function ejecutarAperturaPwa() {
+      var destino = window.location.origin + window.location.pathname + (query ? query : "");
+      var enlace = document.createElement('a');
+      enlace.href = destino;
+      enlace.target = '_blank';
+      enlace.rel = 'noopener noreferrer';
+      document.body.appendChild(enlace);
+      enlace.click();
+      document.body.removeChild(enlace);
+    }
 
     function configurarBotonAbrirApp() {
       var barra = document.getElementById('pwaBarBottom');
@@ -491,10 +504,7 @@
       if (btnInstalar) {
         btnInstalar.textContent = "Abrir App";
         btnInstalar.classList.remove('is-saving');
-        btnInstalar.onclick = function() {
-          var urlIntent = "intent://" + window.location.host + window.location.pathname + (query ? query : "") + "#Intent;scheme=https;end";
-          window.location.href = urlIntent;
-        };
+        btnInstalar.onclick = ejecutarAperturaPwa;
       }
     }
 
@@ -505,7 +515,7 @@
       var txtSub = barra ? barra.querySelector('.bar-sub') : null;
 
       if (esApple) {
-        if (!yaCerroBarraSesion) {
+        if (!yaCerroGuardarSesion) {
           setTimeout(function() {
             barra.style.display = 'flex';
           }, 1200);
@@ -518,11 +528,11 @@
         }
       } else {
         if (estaInstalada) {
-          // Si ya está instalada: SIEMPRE se muestra la barra con Abrir App (con su X disponible)
-          configurarBotonAbrirApp();
-          barra.style.display = 'flex';
-        } else if (!yaCerroBarraSesion) {
-          // Si no está instalada: solo se muestra si el usuario no tocó la X en esta pestaña
+          if (!yaCerroAbrirSesion) {
+            configurarBotonAbrirApp();
+            barra.style.display = 'flex';
+          }
+        } else if (!yaCerroGuardarSesion) {
           var promptDiferido;
           window.addEventListener('beforeinstallprompt', function(e) {
             e.preventDefault();
@@ -548,9 +558,15 @@
       }
     }
 
-    function cerrarBarraDefinitivo() {
+    function cerrarBarraClick() {
       document.getElementById('pwaBarBottom').style.display = 'none';
-      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+      try {
+        if (estaInstalada) {
+          sessionStorage.setItem('pwa_abrir_descartada', '1');
+        } else {
+          sessionStorage.setItem('pwa_barra_descartada', '1');
+        }
+      } catch(e) {}
     }
 
     function cerrarGuiaIos() {
@@ -560,23 +576,13 @@
     }
 
     window.addEventListener('appinstalled', function() {
+      estaInstalada = true;
       try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
-      try { sessionStorage.removeItem('pwa_barra_descartada'); } catch(e) {}
+      try { sessionStorage.removeItem('pwa_abrir_descartada'); } catch(e) {}
       
       var barra = document.getElementById('pwaBarBottom');
-      var btnInstalar = document.getElementById('btnBarInstall');
-      var txtTit = barra ? barra.querySelector('.bar-title') : null;
-      var txtSub = barra ? barra.querySelector('.bar-sub') : null;
-
-      if (barra && btnInstalar) {
-        if (txtTit) txtTit.textContent = "Tarjeta Instalada";
-        if (txtSub) txtSub.textContent = "Búscala como SP!";
-        btnInstalar.textContent = "Abrir App";
-        btnInstalar.classList.remove('is-saving');
-        btnInstalar.onclick = function() {
-          var urlIntent = "intent://" + window.location.host + window.location.pathname + (query ? query : "") + "#Intent;scheme=https;end";
-          window.location.href = urlIntent;
-        };
+      if (barra) {
+        configurarBotonAbrirApp();
         barra.style.display = 'flex';
       }
     });
