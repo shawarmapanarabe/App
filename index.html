@@ -519,7 +519,6 @@
         btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = function() {
           if (promptObj) {
-            // Cambio inmediato sin recuadros de selección
             if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
             if (txtSub) txtSub.textContent = "Un momento, por favor...";
             btnInstalar.textContent = "Guardando...";
@@ -528,7 +527,6 @@
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
               if (choice.outcome !== 'accepted') {
-                // Si cancela en Android, regresa a estado Guardar
                 configurarBotonGuardar(promptObj);
               }
             });
@@ -592,7 +590,6 @@
       try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
-    // Al confirmarse la instalación en Android, reemplaza directamente la barra
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
       try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
@@ -607,3 +604,4 @@
   </script>
 </body>
 </html>
+
