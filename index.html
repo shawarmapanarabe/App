@@ -310,23 +310,62 @@
     var query = window.location.search;
     var tieneCredenciales = false;
 
+    // Normalizar formato de búsqueda
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
       if (query.indexOf('search=') === -1 && query.indexOf('action=') === -1) {
         query = '?search=' + query.substring(1);
       }
       tieneCredenciales = true;
-      try { 
-        localStorage.setItem('panarabe_final_query', query); 
-        sessionStorage.setItem('panarabe_session_query', query);
-      } catch(e) {}
-    } else {
-      try {
-        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
-        if (guardado) {
-          query = guardado;
-          tieneCredenciales = true;
+    }
+
+    // Extraer código de cliente para comparar dueño
+    function extraerCodParam(q) {
+      if (!q) return '';
+      var m = q.match(/[?&]search=([^&]+)/i);
+      return m && m[1] ? decodeURIComponent(m[1]).toUpperCase() : '';
+    }
+
+    var codEntrante = extraerCodParam(query);
+
+    // BLINDAJE DE USUARIO ÚNICO (PWA vs NAVEGADOR)
+    if (esPWA) {
+      var duenoPwa = localStorage.getItem('panarabe_pwa_owner');
+      var codDueno = extraerCodParam(duenoPwa);
+
+      if (duenoPwa) {
+        // Si el enlace entrante trae autoqr pero coincide con el dueño, permite abrir con el QR
+        if (query && query.indexOf('autoqr=1') !== -1 && codEntrante && codEntrante === codDueno) {
+          query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
+        } else {
+          // Para cualquier otro caso, la PWA carga exclusivamente la tarjeta del dueño
+          query = duenoPwa;
         }
-      } catch(e) {}
+        tieneCredenciales = true;
+      } else if (tieneCredenciales) {
+        // Primera instalación: se ancla este usuario como dueño permanente de la PWA
+        var queryLimpiaBase = query.replace(/([&?])autoqr=1(&|$)/gi, '$1').replace(/[?&]$/, '');
+        localStorage.setItem('panarabe_pwa_owner', queryLimpiaBase);
+      }
+    } else {
+      // Modo navegador normal: mantiene sesiones independientes sin sobreescribir la PWA instalada
+      if (tieneCredenciales) {
+        try { sessionStorage.setItem('panarabe_session_query', query); } catch(e) {}
+      } else {
+        try {
+          var guardadoSesion = sessionStorage.getItem('panarabe_session_query');
+          if (guardadoSesion) {
+            query = guardadoSesion;
+            tieneCredenciales = true;
+          }
+        } catch(e) {}
+      }
+    }
+
+    // Limpieza de URL en barra de direcciones para que cualquier instalación siempre sea la portada
+    if (window.history && window.history.replaceState && window.location.search.indexOf('autoqr=1') !== -1) {
+      var queryVisual = window.location.search.replace(/([&?])autoqr=1(&|$)/gi, '$1').replace(/[?&]$/, '');
+      var pathLimpio = window.location.pathname + (queryVisual ? queryVisual : '');
+      window.history.replaceState({}, document.title, pathLimpio);
     }
 
     var frame = document.getElementById("appFrame");
@@ -488,6 +527,17 @@
     }
 
     function cerrarBarraDefinitivo() {
+      document.getElementById('pwaBarBottom').style.display = 'none';
+      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+    }
+
+    function cerrarGuiaIos() {
+      document.getElementById('iosGuideModal').style.display = 'none';
+      document.getElementById('pwaBarBottom').style.display = 'none';
+      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+    }
+
+    window.addEventListener('appinstalled', function() {
       document.getElementById('pwaBarBottom').style.display = 'none';
       try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
