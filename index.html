@@ -254,6 +254,19 @@
   </div>
 
   <script>
+    var splashTerminado = false;
+    function ocultarSplash() {
+      if (splashTerminado) return;
+      splashTerminado = true;
+      var splash = document.getElementById("splashScreen");
+      if (splash) {
+        splash.style.opacity = "0";
+        setTimeout(function() { splash.style.display = "none"; }, 400);
+      }
+    }
+
+    setTimeout(ocultarSplash, 2800);
+
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
     var query = window.location.search || "";
     var tieneCredenciales = false;
@@ -268,9 +281,12 @@
     function extraerCodParam(q) {
       if (!q) return '';
       var m = q.match(/[?&]search=([^&]+)/i);
-      if (m && m[1]) return decodeURIComponent(m[1]).toUpperCase();
+      if (m && m[1]) return decodeURIComponent(m[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
       var p = q.replace(/^\?/, '').split('&')[0];
-      return p ? p.toUpperCase() : '';
+      if (p && p.indexOf('=') === -1) {
+        return p.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      }
+      return '';
     }
 
     var codEntrante = extraerCodParam(query);
@@ -281,13 +297,18 @@
       try { duenoPwa = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || ''; } catch(e) {}
       var codDueno = extraerCodParam(duenoPwa);
 
-      if (duenoPwa) {
-        if (query && query.indexOf('autoqr=1') !== -1 && codEntrante && codEntrante === codDueno) {
+      if (duenoPwa && codDueno) {
+        if (codEntrante && codEntrante !== codDueno) {
+          var urlChromeIntent = "intent://" + window.location.host + window.location.pathname + window.location.search + "#Intent;scheme=https;package=com.android.chrome;end";
+          window.location.replace(urlChromeIntent);
+          query = duenoPwa;
+        } else if (query && query.indexOf('autoqr=1') !== -1) {
           query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
+          tieneCredenciales = true;
         } else {
           query = duenoPwa;
+          tieneCredenciales = true;
         }
-        tieneCredenciales = true;
       } else if (tieneCredenciales) {
         try { 
           localStorage.setItem('panarabe_pwa_owner', querySinQR); 
@@ -306,7 +327,7 @@
         } catch(e) {}
       } else {
         try {
-          var guardado = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
+          var guardado = sessionStorage.getItem('panarabe_session_query') || localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query');
           if (guardado) {
             query = guardado;
             tieneCredenciales = true;
@@ -317,7 +338,7 @@
 
     try {
       if (window.history && window.history.replaceState && window.location.search.indexOf('autoqr=1') !== -1) {
-        var queryVisual = window.location.search.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '');
+        var queryVisual = window.location.search.replace(/([&?])autoqr=1(&|$)/gi, '$1').replace(/[?&]$/, '');
         var pathLimpio = window.location.pathname + (queryVisual ? queryVisual : '');
         window.history.replaceState({}, document.title, pathLimpio);
       }
@@ -326,18 +347,8 @@
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
-    function ocultarSplash() {
-      var splash = document.getElementById("splashScreen");
-      if (splash && splash.style.display !== "none") {
-        splash.style.opacity = "0";
-        setTimeout(function() {
-          splash.style.display = "none";
-        }, 400);
-      }
-    }
-
     frame.onload = function() {
-      setTimeout(ocultarSplash, 400);
+      setTimeout(ocultarSplash, 350);
 
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -357,8 +368,6 @@
         }
       } catch(err) {}
     };
-
-    setTimeout(ocultarSplash, 4000);
 
     (function() {
       var btn = document.getElementById('btnWaFlotante');
