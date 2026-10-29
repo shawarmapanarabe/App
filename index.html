@@ -153,7 +153,7 @@
       position: relative; overflow: hidden;
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
-      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease, background-color 0.2s ease, opacity 0.2s ease;
+      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease, background-color 0.2s ease;
     }
     .btn-bar-save::after {
       content: ''; position: absolute; top: -50%; left: -120%; width: 55%; height: 200%;
@@ -164,13 +164,6 @@
       0% { left: -120%; } 25% { left: 160%; } 100% { left: 160%; }
     }
     .btn-bar-save:active { transform: scale(0.95); }
-    .btn-bar-save.is-saving {
-      background: #475569 !important;
-      cursor: default;
-      opacity: 0.9;
-      pointer-events: none;
-    }
-    .btn-bar-save.is-saving::after { display: none; }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
     /* MODAL GUÍA IOS */
@@ -498,7 +491,6 @@
       if (txtSub) txtSub.textContent = "Búscala como SP!";
       if (btnInstalar) {
         btnInstalar.textContent = "Abrir App";
-        btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = ejecutarAperturaPwa;
       }
     }
@@ -513,18 +505,12 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
-        btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = function() {
           if (promptObj) {
-            if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
-            if (txtSub) txtSub.textContent = "Un momento, por favor...";
-            btnInstalar.textContent = "Guardando...";
-            btnInstalar.classList.add('is-saving');
-
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
-              if (choice.outcome !== 'accepted') {
-                configurarBotonGuardar(promptObj);
+              if (choice.outcome === 'accepted') {
+                barra.style.display = 'none';
               }
             });
           }
@@ -590,12 +576,6 @@
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
       try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
-      
-      var barra = document.getElementById('pwaBarBottom');
-      if (barra) {
-        configurarBotonAbrirApp();
-        barra.style.display = 'flex';
-      }
     });
   </script>
 </body>
