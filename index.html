@@ -153,7 +153,7 @@
       position: relative; overflow: hidden;
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
-      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease;
+      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease, background-color 0.2s ease, opacity 0.2s ease;
     }
     .btn-bar-save::after {
       content: ''; position: absolute; top: -50%; left: -120%; width: 55%; height: 200%;
@@ -164,6 +164,12 @@
       0% { left: -120%; } 25% { left: 160%; } 100% { left: 160%; }
     }
     .btn-bar-save:active { transform: scale(0.95); }
+    .btn-bar-save.is-saving {
+      background: #475569 !important;
+      cursor: default;
+      opacity: 0.9;
+    }
+    .btn-bar-save.is-saving::after { display: none; }
     .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
 
     /* MODAL GUÍA IOS */
@@ -313,26 +319,22 @@
 
       if (duenoPwa && codDueno) {
         if (codEntrante && codEntrante !== codDueno) {
-          // Es otro cliente: abre su tarjeta/QR temporalmente sin tocar la memoria del dueño
           tieneCredenciales = true;
         } else if (query && query.indexOf('autoqr=1') !== -1) {
-          // Es el dueño con su propio QR: abre con su QR
           query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
           tieneCredenciales = true;
         } else {
-          // Es el dueño abriendo normalmente
           query = duenoPwa;
           tieneCredenciales = true;
         }
       } else if (tieneCredenciales) {
-        // Primera instalación: se ancla este dueño en memoria permanente
         try { 
           localStorage.setItem('panarabe_pwa_owner', querySinQR); 
           localStorage.setItem('panarabe_final_query', querySinQR); 
+          localStorage.setItem('panarabe_app_instalada', '1');
         } catch(e) {}
       }
     } else {
-      // Modo Navegador Web: no altera la memoria del dueño
       if (tieneCredenciales) {
         try { 
           var duenoActual = localStorage.getItem('panarabe_pwa_owner');
@@ -469,9 +471,38 @@
       yaCerroBarraSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
     } catch(e) {}
 
+    var estaInstalada = false;
+    try {
+      var dGuardado = localStorage.getItem('panarabe_pwa_owner');
+      var flagInst = localStorage.getItem('panarabe_app_instalada') === '1';
+      if (flagInst || (dGuardado && codEntrante && extraerCodParam(dGuardado) === codEntrante)) {
+        estaInstalada = true;
+      }
+    } catch(e) {}
+
+    function configurarBotonAbrirApp() {
+      var barra = document.getElementById('pwaBarBottom');
+      var btnInstalar = document.getElementById('btnBarInstall');
+      var txtTit = barra ? barra.querySelector('.bar-title') : null;
+      var txtSub = barra ? barra.querySelector('.bar-sub') : null;
+
+      if (txtTit) txtTit.textContent = "Tarjeta Instalada";
+      if (txtSub) txtSub.textContent = "Búscala como SP! en tu teléfono";
+      if (btnInstalar) {
+        btnInstalar.textContent = "Abrir App";
+        btnInstalar.classList.remove('is-saving');
+        btnInstalar.onclick = function() {
+          var urlIntent = "intent://" + window.location.host + window.location.pathname + (query ? query : "") + "#Intent;scheme=https;end";
+          window.location.href = urlIntent;
+        };
+      }
+    }
+
     if (!esPWA && tieneCredenciales && !yaCerroBarraSesion) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
+      var txtTit = barra ? barra.querySelector('.bar-title') : null;
+      var txtSub = barra ? barra.querySelector('.bar-sub') : null;
 
       if (esApple) {
         setTimeout(function() {
@@ -484,25 +515,32 @@
           try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
         };
       } else {
-        var promptDiferido;
-        window.addEventListener('beforeinstallprompt', function(e) {
-          e.preventDefault();
-          promptDiferido = e;
+        if (estaInstalada) {
+          configurarBotonAbrirApp();
           barra.style.display = 'flex';
+        } else {
+          var promptDiferido;
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            promptDiferido = e;
+            barra.style.display = 'flex';
 
-          btnInstalar.onclick = function() {
-            if (promptDiferido) {
-              promptDiferido.prompt();
-              promptDiferido.userChoice.then(function(choice) {
-                if (choice.outcome === 'accepted') {
-                  barra.style.display = 'none';
-                  try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
-                }
-                promptDiferido = null;
-              });
-            }
-          };
-        });
+            btnInstalar.onclick = function() {
+              if (promptDiferido) {
+                promptDiferido.prompt();
+                promptDiferido.userChoice.then(function(choice) {
+                  if (choice.outcome === 'accepted') {
+                    if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
+                    if (txtSub) txtSub.textContent = "Un momento, por favor...";
+                    btnInstalar.textContent = "Guardando...";
+                    btnInstalar.classList.add('is-saving');
+                  }
+                  promptDiferido = null;
+                });
+              }
+            };
+          });
+        }
       }
     }
 
@@ -518,10 +556,26 @@
     }
 
     window.addEventListener('appinstalled', function() {
-      document.getElementById('pwaBarBottom').style.display = 'none';
-      try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
+      try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
+      try { sessionStorage.removeItem('pwa_barra_descartada'); } catch(e) {}
+      
+      var barra = document.getElementById('pwaBarBottom');
+      var btnInstalar = document.getElementById('btnBarInstall');
+      var txtTit = barra ? barra.querySelector('.bar-title') : null;
+      var txtSub = barra ? barra.querySelector('.bar-sub') : null;
+
+      if (barra && btnInstalar) {
+        if (txtTit) txtTit.textContent = "¡Tarjeta Guardada! 🎉";
+        if (txtSub) txtSub.textContent = "Búscala como SP! en tu teléfono";
+        btnInstalar.textContent = "Abrir App";
+        btnInstalar.classList.remove('is-saving');
+        btnInstalar.onclick = function() {
+          var urlIntent = "intent://" + window.location.host + window.location.pathname + (query ? query : "") + "#Intent;scheme=https;end";
+          window.location.href = urlIntent;
+        };
+        barra.style.display = 'flex';
+      }
     });
   </script>
 </body>
 </html>
-
