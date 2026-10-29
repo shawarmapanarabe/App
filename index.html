@@ -35,7 +35,10 @@
   </script>
 
   <style>
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+    }
     html, body {
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
@@ -53,20 +56,34 @@
     }
 
     #iosTopBar {
-      display: none; position: fixed; top: 0; left: 0; width: 100%;
-      background-color: #FFFFFF; z-index: 99990;
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #FFFFFF;
+      z-index: 99990;
     }
     html.is-apple-installed #iosTopBar {
-      display: block; height: env(safe-area-inset-top, 0px);
+      display: block;
+      height: env(safe-area-inset-top, 0px);
     }
 
     #btnWaFlotante {
-      display: flex; position: fixed;
+      display: flex;
+      position: fixed;
       top: clamp(282px, 78vw, 335px);
       left: calc(50% + min(50vw, 215px) - 58px);
-      z-index: 99990; width: 46px; height: 46px; border-radius: 50%;
-      user-select: none; -webkit-user-select: none; cursor: pointer;
-      -webkit-tap-highlight-color: transparent; text-decoration: none;
+      z-index: 99990;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      text-decoration: none;
       transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s ease, left 0.28s ease;
     }
 
@@ -80,7 +97,8 @@
 
     #btnWaFlotante.docked-edge {
       left: calc(100% - 24px) !important;
-      opacity: 0.65; transform: scale(0.92);
+      opacity: 0.65;
+      transform: scale(0.92);
     }
     #btnWaFlotante.docked-edge:hover,
     #btnWaFlotante.docked-edge:active {
@@ -88,37 +106,49 @@
     }
 
     .burbuja-wa-inner {
-      width: 100%; height: 100%; background: #25D366; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45); border: 2px solid #ffffff;
-      animation: palpitarWa 1.5s ease-in-out infinite alternate; pointer-events: none;
+      width: 100%;
+      height: 100%;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.45);
+      border: 2px solid #ffffff;
+      animation: palpitarWa 1.5s ease-in-out infinite alternate;
+      pointer-events: none;
     }
-    .burbuja-wa-inner svg { width: 26px; height: 26px; fill: #ffffff; }
-
+    .burbuja-wa-inner svg {
+      width: 26px;
+      height: 26px;
+      fill: #ffffff;
+    }
     @keyframes palpitarWa {
       0% { transform: scale(1); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); }
       100% { transform: scale(1.1); box-shadow: 0 6px 18px rgba(37, 211, 102, 0.7); }
     }
 
-    /* PANTALLA SPLASH CON FAIL-SAFE AUTOMÁTICO */
+    /* PANTALLA SPLASH */
     #splashScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background-color: #FFFFFF; z-index: 999999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.4s ease-out; pointer-events: none;
-      animation: autoCerrarSplash 0.4s ease-out 2.5s forwards;
-    }
-
-    @keyframes autoCerrarSplash {
-      0% { opacity: 1; }
-      99% { opacity: 0; pointer-events: none; }
-      100% { opacity: 0; pointer-events: none; display: none !important; visibility: hidden; }
+      transition: opacity 0.4s ease-out;
+      pointer-events: none;
     }
 
     .splash-logo {
-      width: 82vw; max-width: 360px; height: auto; aspect-ratio: 1 / 1;
-      border-radius: 0; object-fit: contain; box-shadow: none; background: transparent;
-      user-select: none; -webkit-user-select: none; margin-top: 0;
+      width: 82vw;
+      max-width: 360px;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      border-radius: 0;
+      object-fit: contain;
+      box-shadow: none;
+      background: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      margin-top: 0;
       animation: entrarYpalpitar 1.4s ease-in-out infinite alternate;
     }
 
@@ -134,6 +164,7 @@
       padding: 10px 14px; border-radius: 16px; box-shadow: 0 8px 24px rgba(30, 39, 67, 0.4);
       z-index: 99998; align-items: center; justify-content: space-between;
       animation: subirBarra 0.35s ease-out; border: 1px solid rgba(255, 255, 255, 0.12);
+      outline: none; user-select: none; -webkit-user-select: none;
     }
     @keyframes subirBarra {
       from { transform: translate(-50%, 40px); opacity: 0; }
@@ -150,23 +181,63 @@
     .bar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     
     .btn-bar-save { 
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
       background: #E95042; color: #ffffff; border: none; font-size: 12px; 
       font-weight: 700; cursor: pointer; padding: 7px 15px; border-radius: 20px; 
-      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease, background-color 0.2s ease;
+      font-family: 'Poppins', sans-serif; transition: transform 0.1s ease, background-color 0.2s ease, opacity 0.2s ease;
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      user-select: none; -webkit-user-select: none;
+    }
+    .btn-bar-save:focus, .btn-bar-save:active {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
     }
     .btn-bar-save::after {
-      content: ''; position: absolute; top: -50%; left: -120%; width: 55%; height: 200%;
-      background: linear-gradient(120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.42) 50%, rgba(255, 255, 255, 0) 100%);
-      transform: rotate(25deg); animation: brilloShimmerSave 3.2s infinite ease-in-out; pointer-events: none;
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -120%;
+      width: 55%;
+      height: 200%;
+      background: linear-gradient(
+        120deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.42) 50%, 
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: brilloShimmerSave 3.2s infinite ease-in-out;
+      pointer-events: none;
     }
     @keyframes brilloShimmerSave {
-      0% { left: -120%; } 25% { left: 160%; } 100% { left: 160%; }
+      0% { left: -120%; }
+      25% { left: 160%; }
+      100% { left: 160%; }
     }
     .btn-bar-save:active { transform: scale(0.95); }
-    .btn-bar-close { background: transparent; color: #9aa0a6; border: none; font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
+    .btn-bar-save.is-saving {
+      background: #475569 !important;
+      cursor: default;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .btn-bar-save.is-saving::after { display: none; }
 
-    /* MODAL GUÍA IOS */
+    .btn-bar-close { 
+      background: transparent; color: #9aa0a6; border: none; font-size: 16px; 
+      cursor: pointer; padding: 4px; line-height: 1;
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+      user-select: none; -webkit-user-select: none;
+    }
+    .btn-bar-close:focus, .btn-bar-close:active {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* MODAL DE GUÍA IOS */
     #iosGuideModal {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(30, 39, 67, 0.72); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
@@ -201,6 +272,8 @@
       padding: 13px; border-radius: 14px; font-family: 'Poppins', sans-serif;
       font-weight: 700; font-size: 13.5px; cursor: pointer; transition: transform 0.1s ease;
       box-shadow: 0 4px 12px rgba(233, 80, 66, 0.25);
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
     }
     .modal-btn-ok:active { transform: scale(0.96); }
   </style>
@@ -264,21 +337,8 @@
   </div>
 
   <script>
-    var splashTerminado = false;
-    function ocultarSplash() {
-      if (splashTerminado) return;
-      splashTerminado = true;
-      var splash = document.getElementById("splashScreen");
-      if (splash) {
-        splash.style.opacity = "0";
-        setTimeout(function() { splash.style.display = "none"; }, 400);
-      }
-    }
-
-    setTimeout(ocultarSplash, 2200);
-
     var urlBase = "https://script.google.com/macros/s/AKfycbzQUgbqTUXLNHNpmufsJx_MYkkZdxa27kUmfNmP9fF5QsL3XuoQZWBn2_UCfVOU9RfEPQ/exec";
-    var query = window.location.search || "";
+    var query = window.location.search;
     var tieneCredenciales = false;
 
     if (query && (query.indexOf('pin=') !== -1 || query.indexOf('search=') !== -1 || query.length > 5)) {
@@ -286,82 +346,35 @@
         query = '?search=' + query.substring(1);
       }
       tieneCredenciales = true;
-    }
-
-    function extraerCodParam(q) {
-      if (!q) return '';
-      var s = q;
-      if (s.indexOf('?') !== -1) s = s.split('?')[1];
-      var m = s.match(/(?:^|&)search=([^&]+)/i);
-      if (m && m[1]) return decodeURIComponent(m[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
-      var primer = s.split('&')[0];
-      if (primer.indexOf('=') !== -1) {
-        var p = primer.split('=');
-        if (p[0].toLowerCase() === 'search') return decodeURIComponent(p[1]).toUpperCase().replace(/[^A-Z0-9]/g, '');
-        return '';
-      }
-      return primer.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    }
-
-    var codEntrante = extraerCodParam(query);
-    var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
-
-    if (esPWA) {
-      var duenoPwa = '';
-      try { duenoPwa = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || ''; } catch(e) {}
-      var codDueno = extraerCodParam(duenoPwa);
-
-      if (duenoPwa && codDueno) {
-        if (codEntrante && codEntrante !== codDueno) {
-          tieneCredenciales = true;
-        } else if (query && query.indexOf('autoqr=1') !== -1) {
-          query = duenoPwa + (duenoPwa.indexOf('autoqr=1') === -1 ? '&autoqr=1' : '');
-          tieneCredenciales = true;
-        } else {
-          query = duenoPwa;
+      try { 
+        localStorage.setItem('panarabe_final_query', query); 
+        sessionStorage.setItem('panarabe_session_query', query);
+      } catch(e) {}
+    } else {
+      try {
+        var guardado = localStorage.getItem('panarabe_final_query') || sessionStorage.getItem('panarabe_session_query');
+        if (guardado) {
+          query = guardado;
           tieneCredenciales = true;
         }
-      } else if (tieneCredenciales) {
-        try { 
-          localStorage.setItem('panarabe_pwa_owner', querySinQR); 
-          localStorage.setItem('panarabe_final_query', querySinQR); 
-          localStorage.setItem('panarabe_app_instalada', '1');
-        } catch(e) {}
-      }
-    } else {
-      if (tieneCredenciales) {
-        try { 
-          var duenoActual = localStorage.getItem('panarabe_pwa_owner');
-          if (!duenoActual) {
-            localStorage.setItem('panarabe_pwa_owner', querySinQR);
-            localStorage.setItem('panarabe_final_query', querySinQR);
-          }
-          sessionStorage.setItem('panarabe_session_query', query); 
-        } catch(e) {}
-      } else {
-        try {
-          var guardado = sessionStorage.getItem('panarabe_session_query') || localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query');
-          if (guardado) {
-            query = guardado;
-            tieneCredenciales = true;
-          }
-        } catch(e) {}
-      }
+      } catch(e) {}
     }
-
-    try {
-      if (window.history && window.history.replaceState && window.location.search.indexOf('autoqr=1') !== -1) {
-        var queryVisual = window.location.search.replace(/([&?])autoqr=1(&|$)/gi, '$1').replace(/[?&]$/, '');
-        var pathLimpio = window.location.pathname + (queryVisual ? queryVisual : '');
-        window.history.replaceState({}, document.title, pathLimpio);
-      }
-    } catch(e) {}
 
     var frame = document.getElementById("appFrame");
     frame.src = urlBase + (query ? query : "");
 
+    function ocultarSplash() {
+      var splash = document.getElementById("splashScreen");
+      if (splash && splash.style.display !== "none") {
+        splash.style.opacity = "0";
+        setTimeout(function() {
+          splash.style.display = "none";
+        }, 400);
+      }
+    }
+
     frame.onload = function() {
-      setTimeout(ocultarSplash, 350);
+      setTimeout(ocultarSplash, 400);
 
       try {
         var iframeDoc = frame.contentDocument || frame.contentWindow.document;
@@ -382,6 +395,9 @@
       } catch(err) {}
     };
 
+    setTimeout(ocultarSplash, 4000);
+
+    /* WHATSAPP CON TEMPORIZADOR DE 7 SEGUNDOS Y OCULTADO INMEDIATO POR TOQUE */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
       if (!btn) return;
@@ -472,13 +488,7 @@
 
     function ejecutarAperturaPwa() {
       var destino = window.location.origin + window.location.pathname + (query ? query : "");
-      var enlace = document.createElement('a');
-      enlace.href = destino;
-      enlace.target = '_blank';
-      enlace.rel = 'noopener noreferrer';
-      document.body.appendChild(enlace);
-      enlace.click();
-      document.body.removeChild(enlace);
+      window.location.href = destino;
     }
 
     function configurarBotonAbrirApp() {
@@ -491,6 +501,7 @@
       if (txtSub) txtSub.textContent = "Búscala como SP!";
       if (btnInstalar) {
         btnInstalar.textContent = "Abrir App";
+        btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = ejecutarAperturaPwa;
       }
     }
@@ -505,12 +516,20 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
+        btnInstalar.classList.remove('is-saving');
         btnInstalar.onclick = function() {
           if (promptObj) {
+            // Cambio inmediato sin recuadros de selección
+            if (txtTit) txtTit.textContent = "Guardando en tu teléfono...";
+            if (txtSub) txtSub.textContent = "Un momento, por favor...";
+            btnInstalar.textContent = "Guardando...";
+            btnInstalar.classList.add('is-saving');
+
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
-              if (choice.outcome === 'accepted') {
-                barra.style.display = 'none';
+              if (choice.outcome !== 'accepted') {
+                // Si cancela en Android, regresa a estado Guardar
+                configurarBotonGuardar(promptObj);
               }
             });
           }
@@ -573,9 +592,17 @@
       try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
+    // Al confirmarse la instalación en Android, reemplaza directamente la barra
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
       try { localStorage.setItem('panarabe_app_instalada', '1'); } catch(e) {}
+      try { sessionStorage.removeItem('pwa_barra_descartada'); } catch(e) {}
+      
+      var barra = document.getElementById('pwaBarBottom');
+      if (barra) {
+        configurarBotonAbrirApp();
+        barra.style.display = 'flex';
+      }
     });
   </script>
 </body>
