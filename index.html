@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
-  <!-- ONESIGNAL SDK -->
+  <!-- ONESIGNAL SDK (ORIGINAL ESTABLE) -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -23,7 +23,6 @@
       await OneSignal.init({
         appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
         notifyButton: { enable: false },
-        welcomeNotification: { disable: true },
         serviceWorkerPath: swPath,
         serviceWorkerParam: { scope: swScope }
       });
@@ -553,14 +552,9 @@
 
     /* REFRESCO AUTOMÁTICO AL VOLVER DEL SEGUNDO PLANO */
     document.addEventListener('visibilitychange', function() {
-      if (!document.hidden && frame) {
-        try {
-          var iframeDoc = frame.contentDocument || frame.contentWindow.document;
-          var btnAct = iframeDoc.querySelector('.btn-actualizar');
-          if (btnAct) {
-            btnAct.click();
-          }
-        } catch(e) {}
+      if (!document.hidden && frame && frame.src) {
+        var sep = (frame.src.indexOf('?') !== -1) ? '&' : '?';
+        frame.src = frame.src.split('&_t=')[0].split('?_t=')[0] + sep + '_t=' + Date.now();
       }
     });
 
