@@ -13,9 +13,6 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
-  <!-- SDK V16 DE ONESIGNAL -->
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-
   <script>
     var qInit = window.location.search;
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -160,34 +157,6 @@
       100% { transform: scale(1.025); }
     }
 
-    /* PÍLDORA NOTIFICACIONES IOS */
-    #iosPushPill {
-      display: none;
-      position: fixed;
-      top: calc(env(safe-area-inset-top, 0px) + 10px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: #1E2743;
-      color: #ffffff;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 11.5px;
-      font-weight: 700;
-      z-index: 99995;
-      box-shadow: 0 6px 18px rgba(30, 39, 67, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      align-items: center;
-      gap: 6px;
-      animation: bajarPildora 0.3s ease-out;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    @keyframes bajarPildora {
-      from { transform: translate(-50%, -30px); opacity: 0; }
-      to { transform: translate(-50%, 0); opacity: 1; }
-    }
-
     /* BARRA INFERIOR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
@@ -221,6 +190,32 @@
       -webkit-tap-highlight-color: transparent !important;
       user-select: none; -webkit-user-select: none;
     }
+    .btn-bar-save:focus, .btn-bar-save:active {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    .btn-bar-save::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -120%;
+      width: 55%;
+      height: 200%;
+      background: linear-gradient(
+        120deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.42) 50%, 
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: brilloShimmerSave 3.2s infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes brilloShimmerSave {
+      0% { left: -120%; }
+      25% { left: 160%; }
+      100% { left: 160%; }
+    }
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { 
       background: transparent; color: #9aa0a6; border: none; font-size: 16px; 
@@ -228,6 +223,10 @@
       outline: none !important;
       -webkit-tap-highlight-color: transparent !important;
       user-select: none; -webkit-user-select: none;
+    }
+    .btn-bar-close:focus, .btn-bar-close:active {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
     }
 
     /* MODAL DE GUÍA IOS */
@@ -274,13 +273,6 @@
 <body>
 
   <div id="iosTopBar"></div>
-
-  <!-- PÍLDORA PUSH PARA IPHONE -->
-  <div id="iosPushPill" onclick="activarPushIosClick()">
-    <span>🔔</span>
-    <span>Activar avisos de saldo</span>
-    <span onclick="cerrarPillTemporal(event)" style="margin-left:8px; opacity:0.65; padding:2px 6px; font-size:13px; font-weight:800; cursor:pointer;" title="Cerrar">✕</span>
-  </div>
 
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
@@ -337,7 +329,7 @@
   </div>
 
   <script>
-      var splashTerminado = false;
+    var splashTerminado = false;
     function ocultarSplash() {
       if (splashTerminado) return;
       splashTerminado = true;
@@ -377,72 +369,6 @@
     }
 
     var codEntrante = extraerCodParam(query);
-    var osInstancia = null;
-
-    /* REGISTRO DE ONESIGNAL CON RUTAS EXACTAS Y LOGIN */
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      osInstancia = OneSignal;
-      
-      var rutaBase = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) || '/App/';
-      
-      await OneSignal.init({
-        appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
-        serviceWorkerPath: rutaBase + "OneSignalSDKWorker.js",
-        serviceWorkerUpdaterPath: rutaBase + "OneSignalSDKUpdaterWorker.js",
-        serviceWorkerParam: { scope: rutaBase }
-      });
-
-      var codParaPush = codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
-      if (codParaPush) {
-        await OneSignal.login(codParaPush);
-      }
-
-      if (esApple && esPWA) {
-        try {
-          var yaDescartoPill = sessionStorage.getItem('panarabe_pill_descartada') === '1';
-          var permisoAct = Notification.permission;
-          if (!yaDescartoPill && permisoAct !== 'granted' && permisoAct !== 'denied') {
-            var pill = document.getElementById('iosPushPill');
-            if (pill) pill.style.display = 'inline-flex';
-          }
-        } catch(e) {}
-      } else if (!esApple) {
-        try {
-          if ('Notification' in window && Notification.permission === 'default') {
-            await OneSignal.Notifications.requestPermission();
-          }
-        } catch(ePerm) {}
-      }
-    });
-
-    async function activarPushIosClick() {
-      var pill = document.getElementById('iosPushPill');
-      if (pill) pill.style.display = 'none';
-      var codParaPush = codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
-      if (osInstancia) {
-        try {
-          await osInstancia.Notifications.requestPermission();
-          if (codParaPush) {
-            await osInstancia.login(codParaPush);
-          }
-        } catch(err) {}
-      } else if ('Notification' in window) {
-        try {
-          await Notification.requestPermission();
-        } catch(err) {}
-      }
-    }
-
-    function cerrarPillTemporal(e) {
-      if (e) e.stopPropagation();
-      var pill = document.getElementById('iosPushPill');
-      if (pill) pill.style.display = 'none';
-      try {
-        sessionStorage.setItem('panarabe_pill_descartada', '1');
-      } catch(err) {}
-    }
-
     var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
 
     /* ANCLAJE Y PROTECCIÓN DE LA TARJETA DEL DUEÑO */
@@ -651,10 +577,7 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
-        btnInstalar.onclick = async function() {
-          if (osInstancia) {
-            try { await osInstancia.Notifications.requestPermission(); } catch(e) {}
-          }
+        btnInstalar.onclick = function() {
           if (promptObj) {
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
@@ -685,6 +608,7 @@
           };
         }
       } else {
+        // Si ya está instalada, SIEMPRE se muestra la barra invitando a abrir la App
         if (estaInstalada) {
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
@@ -697,6 +621,7 @@
           estaInstalada = false;
           try { localStorage.removeItem('panarabe_app_instalada'); } catch(err) {}
 
+          // Si el usuario no ha cerrado la barra en esta pestaña, se muestra
           if (!yaCerroGuardarSesion) {
             configurarBotonGuardar(promptDiferido);
             barra.style.display = 'flex';
@@ -711,6 +636,8 @@
       var barra = document.getElementById('pwaBarBottom');
       if (barra) barra.style.display = 'none';
       try {
+        // Solo guarda el descarte en sesión si estaba en modo "Guardar"
+        // Si está instalada ("Abrir App"), no se bloquea para futuros accesos
         if (!estaInstalada) {
           sessionStorage.setItem('pwa_barra_descartada', '1');
         }
@@ -724,6 +651,9 @@
       try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
+    // Al confirmarse la instalación en segundo plano por Android:
+    // - Se asegura la tarjeta del dueño en almacenamiento local
+    // - Se mantiene la barra oculta en esta misma pestaña
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
       try { 
@@ -742,3 +672,4 @@
   </script>
 </body>
 </html>
+
