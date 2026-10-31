@@ -23,6 +23,7 @@
       await OneSignal.init({
         appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
         notifyButton: { enable: false },
+        welcomeNotification: { disable: true },
         serviceWorkerPath: swPath,
         serviceWorkerParam: { scope: swScope }
       });
@@ -550,6 +551,19 @@
       } catch(err) {}
     };
 
+    /* REFRESCO AUTOMÁTICO AL VOLVER DEL SEGUNDO PLANO */
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && frame) {
+        try {
+          var iframeDoc = frame.contentDocument || frame.contentWindow.document;
+          var btnAct = iframeDoc.querySelector('.btn-actualizar');
+          if (btnAct) {
+            btnAct.click();
+          }
+        } catch(e) {}
+      }
+    });
+
     /* BOTÓN WHATSAPP */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
@@ -835,4 +849,3 @@
   </script>
 </body>
 </html>
-
