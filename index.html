@@ -221,32 +221,6 @@
       -webkit-tap-highlight-color: transparent !important;
       user-select: none; -webkit-user-select: none;
     }
-    .btn-bar-save:focus, .btn-bar-save:active {
-      outline: none !important;
-      -webkit-tap-highlight-color: transparent !important;
-    }
-    .btn-bar-save::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -120%;
-      width: 55%;
-      height: 200%;
-      background: linear-gradient(
-        120deg, 
-        rgba(255, 255, 255, 0) 0%, 
-        rgba(255, 255, 255, 0.42) 50%, 
-        rgba(255, 255, 255, 0) 100%
-      );
-      transform: rotate(25deg);
-      animation: brilloShimmerSave 3.2s infinite ease-in-out;
-      pointer-events: none;
-    }
-    @keyframes brilloShimmerSave {
-      0% { left: -120%; }
-      25% { left: 160%; }
-      100% { left: 160%; }
-    }
     .btn-bar-save:active { transform: scale(0.95); }
     .btn-bar-close { 
       background: transparent; color: #9aa0a6; border: none; font-size: 16px; 
@@ -254,10 +228,6 @@
       outline: none !important;
       -webkit-tap-highlight-color: transparent !important;
       user-select: none; -webkit-user-select: none;
-    }
-    .btn-bar-close:focus, .btn-bar-close:active {
-      outline: none !important;
-      -webkit-tap-highlight-color: transparent !important;
     }
 
     /* MODAL DE GUÍA IOS */
@@ -305,7 +275,7 @@
 
   <div id="iosTopBar"></div>
 
-  <!-- PÍLDORA CON CIERRE TEMPORAL (X) PARA IPHONE -->
+  <!-- PÍLDORA PUSH PARA IPHONE -->
   <div id="iosPushPill" onclick="activarPushIosClick()">
     <span>🔔</span>
     <span>Activar avisos de saldo</span>
@@ -330,7 +300,8 @@
     src="" 
     allow="downloads; clipboard-write" 
   ></iframe>
-    <div id="pwaBarBottom">
+
+  <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="bar-icon" alt="SP!">
       <div class="bar-text-group">
@@ -366,7 +337,7 @@
   </div>
 
   <script>
-    var splashTerminado = false;
+      var splashTerminado = false;
     function ocultarSplash() {
       if (splashTerminado) return;
       splashTerminado = true;
@@ -408,7 +379,7 @@
     var codEntrante = extraerCodParam(query);
     var osInstancia = null;
 
-    /* VINCULACIÓN ONESIGNAL PUSH CON RUTA EXACTA DE GITHUB PAGES */
+    /* REGISTRO DE ONESIGNAL CON RUTAS EXACTAS Y LOGIN */
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       osInstancia = OneSignal;
@@ -417,7 +388,8 @@
       
       await OneSignal.init({
         appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
-        serviceWorkerPath: rutaBase + "sw.js",
+        serviceWorkerPath: rutaBase + "OneSignalSDKWorker.js",
+        serviceWorkerUpdaterPath: rutaBase + "OneSignalSDKUpdaterWorker.js",
         serviceWorkerParam: { scope: rutaBase }
       });
 
@@ -437,7 +409,9 @@
         } catch(e) {}
       } else if (!esApple) {
         try {
-          await OneSignal.Notifications.requestPermission();
+          if ('Notification' in window && Notification.permission === 'default') {
+            await OneSignal.Notifications.requestPermission();
+          }
         } catch(ePerm) {}
       }
     });
