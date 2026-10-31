@@ -305,6 +305,7 @@
 
   <div id="iosTopBar"></div>
 
+  <!-- PÍLDORA CON CIERRE TEMPORAL (X) PARA IPHONE -->
   <div id="iosPushPill" onclick="activarPushIosClick()">
     <span>🔔</span>
     <span>Activar avisos de saldo</span>
@@ -407,19 +408,24 @@
     var codEntrante = extraerCodParam(query);
     var osInstancia = null;
 
-    /* REGISTRO Y VINCULACIÓN ONESIGNAL PUSH */
+    /* VINCULACIÓN ONESIGNAL PUSH CON RUTA EXACTA DE GITHUB PAGES */
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       osInstancia = OneSignal;
+      
+      var rutaBase = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) || '/App/';
+      
       await OneSignal.init({
         appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
+        serviceWorkerPath: rutaBase + "sw.js",
+        serviceWorkerParam: { scope: rutaBase }
       });
+
       var codParaPush = codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
       if (codParaPush) {
         await OneSignal.login(codParaPush);
       }
 
-      // Si es iPhone instalado como PWA
       if (esApple && esPWA) {
         try {
           var yaDescartoPill = sessionStorage.getItem('panarabe_pill_descartada') === '1';
@@ -430,7 +436,6 @@
           }
         } catch(e) {}
       } else if (!esApple) {
-        // En Android solicita permiso transparente
         try {
           await OneSignal.Notifications.requestPermission();
         } catch(ePerm) {}
@@ -672,7 +677,10 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
-        btnInstalar.onclick = function() {
+        btnInstalar.onclick = async function() {
+          if (osInstancia) {
+            try { await osInstancia.Notifications.requestPermission(); } catch(e) {}
+          }
           if (promptObj) {
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
