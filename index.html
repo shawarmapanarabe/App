@@ -294,7 +294,7 @@
     src="" 
     allow="downloads; clipboard-write" 
   ></iframe>
-    <div id="pwaBarBottom">
+   <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="bar-icon" alt="SP!">
       <div class="bar-text-group">
@@ -381,6 +381,9 @@
       if (codParaPush) {
         await OneSignal.login(codParaPush);
       }
+      try {
+        await OneSignal.Notifications.requestPermission();
+      } catch(ePerm) {}
     });
 
     var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
@@ -622,7 +625,6 @@
           };
         }
       } else {
-        // Si ya está instalada, SIEMPRE se muestra la barra invitando a abrir la App
         if (estaInstalada) {
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
@@ -635,7 +637,6 @@
           estaInstalada = false;
           try { localStorage.removeItem('panarabe_app_instalada'); } catch(err) {}
 
-          // Si el usuario no ha cerrado la barra en esta pestaña, se muestra
           if (!yaCerroGuardarSesion) {
             configurarBotonGuardar(promptDiferido);
             barra.style.display = 'flex';
