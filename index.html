@@ -13,6 +13,9 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
+  <!-- SDK ONESIGNAL V16 -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
   <script>
     var qInit = window.location.search;
     var esApple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -329,7 +332,7 @@
   </div>
 
   <script>
-    var splashTerminado = false;
+     var splashTerminado = false;
     function ocultarSplash() {
       if (splashTerminado) return;
       splashTerminado = true;
@@ -369,6 +372,26 @@
     }
 
     var codEntrante = extraerCodParam(query);
+
+    /* REGISTRO Y VINCULACIÓN CON ONESIGNAL */
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e"
+      });
+
+      var codParaPush = codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
+      if (codParaPush) {
+        await OneSignal.login(codParaPush);
+      }
+
+      if ('Notification' in window && Notification.permission === 'default') {
+        try {
+          await OneSignal.Notifications.requestPermission();
+        } catch(e) {}
+      }
+    });
+
     var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
 
     /* ANCLAJE Y PROTECCIÓN DE LA TARJETA DEL DUEÑO */
@@ -608,7 +631,6 @@
           };
         }
       } else {
-        // Si ya está instalada, SIEMPRE se muestra la barra invitando a abrir la App
         if (estaInstalada) {
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
@@ -621,7 +643,6 @@
           estaInstalada = false;
           try { localStorage.removeItem('panarabe_app_instalada'); } catch(err) {}
 
-          // Si el usuario no ha cerrado la barra en esta pestaña, se muestra
           if (!yaCerroGuardarSesion) {
             configurarBotonGuardar(promptDiferido);
             barra.style.display = 'flex';
@@ -636,8 +657,6 @@
       var barra = document.getElementById('pwaBarBottom');
       if (barra) barra.style.display = 'none';
       try {
-        // Solo guarda el descarte en sesión si estaba en modo "Guardar"
-        // Si está instalada ("Abrir App"), no se bloquea para futuros accesos
         if (!estaInstalada) {
           sessionStorage.setItem('pwa_barra_descartada', '1');
         }
@@ -651,9 +670,6 @@
       try { sessionStorage.setItem('pwa_barra_descartada', '1'); } catch(e) {}
     }
 
-    // Al confirmarse la instalación en segundo plano por Android:
-    // - Se asegura la tarjeta del dueño en almacenamiento local
-    // - Se mantiene la barra oculta en esta misma pestaña
     window.addEventListener('appinstalled', function() {
       estaInstalada = true;
       try { 
