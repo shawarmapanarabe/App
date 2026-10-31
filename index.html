@@ -13,8 +13,16 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
-  <!-- SDK ONESIGNAL V16 -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
+        notifyButton: { enable: false }
+      });
+    });
+  </script>
 
   <script>
     var qInit = window.location.search;
@@ -46,6 +54,67 @@
       margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
       background-color: #FFFFFF; font-family: 'Poppins', sans-serif;
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
+    }
+
+    /* BARRA SUPERIOR DE AVISOS PUSH */
+    #barraPushSuperior {
+      display: none;
+      position: fixed;
+      top: env(safe-area-inset-top, 0px);
+      left: 0;
+      width: 100%;
+      background: #1e293b;
+      color: #ffffff;
+      padding: 7px 14px;
+      box-sizing: border-box;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 999995;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    #btnActivarPush {
+      background: #22c55e;
+      color: #ffffff;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      transition: transform 0.1s ease, background 0.15s ease;
+      outline: none !important;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #btnActivarPush:active {
+      transform: scale(0.95);
+      background: #16a34a;
+    }
+
+    #btnCerrarPushTemp {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 17px;
+      font-weight: bold;
+      padding: 4px 8px;
+      cursor: pointer;
+      line-height: 1;
+      outline: none !important;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #btnCerrarPushTemp:active {
+      color: #ffffff;
     }
 
     iframe { 
@@ -275,6 +344,14 @@
 </head>
 <body>
 
+  <!-- BARRA SUPERIOR FIJA PARA ACTIVAR PUSH -->
+  <div id="barraPushSuperior">
+    <button id="btnActivarPush" onclick="activarAvisosPush()">
+      <span>🔔</span> Activar avisos de saldo
+    </button>
+    <button id="btnCerrarPushTemp" onclick="cerrarBarraPushTemp()" title="Cerrar">✕</button>
+  </div>
+
   <div id="iosTopBar"></div>
 
   <div id="btnWaFlotante" aria-label="WhatsApp">
@@ -295,8 +372,7 @@
     src="" 
     allow="downloads; clipboard-write" 
   ></iframe>
-
-  <div id="pwaBarBottom">
+    <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="bar-icon" alt="SP!">
       <div class="bar-text-group">
@@ -332,7 +408,7 @@
   </div>
 
   <script>
-     var splashTerminado = false;
+    var splashTerminado = false;
     function ocultarSplash() {
       if (splashTerminado) return;
       splashTerminado = true;
@@ -372,26 +448,6 @@
     }
 
     var codEntrante = extraerCodParam(query);
-
-    /* REGISTRO Y VINCULACIÓN CON ONESIGNAL */
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
-      await OneSignal.init({
-        appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e"
-      });
-
-      var codParaPush = codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
-      if (codParaPush) {
-        await OneSignal.login(codParaPush);
-      }
-
-      if ('Notification' in window && Notification.permission === 'default') {
-        try {
-          await OneSignal.Notifications.requestPermission();
-        } catch(e) {}
-      }
-    });
-
     var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
 
     /* ANCLAJE Y PROTECCIÓN DE LA TARJETA DEL DUEÑO */
@@ -550,6 +606,58 @@
       });
     }
 
+    /* CONTROL DE NOTIFICACIONES PUSH Y BARRA SUPERIOR */
+    function obtenerCodigoClienteActivo() {
+      return codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
+    }
+
+    function verificarBarraPush() {
+      var barra = document.getElementById('barraPushSuperior');
+      if (!barra) return;
+
+      var cod = obtenerCodigoClienteActivo();
+      var descartadoSesion = false;
+      try {
+        descartadoSesion = sessionStorage.getItem('push_barra_cerrada_sesion') === '1';
+      } catch(e) {}
+
+      // Si el navegador soporta notificaciones, no está concedido aún y no la cerró en esta pestaña
+      if ('Notification' in window && Notification.permission !== 'granted' && !descartadoSesion && cod) {
+        barra.style.display = 'flex';
+      } else {
+        barra.style.display = 'none';
+      }
+    }
+
+    function cerrarBarraPushTemp() {
+      var barra = document.getElementById('barraPushSuperior');
+      if (barra) barra.style.display = 'none';
+      try {
+        sessionStorage.setItem('push_barra_cerrada_sesion', '1');
+      } catch(e) {}
+    }
+
+    async function activarAvisosPush() {
+      var cod = obtenerCodigoClienteActivo();
+      var barra = document.getElementById('barraPushSuperior');
+
+      try {
+        if (window.OneSignal) {
+          if (cod) {
+            await OneSignal.login(cod);
+          }
+          var permiso = await OneSignal.Notifications.requestPermission();
+          if (permiso === true || Notification.permission === 'granted') {
+            if (barra) barra.style.display = 'none';
+          }
+        }
+      } catch(err) {
+        console.error("Error al suscribir notificaciones:", err);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', verificarBarraPush);
+
     var yaCerroGuardarSesion = false;
     try {
       yaCerroGuardarSesion = sessionStorage.getItem('pwa_barra_descartada') === '1';
@@ -600,7 +708,15 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
-        btnInstalar.onclick = function() {
+        btnInstalar.onclick = async function() {
+          try {
+            var cod = obtenerCodigoClienteActivo();
+            if (window.OneSignal) {
+              if (cod) await OneSignal.login(cod);
+              await OneSignal.Notifications.requestPermission();
+            }
+          } catch(err) {}
+
           if (promptObj) {
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
