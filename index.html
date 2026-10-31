@@ -305,7 +305,6 @@
 
   <div id="iosTopBar"></div>
 
-  <!-- PÍLDORA CON BOTÓN DE CIERRE (X) PARA IPHONE -->
   <div id="iosPushPill" onclick="activarPushIosClick()">
     <span>🔔</span>
     <span>Activar avisos de saldo</span>
@@ -408,7 +407,7 @@
     var codEntrante = extraerCodParam(query);
     var osInstancia = null;
 
-    /* INICIALIZACIÓN Y VINCULACIÓN CON ONESIGNAL */
+    /* REGISTRO Y VINCULACIÓN ONESIGNAL PUSH */
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       osInstancia = OneSignal;
@@ -420,7 +419,7 @@
         await OneSignal.login(codParaPush);
       }
 
-      // En iPhone instalado en pantalla de inicio muestra la píldora superior
+      // Si es iPhone instalado como PWA
       if (esApple && esPWA) {
         try {
           var yaDescartoPill = sessionStorage.getItem('panarabe_pill_descartada') === '1';
@@ -431,7 +430,7 @@
           }
         } catch(e) {}
       } else if (!esApple) {
-        // En Android solicita permiso directamente al cargar
+        // En Android solicita permiso transparente
         try {
           await OneSignal.Notifications.requestPermission();
         } catch(ePerm) {}
