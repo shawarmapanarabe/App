@@ -550,14 +550,6 @@
       } catch(err) {}
     };
 
-    /* REFRESCO AUTOMÁTICO AL VOLVER DEL SEGUNDO PLANO */
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden && frame && frame.src) {
-        var sep = (frame.src.indexOf('?') !== -1) ? '&' : '?';
-        frame.src = frame.src.split('&_t=')[0].split('?_t=')[0] + sep + '_t=' + Date.now();
-      }
-    });
-
     /* BOTÓN WHATSAPP */
     (function() {
       var btn = document.getElementById('btnWaFlotante');
