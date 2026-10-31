@@ -159,6 +159,32 @@
       100% { transform: scale(1.025); }
     }
 
+    /* PÍLDORA NOTIFICACIONES IOS */
+    #iosPushPill {
+      display: none;
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E2743;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      z-index: 99995;
+      box-shadow: 0 6px 18px rgba(30, 39, 67, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      align-items: center;
+      gap: 6px;
+      animation: bajarPildora 0.3s ease-out;
+    }
+    @keyframes bajarPildora {
+      from { transform: translate(-50%, -30px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
     /* BARRA INFERIOR */
     #pwaBarBottom {
       display: none; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
@@ -276,6 +302,10 @@
 
   <div id="iosTopBar"></div>
 
+  <div id="iosPushPill" onclick="activarPushIosClick()">
+    <span>🔔</span> <span>Activar avisos de saldo</span>
+  </div>
+
   <div id="btnWaFlotante" aria-label="WhatsApp">
     <div class="burbuja-wa-inner">
       <svg viewBox="0 0 32 32">
@@ -370,10 +400,12 @@
     }
 
     var codEntrante = extraerCodParam(query);
+    var osInstancia = null;
 
     /* VINCULACIÓN ONE SIGNAL PUSH CON EL CÓDIGO DE CLIENTE */
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
+      osInstancia = OneSignal;
       await OneSignal.init({
         appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
       });
@@ -381,10 +413,37 @@
       if (codParaPush) {
         await OneSignal.login(codParaPush);
       }
-      try {
-        await OneSignal.Notifications.requestPermission();
-      } catch(ePerm) {}
+
+      // Si es iPhone y está instalado en pantalla de inicio
+      if (esApple && esPWA) {
+        try {
+          var permisoAct = Notification.permission;
+          if (permisoAct !== 'granted' && permisoAct !== 'denied') {
+            var pill = document.getElementById('iosPushPill');
+            if (pill) pill.style.display = 'inline-flex';
+          }
+        } catch(e) {}
+      } else if (!esApple) {
+        // En Android solicita automáticamente al cargar
+        try {
+          await OneSignal.Notifications.requestPermission();
+        } catch(ePerm) {}
+      }
     });
+
+    async function activarPushIosClick() {
+      var pill = document.getElementById('iosPushPill');
+      if (pill) pill.style.display = 'none';
+      if (osInstancia) {
+        try {
+          await osInstancia.Notifications.requestPermission();
+        } catch(err) {}
+      } else if ('Notification' in window) {
+        try {
+          await Notification.requestPermission();
+        } catch(err) {}
+      }
+    }
 
     var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
 
