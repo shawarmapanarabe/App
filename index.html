@@ -13,14 +13,26 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
+  <!-- ONESIGNAL SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
+      var swPath = (window.location.pathname.indexOf('/App') === 0) ? "App/sw.js" : "sw.js";
+      var swScope = (window.location.pathname.indexOf('/App') === 0) ? "/App/" : "./";
       await OneSignal.init({
         appId: "8a1a908c-8769-41bd-bc6b-d26fb0e6bf8e",
-        notifyButton: { enable: false }
+        notifyButton: { enable: false },
+        serviceWorkerPath: swPath,
+        serviceWorkerParam: { scope: swScope }
       });
+
+      try {
+        var cod = (typeof obtenerCodigoClienteActivo === 'function') ? obtenerCodigoClienteActivo() : '';
+        if (cod && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          await OneSignal.login(cod);
+        }
+      } catch(e) {}
     });
   </script>
 
@@ -60,10 +72,10 @@
     #barraPushSuperior {
       display: none;
       position: fixed;
-      top: env(safe-area-inset-top, 0px);
+      top: 0;
       left: 0;
       width: 100%;
-      background: #1e293b;
+      background: #1e2743;
       color: #ffffff;
       padding: 7px 14px;
       box-sizing: border-box;
@@ -71,8 +83,11 @@
       justify-content: space-between;
       gap: 10px;
       z-index: 999995;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       font-family: 'Poppins', sans-serif;
+    }
+    html.is-apple-installed #barraPushSuperior {
+      top: env(safe-area-inset-top, 0px);
     }
 
     #btnActivarPush {
@@ -92,8 +107,8 @@
       outline: none !important;
       user-select: none;
       -webkit-user-select: none;
+      touch-action: manipulation;
     }
-
     #btnActivarPush:active {
       transform: scale(0.95);
       background: #16a34a;
@@ -111,8 +126,8 @@
       outline: none !important;
       user-select: none;
       -webkit-user-select: none;
+      touch-action: manipulation;
     }
-
     #btnCerrarPushTemp:active {
       color: #ffffff;
     }
@@ -344,7 +359,7 @@
 </head>
 <body>
 
-  <!-- BARRA SUPERIOR FIJA PARA ACTIVAR PUSH -->
+  <!-- BARRA SUPERIOR INDEPENDIENTE PARA ACTIVAR NOTIFICACIONES PUSH -->
   <div id="barraPushSuperior">
     <button id="btnActivarPush" onclick="activarAvisosPush()">
       <span>🔔</span> Activar avisos de saldo
@@ -606,9 +621,19 @@
       });
     }
 
-    /* CONTROL DE NOTIFICACIONES PUSH Y BARRA SUPERIOR */
+    /* FUNCIONES DE LA BARRA SUPERIOR INDEPENDIENTE (PUSH) */
     function obtenerCodigoClienteActivo() {
-      return codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
+      if (typeof codEntrante !== 'undefined' && codEntrante) return codEntrante;
+      if (typeof codDueno !== 'undefined' && codDueno) return codDueno;
+      try {
+        var q = window.location.search || '';
+        var m = q.match(/(?:search=|\?)([0-9]{4}[A-Z])/i);
+        if (m) return m[1].toUpperCase();
+        var guardado = localStorage.getItem('panarabe_pwa_owner') || localStorage.getItem('panarabe_final_query') || '';
+        var m2 = guardado.match(/(?:search=|\?)([0-9]{4}[A-Z])/i);
+        if (m2) return m2[1].toUpperCase();
+      } catch(e) {}
+      return '';
     }
 
     function verificarBarraPush() {
@@ -621,8 +646,8 @@
         descartadoSesion = sessionStorage.getItem('push_barra_cerrada_sesion') === '1';
       } catch(e) {}
 
-      // Si el navegador soporta notificaciones, no está concedido aún y no la cerró en esta pestaña
-      if ('Notification' in window && Notification.permission !== 'granted' && !descartadoSesion && cod) {
+      var yaPermitido = (typeof Notification !== 'undefined' && Notification.permission === 'granted');
+      if ('Notification' in window && !yaPermitido && !descartadoSesion && cod) {
         barra.style.display = 'flex';
       } else {
         barra.style.display = 'none';
@@ -638,25 +663,30 @@
     }
 
     async function activarAvisosPush() {
-      var cod = obtenerCodigoClienteActivo();
+      var btn = document.getElementById('btnActivarPush');
       var barra = document.getElementById('barraPushSuperior');
+      if (btn) btn.innerHTML = '<span>⏳</span> Vinculando...';
 
       try {
+        var cod = obtenerCodigoClienteActivo();
         if (window.OneSignal) {
-          if (cod) {
-            await OneSignal.login(cod);
-          }
-          var permiso = await OneSignal.Notifications.requestPermission();
-          if (permiso === true || Notification.permission === 'granted') {
-            if (barra) barra.style.display = 'none';
-          }
+          if (cod) await OneSignal.login(cod);
+          await OneSignal.Notifications.requestPermission();
         }
       } catch(err) {
-        console.error("Error al suscribir notificaciones:", err);
+        console.error("Error OneSignal:", err);
+      }
+
+      var yaPermitido = (typeof Notification !== 'undefined' && Notification.permission === 'granted');
+      if (yaPermitido) {
+        if (barra) barra.style.display = 'none';
+      } else {
+        if (btn) btn.innerHTML = '<span>🔔</span> Activar avisos de saldo';
       }
     }
 
     window.addEventListener('DOMContentLoaded', verificarBarraPush);
+    window.addEventListener('load', verificarBarraPush);
 
     var yaCerroGuardarSesion = false;
     try {
@@ -698,6 +728,7 @@
       }
     }
 
+    /* BOTÓN GUARDAR ORIGINAL (SIN ASYNC, NO SE CONGELA) */
     function configurarBotonGuardar(promptObj) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
@@ -708,15 +739,7 @@
       if (txtSub) txtSub.textContent = "Acceso directo a tu saldo";
       if (btnInstalar) {
         btnInstalar.textContent = "Guardar";
-        btnInstalar.onclick = async function() {
-          try {
-            var cod = obtenerCodigoClienteActivo();
-            if (window.OneSignal) {
-              if (cod) await OneSignal.login(cod);
-              await OneSignal.Notifications.requestPermission();
-            }
-          } catch(err) {}
-
+        btnInstalar.onclick = function() {
           if (promptObj) {
             promptObj.prompt();
             promptObj.userChoice.then(function(choice) {
@@ -747,6 +770,7 @@
           };
         }
       } else {
+        // Si ya está instalada, SIEMPRE se muestra la barra invitando a abrir la App
         if (estaInstalada) {
           configurarBotonAbrirApp();
           barra.style.display = 'flex';
@@ -759,6 +783,7 @@
           estaInstalada = false;
           try { localStorage.removeItem('panarabe_app_instalada'); } catch(err) {}
 
+          // Si el usuario no ha cerrado la barra en esta pestaña, se muestra
           if (!yaCerroGuardarSesion) {
             configurarBotonGuardar(promptDiferido);
             barra.style.display = 'flex';
@@ -804,4 +829,3 @@
   </script>
 </body>
 </html>
-
