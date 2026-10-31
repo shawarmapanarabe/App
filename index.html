@@ -13,6 +13,7 @@
   <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
   
+  <!-- SDK V16 DE ONESIGNAL -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
   <script>
@@ -168,7 +169,7 @@
       transform: translateX(-50%);
       background: #1E2743;
       color: #ffffff;
-      padding: 8px 16px;
+      padding: 8px 14px;
       border-radius: 20px;
       font-size: 11.5px;
       font-weight: 700;
@@ -179,6 +180,8 @@
       align-items: center;
       gap: 6px;
       animation: bajarPildora 0.3s ease-out;
+      user-select: none;
+      -webkit-user-select: none;
     }
     @keyframes bajarPildora {
       from { transform: translate(-50%, -30px); opacity: 0; }
@@ -302,8 +305,11 @@
 
   <div id="iosTopBar"></div>
 
+  <!-- PÍLDORA CON BOTÓN DE CIERRE (X) PARA IPHONE -->
   <div id="iosPushPill" onclick="activarPushIosClick()">
-    <span>🔔</span> <span>Activar avisos de saldo</span>
+    <span>🔔</span>
+    <span>Activar avisos de saldo</span>
+    <span onclick="cerrarPillTemporal(event)" style="margin-left:8px; opacity:0.65; padding:2px 6px; font-size:13px; font-weight:800; cursor:pointer;" title="Cerrar">✕</span>
   </div>
 
   <div id="btnWaFlotante" aria-label="WhatsApp">
@@ -324,7 +330,7 @@
     src="" 
     allow="downloads; clipboard-write" 
   ></iframe>
-   <div id="pwaBarBottom">
+    <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="bar-icon" alt="SP!">
       <div class="bar-text-group">
@@ -402,7 +408,7 @@
     var codEntrante = extraerCodParam(query);
     var osInstancia = null;
 
-    /* VINCULACIÓN ONE SIGNAL PUSH CON EL CÓDIGO DE CLIENTE */
+    /* INICIALIZACIÓN Y VINCULACIÓN CON ONESIGNAL */
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       osInstancia = OneSignal;
@@ -414,17 +420,18 @@
         await OneSignal.login(codParaPush);
       }
 
-      // Si es iPhone y está instalado en pantalla de inicio
+      // En iPhone instalado en pantalla de inicio muestra la píldora superior
       if (esApple && esPWA) {
         try {
+          var yaDescartoPill = sessionStorage.getItem('panarabe_pill_descartada') === '1';
           var permisoAct = Notification.permission;
-          if (permisoAct !== 'granted' && permisoAct !== 'denied') {
+          if (!yaDescartoPill && permisoAct !== 'granted' && permisoAct !== 'denied') {
             var pill = document.getElementById('iosPushPill');
             if (pill) pill.style.display = 'inline-flex';
           }
         } catch(e) {}
       } else if (!esApple) {
-        // En Android solicita automáticamente al cargar
+        // En Android solicita permiso directamente al cargar
         try {
           await OneSignal.Notifications.requestPermission();
         } catch(ePerm) {}
@@ -434,15 +441,28 @@
     async function activarPushIosClick() {
       var pill = document.getElementById('iosPushPill');
       if (pill) pill.style.display = 'none';
+      var codParaPush = codEntrante || (typeof codDueno !== 'undefined' ? codDueno : '');
       if (osInstancia) {
         try {
           await osInstancia.Notifications.requestPermission();
+          if (codParaPush) {
+            await osInstancia.login(codParaPush);
+          }
         } catch(err) {}
       } else if ('Notification' in window) {
         try {
           await Notification.requestPermission();
         } catch(err) {}
       }
+    }
+
+    function cerrarPillTemporal(e) {
+      if (e) e.stopPropagation();
+      var pill = document.getElementById('iosPushPill');
+      if (pill) pill.style.display = 'none';
+      try {
+        sessionStorage.setItem('panarabe_pill_descartada', '1');
+      } catch(err) {}
     }
 
     var querySinQR = query ? query.replace(/([&?])autoqr=[^&]*(&|$)/gi, '$1').replace(/[?&]$/, '') : '';
