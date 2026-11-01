@@ -79,7 +79,7 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       color: #ffffff;
-      padding: 6px 12px 6px 16px;
+      padding: 6px 14px 6px 16px;
       border-radius: 30px;
       box-sizing: border-box;
       align-items: center;
@@ -116,20 +116,6 @@
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
-    }
-    #btnActivarPush svg,
-    #btnActivarPush span {
-      pointer-events: none;
-    }
-    #btnActivarPush svg {
-      width: 15px;
-      height: 15px;
-      fill: none;
-      stroke: #F2B647;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
     }
     #btnActivarPush:active {
       transform: scale(0.96);
@@ -386,11 +372,7 @@
   <!-- PÍLDORA ELEGANTE PANARABE -->
   <div id="barraPushSuperior">
     <button id="btnActivarPush" onclick="activarAvisosPush()">
-      <svg viewBox="0 0 24 24">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-      </svg>
-      <span id="txtBtnPush">Activar avisos de saldo</span>
+      <span>🔔</span> Activar avisos de saldo
     </button>
     <button id="btnCerrarPushTemp" onclick="cerrarBarraPushTemp()" title="Cerrar">✕</button>
   </div>
@@ -649,7 +631,7 @@
       });
     }
 
-    /* FUNCIONES DE LA PÍLDORA ELEGANTE (PUSH) */
+    /* FUNCIONES DE LA PÍLDORA ELEGANTE (PUSH - ORIGINAL FUNCIONAL) */
     function obtenerCodigoClienteActivo() {
       if (typeof codEntrante !== 'undefined' && codEntrante) return codEntrante;
       if (typeof codDueno !== 'undefined' && codDueno) return codDueno;
@@ -691,16 +673,14 @@
     }
 
     async function activarAvisosPush() {
-      var txtElem = document.getElementById('txtBtnPush');
+      var btn = document.getElementById('btnActivarPush');
       var barra = document.getElementById('barraPushSuperior');
-      if (txtElem) txtElem.textContent = 'Vinculando...';
+      if (btn) btn.innerHTML = '<span>⏳</span> Vinculando...';
 
       try {
         var cod = obtenerCodigoClienteActivo();
         if (window.OneSignal) {
-          if (cod) {
-            try { await OneSignal.login(cod); } catch(eLogin) {}
-          }
+          if (cod) await OneSignal.login(cod);
           await OneSignal.Notifications.requestPermission();
         }
       } catch(err) {
@@ -711,7 +691,7 @@
       if (yaPermitido) {
         if (barra) barra.style.display = 'none';
       } else {
-        if (txtElem) txtElem.textContent = 'Activar avisos de saldo';
+        if (btn) btn.innerHTML = '<span>🔔</span> Activar avisos de saldo';
       }
     }
 
