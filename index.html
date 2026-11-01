@@ -79,7 +79,7 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       color: #ffffff;
-      padding: 6px 14px 6px 16px;
+      padding: 6px 12px 6px 16px;
       border-radius: 30px;
       box-sizing: border-box;
       align-items: center;
@@ -116,6 +116,20 @@
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
+    }
+    #btnActivarPush svg,
+    #btnActivarPush span {
+      pointer-events: none;
+    }
+    #btnActivarPush svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: #F2B647;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
     }
     #btnActivarPush:active {
       transform: scale(0.96);
@@ -372,7 +386,11 @@
   <!-- PÍLDORA ELEGANTE PANARABE -->
   <div id="barraPushSuperior">
     <button id="btnActivarPush" onclick="activarAvisosPush()">
-      <span>🔔</span> Activar avisos de saldo
+      <svg viewBox="0 0 24 24">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span id="txtBtnPush">Activar avisos de saldo</span>
     </button>
     <button id="btnCerrarPushTemp" onclick="cerrarBarraPushTemp()" title="Cerrar">✕</button>
   </div>
@@ -631,7 +649,7 @@
       });
     }
 
-    /* FUNCIONES DE LA PÍLDORA ELEGANTE (PUSH - ORIGINAL FUNCIONAL) */
+    /* FUNCIONES DE LA PÍLDORA ELEGANTE (PUSH - SIEMPRE ACTIVA AL RECARGAR) */
     function obtenerCodigoClienteActivo() {
       if (typeof codEntrante !== 'undefined' && codEntrante) return codEntrante;
       if (typeof codDueno !== 'undefined' && codDueno) return codDueno;
@@ -651,13 +669,10 @@
       if (!barra) return;
 
       var cod = obtenerCodigoClienteActivo();
-      var descartadoSesion = false;
-      try {
-        descartadoSesion = sessionStorage.getItem('push_barra_cerrada_sesion') === '1';
-      } catch(e) {}
-
       var yaPermitido = (typeof Notification !== 'undefined' && Notification.permission === 'granted');
-      if ('Notification' in window && !yaPermitido && !descartadoSesion && cod) {
+      
+      // Siempre aparece al recargar si no tiene el permiso otorgado aún
+      if ('Notification' in window && !yaPermitido && cod) {
         barra.style.display = 'flex';
       } else {
         barra.style.display = 'none';
@@ -667,31 +682,43 @@
     function cerrarBarraPushTemp() {
       var barra = document.getElementById('barraPushSuperior');
       if (barra) barra.style.display = 'none';
-      try {
-        sessionStorage.setItem('push_barra_cerrada_sesion', '1');
-      } catch(e) {}
+      // Sin bloqueo de sesión: al recargar vuelve a aparecer siempre
     }
 
     async function activarAvisosPush() {
-      var btn = document.getElementById('btnActivarPush');
       var barra = document.getElementById('barraPushSuperior');
-      if (btn) btn.innerHTML = '<span>⏳</span> Vinculando...';
+      var txtElem = document.getElementById('txtBtnPush');
 
-      try {
-        var cod = obtenerCodigoClienteActivo();
-        if (window.OneSignal) {
-          if (cod) await OneSignal.login(cod);
-          await OneSignal.Notifications.requestPermission();
-        }
-      } catch(err) {
-        console.error("Error OneSignal:", err);
+      if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+        alert("Las notificaciones están bloqueadas en tu navegador. Toca el candado o ajustes arriba en la barra de direcciones y cambia Notificaciones a 'Permitir'.");
+        return;
       }
 
-      var yaPermitido = (typeof Notification !== 'undefined' && Notification.permission === 'granted');
-      if (yaPermitido) {
-        if (barra) barra.style.display = 'none';
-      } else {
-        if (btn) btn.innerHTML = '<span>🔔</span> Activar avisos de saldo';
+      if (txtElem) txtElem.textContent = 'Vinculando...';
+
+      try {
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            await OneSignal.Notifications.requestPermission();
+            var cod = (typeof obtenerCodigoClienteActivo === 'function') ? obtenerCodigoClienteActivo() : '';
+            if (cod && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+              try { await OneSignal.login(cod); } catch(eLogin) {}
+            }
+          } catch(errOS) {
+            console.error("Error OneSignal:", errOS);
+          }
+
+          var yaPermitido = (typeof Notification !== 'undefined' && Notification.permission === 'granted');
+          if (yaPermitido) {
+            if (barra) barra.style.display = 'none';
+          } else {
+            if (txtElem) txtElem.textContent = 'Activar avisos de saldo';
+          }
+        });
+      } catch(err) {
+        console.error("Error push:", err);
+        if (txtElem) txtElem.textContent = 'Activar avisos de saldo';
       }
     }
 
