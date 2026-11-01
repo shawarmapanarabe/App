@@ -68,30 +68,32 @@
       overscroll-behavior-y: none; -webkit-overscroll-behavior: none;
     }
 
-    /* PÍLDORA MORADA PANÁRABE DE AVISOS PUSH */
+    /* PÍLDORA ELEGANTE PANÁRABE (AZUL MARINO #1E2743 CON GLASSMORPHISM) */
     #barraPushSuperior {
       display: none;
       position: fixed;
-      top: 14px;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      background: #4d49bf;
+      background: rgba(30, 39, 67, 0.90);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: #ffffff;
-      padding: 7px 14px 7px 18px;
+      padding: 6px 12px 6px 16px;
       border-radius: 30px;
       box-sizing: border-box;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      z-index: 999995;
-      box-shadow: 0 4px 18px rgba(77, 73, 191, 0.4);
+      gap: 8px;
+      z-index: 9990;
+      box-shadow: 0 4px 18px rgba(30, 39, 67, 0.35);
       font-family: 'Poppins', sans-serif;
       white-space: nowrap;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.20);
       animation: flotarPildoraPush 0.3s ease-out;
     }
     html.is-apple-installed #barraPushSuperior {
-      top: calc(14px + env(safe-area-inset-top, 0px));
+      top: calc(12px + env(safe-area-inset-top, 0px));
     }
     @keyframes flotarPildoraPush {
       from { transform: translate(-50%, -20px); opacity: 0; }
@@ -103,7 +105,7 @@
       color: #ffffff;
       border: none;
       padding: 0;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -115,6 +117,16 @@
       -webkit-user-select: none;
       touch-action: manipulation;
     }
+    #btnActivarPush svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: #F2B647;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
     #btnActivarPush:active {
       transform: scale(0.96);
       opacity: 0.9;
@@ -123,8 +135,8 @@
     #btnCerrarPushTemp {
       background: transparent;
       border: none;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 15px;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 14px;
       font-weight: bold;
       padding: 2px 4px 2px 8px;
       cursor: pointer;
@@ -133,7 +145,7 @@
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
-      border-left: 1px solid rgba(255, 255, 255, 0.28);
+      border-left: 1px solid rgba(255, 255, 255, 0.22);
       margin-left: 2px;
     }
     #btnCerrarPushTemp:hover, #btnCerrarPushTemp:active {
@@ -367,10 +379,14 @@
 </head>
 <body>
 
-  <!-- PÍLDORA FLOTANTE MORADA PANARABE -->
+  <!-- PÍLDORA ELEGANTE PANARABE -->
   <div id="barraPushSuperior">
     <button id="btnActivarPush" onclick="activarAvisosPush()">
-      <span>🔔</span> Activar avisos de saldo
+      <svg viewBox="0 0 24 24">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
+      <span>Activar avisos de saldo</span>
     </button>
     <button id="btnCerrarPushTemp" onclick="cerrarBarraPushTemp()" title="Cerrar">✕</button>
   </div>
@@ -395,7 +411,7 @@
     src="" 
     allow="downloads; clipboard-write" 
   ></iframe>
-    <div id="pwaBarBottom">
+      <div id="pwaBarBottom">
     <div class="bar-left">
       <img src="https://lh3.googleusercontent.com/d/15GPc4cvy73xlL6Xl6reBbeCeF--LXDV1" class="bar-icon" alt="SP!">
       <div class="bar-text-group">
@@ -629,7 +645,7 @@
       });
     }
 
-    /* FUNCIONES DE LA PÍLDORA MORADA (PUSH) */
+    /* FUNCIONES DE LA PÍLDORA ELEGANTE (PUSH) */
     function obtenerCodigoClienteActivo() {
       if (typeof codEntrante !== 'undefined' && codEntrante) return codEntrante;
       if (typeof codDueno !== 'undefined' && codDueno) return codDueno;
@@ -673,7 +689,9 @@
     async function activarAvisosPush() {
       var btn = document.getElementById('btnActivarPush');
       var barra = document.getElementById('barraPushSuperior');
-      if (btn) btn.innerHTML = '<span>⏳</span> Vinculando...';
+      if (btn) {
+        btn.querySelector('span').textContent = 'Vinculando...';
+      }
 
       try {
         var cod = obtenerCodigoClienteActivo();
@@ -689,7 +707,9 @@
       if (yaPermitido) {
         if (barra) barra.style.display = 'none';
       } else {
-        if (btn) btn.innerHTML = '<span>🔔</span> Activar avisos de saldo';
+        if (btn) {
+          btn.querySelector('span').textContent = 'Activar avisos de saldo';
+        }
       }
     }
 
@@ -736,7 +756,7 @@
       }
     }
 
-    /* BOTÓN GUARDAR ORIGINAL (SIN ASYNC, NO SE CONGELA) */
+    /* BOTÓN GUARDAR ORIGINAL */
     function configurarBotonGuardar(promptObj) {
       var barra = document.getElementById('pwaBarBottom');
       var btnInstalar = document.getElementById('btnBarInstall');
@@ -809,7 +829,6 @@
         }
       } catch(e) {}
     }
-    var cerrarBarraDefinitivo = cerrarBarraClick;
 
     function cerrarGuiaIos() {
       document.getElementById('iosGuideModal').style.display = 'none';
