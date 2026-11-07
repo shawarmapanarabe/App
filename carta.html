@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Carta Digital | Shawarma Panárabe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --azul: #1E2743;
+      --rojo: #E95042;
+      --amarillo: #F2B647;
+      --morado: #4D49BF;
+      --fondo: #F8FAFC;
+      --texto: #1E293B;
+      --gris-borde: #E2E8F0;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; padding: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: 'Poppins', sans-serif;
+      padding-bottom: 90px;
+    }
+
+    /* HEADER */
+    .header-hero {
+      background: linear-gradient(135deg, var(--azul) 0%, #151c30 100%);
+      color: #fff;
+      padding: 20px 18px 16px;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 4px 16px rgba(30,39,67,0.15);
+    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; }
+    .brand-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    .badge-modalidad {
+      background: var(--amarillo);
+      color: var(--azul);
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* BARRA DE CUENTA DIVIDIDA O SALÓN */
+    .salon-bar {
+      margin-top: 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex;
+      gap: 6px;
+    }
+    .btn-modo-cuenta {
+      flex: 1;
+      padding: 7px;
+      border: none;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.2s;
+      background: transparent;
+      color: #fff;
+    }
+    .btn-modo-cuenta.activo {
+      background: #fff;
+      color: var(--azul);
+    }
+    .input-responsable {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.9);
+      color: var(--azul);
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    /* CARRUSEL CATEGORÍAS */
+    .cat-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 14px 16px;
+      scrollbar-width: none;
+    }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      background: #fff;
+      border: 1.5px solid var(--gris-borde);
+      color: #64748B;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cat-pill.activa {
+      background: var(--azul);
+      color: #fff;
+      border-color: var(--azul);
+    }
+
+    /* PRODUCTOS */
+    .menu-container { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+    .item-card {
+      background: #fff;
+      border: 1px solid var(--gris-borde);
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .item-img {
+      width: 82px;
+      height: 82px;
+      border-radius: 14px;
+      object-fit: cover;
+      background: #eee;
+      flex-shrink: 0;
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-title { font-size: 13.5px; font-weight: 700; margin: 0 0 4px; color: var(--azul); }
+    .item-desc {
+      font-size: 11px;
+      color: #64748B;
+      margin: 0 0 6px;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .item-price { font-size: 14px; font-weight: 800; color: var(--rojo); margin: 0; }
+    .btn-add-mini {
+      background: var(--amarillo);
+      color: var(--azul);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* MODAL DE PERSONALIZACIÓN (BOTTOM SHEET) */
+    .sheet-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15,23,42,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-card {
+      background: #fff;
+      width: 100%;
+      max-width: 480px;
+      max-height: 85vh;
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.25s ease-out;
+      box-sizing: border-box;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--gris-borde);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sheet-header h3 { margin: 0; font-size: 15px; color: var(--azul); font-weight: 800; }
+    .btn-cerrar-sheet { background: none; border: none; font-size: 18px; color: #94A3B8; cursor: pointer; }
+    .sheet-body { padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+    
+    .sec-label { font-size: 11.5px; font-weight: 800; color: #475569; margin-bottom: 6px; display: block; text-transform: uppercase; }
+    .chips-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip-opt {
+      flex: 1; min-width: 90px; text-align: center;
+      padding: 9px 8px;
+      border: 1.5px solid var(--gris-borde);
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #475569;
+    }
+    .chip-opt.selected {
+      border-color: var(--azul);
+      background: #EEF2FF;
+      color: var(--azul);
+    }
+    .check-opt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F8FAFC;
+      border: 1px solid var(--gris-borde);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .input-nota {
+      width: 100%;
+      border: 1.5px solid var(--gris-borde);
+      border-radius: 12px;
+      padding: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 12px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .sheet-footer {
+      padding: 14px 20px 20px;
+      border-top: 1px solid var(--gris-borde);
+    }
+    .btn-confirmar-add {
+      width: 100%;
+      background: var(--rojo);
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 4px 14px rgba(233,80,66,0.3);
+    }
+
+    /* BARRA INFERIOR CARRITO */
+    .cart-bar {
+      position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+      width: calc(100% - 32px); max-width: 440px;
+      background: var(--azul);
+      color: #fff;
+      border-radius: 18px;
+      padding: 12px 16px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 24px rgba(30,39,67,0.35);
+      z-index: 999;
+      cursor: pointer;
+    }
+    .cart-bar-left { display: flex; align-items: center; gap: 10px; }
+    .cart-badge {
+      background: var(--amarillo);
+      color: var(--azul);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 12px;
+    }
+    .cart-bar-btn {
+      background: var(--rojo);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* MODAL CARRITO Y PAGO */
+    #modalCheckout .sheet-card { max-height: 90vh; }
+    .cart-item-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 10px; border-bottom: 1px dashed var(--gris-borde); margin-bottom: 10px;
+    }
+    .cart-item-title { font-size: 12.5px; font-weight: 700; color: var(--azul); }
+    .cart-item-sub { font-size: 11px; color: #64748B; margin-top: 2px; }
+    .btn-pay-option {
+      flex: 1; padding: 12px 6px; border: 1.5px solid var(--gris-borde);
+      border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      background: #fff;
+    }
+    .btn-pay-option.selected {
+      border-color: #6C5CE7;
+      background: #F8F7FF;
+      color: #6C5CE7;
+    }
+    .pay-details-box {
+      background: #F1F5F9; border-radius: 14px; padding: 12px; text-align: center;
+      margin-top: 10px; font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO SUPERIOR -->
+  <div class="header-hero">
+    <div class="header-top">
+      <div>
+        <p class="brand-title">SHAWARMA PANÁRABE</p>
+        <span style="font-size: 11px; color: #94A3B8;">El sabor auténtico</span>
+      </div>
+      <div id="badgeUbicacion" class="badge-modalidad">📍 Mesa 1</div>
+    </div>
+
+    <!-- MODO SALÓN (COMPLETA VS INDIVIDUAL) -->
+    <div id="bloqueModoSalon" class="salon-bar">
+      <button class="btn-modo-cuenta activo" onclick="seleccionarModoCuenta('completa')">👥 Toda la Mesa</button>
+      <button class="btn-modo-cuenta" onclick="seleccionarModoCuenta('dividida')">👤 Mi Pedido</button>
+    </div>
+    <input type="text" id="inputNombreDividida" class="input-responsable" placeholder="Ingresa tu nombre o apodo (Ej. Carlos)">
+  </div>
+
+  <!-- NAVEGACIÓN CATEGORÍAS -->
+  <div class="cat-nav">
+    <button class="cat-pill activa" onclick="filtrarCategoria('shawarma', this)">🌯 Shawarmas</button>
+    <button class="cat-pill" onclick="filtrarCategoria('burger', this)">🍔 Hamburguesas</button>
+    <button class="cat-pill" onclick="filtrarCategoria('broaster', this)">🍗 Broaster</button>
+    <button class="cat-pill" onclick="filtrarCategoria('bebidas', this)">🥤 Bebidas</button>
+  </div>
+
+  <!-- LISTADO DE PLATOS -->
+  <div id="menuList" class="menu-container"></div>
+
+  <!-- BOTTOM SHEET: PERSONALIZAR PLATO -->
+  <div id="sheetPlato" class="sheet-overlay">
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <h3 id="sheetItemNombre">Shawarma Clásico</h3>
+        <button class="btn-cerrar-sheet" onclick="cerrarSheetPlato()">✕</button>
+      </div>
+      <div class="sheet-body">
+        <!-- CORTE / PRESENTACIÓN -->
+        <div>
+          <span class="sec-label">¿Cómo lo prefieres?</span>
+          <div class="chips-group">
+            <div class="chip-opt selected" onclick="seleccionarCorte('Entero', this)">Entero</div>
+            <div class="chip-opt" onclick="seleccionarCorte('Partido en dos', this)">Partido en dos ✂️</div>
+          </div>
+        </div>
+
+        <!-- EXTRAS -->
+        <div>
+          <span class="sec-label">Adicionales / Salsas</span>
+          <label class="check-opt">
+            <span>Extra Salsa de Ajo Casera</span>
+            <input type="checkbox" id="chkExtraAjo" style="width:16px;height:16px;">
+          </label>
+          <label class="check-opt">
+            <span>Queso fundido extra (+S/ 2.50)</span>
+            <input type="checkbox" id="chkExtraQueso" data-precio="2.5" style="width:16px;height:16px;">
+          </label>
+        </div>
+
+        <!-- NOTA DE COCINA -->
+        <div>
+          <span class="sec-label">Nota especial para cocina</span>
+          <input type="text" id="inputNotaPlato" class="input-nota" maxlength="80" placeholder="Ej. Sin cebolla, bien tostado...">
+        </div>
+      </div>
+      <div class="sheet-footer">
+        <button id="btnAgregarPlatoFinal" class="btn-confirmar-add" onclick="confirmarAgregarAlCarrito()">
+          Agregar al pedido • S/ 15.00
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET: CARRITO Y CHECKOUT -->
+  <div id="modalCheckout" class="sheet-overlay">
+    <div class="sheet-card">
+      <div class="sheet-header">
+        <h3>Tu Pedido</h3>
+        <button class="btn-cerrar-sheet" onclick="cerrarCheckout()">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div id="listaCheckoutItems"></div>
+
+        <!-- MÉTODO DE PAGO -->
+        <span class="sec-label" style="margin-top: 10px;">Método de Pago</span>
+        <div style="display: flex; gap: 8px;">
+          <button id="btnPayYape" class="btn-pay-option selected" onclick="elegirMetodoPago('YAPE')">
+            <span style="font-size: 16px;">🟣</span>
+            <span>Yape / Plin</span>
+          </button>
+          <button id="btnPayEfectivo" class="btn-pay-option" onclick="elegirMetodoPago('EFECTIVO')">
+            <span style="font-size: 16px;">💵</span>
+            <span>Efectivo</span>
+          </button>
+        </div>
+
+        <div id="boxDetallePago" class="pay-details-box">
+          <b style="color: #6C5CE7; display: block; margin-bottom: 4px;">Paga a nuestro número Yape:</b>
+          <span style="font-size: 15px; font-weight: 800; color: var(--azul);">906 769 744</span>
+          <span style="font-size: 10.5px; color: #64748B; display: block; margin-top: 4px;">Muestra tu constancia en caja para validar y despachar.</span>
+        </div>
+      </div>
+      <div class="sheet-footer">
+        <button class="btn-confirmar-add" style="background: #25D366;" onclick="enviarPedidoFinal()">
+          Confirmar y Enviar Pedido 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA FLOTANTE CARRITO -->
+  <div id="barraCarrito" class="cart-bar" onclick="abrirCheckout()">
+    <div class="cart-bar-left">
+      <div id="txtCantCarrito" class="cart-badge">0</div>
+      <div>
+        <div style="font-size: 10px; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Subtotal</div>
+        <div id="txtTotalCarrito" style="font-size: 15px; font-weight: 800; color: #fff;">S/ 0.00</div>
+      </div>
+    </div>
+    <button class="cart-bar-btn">Ver Pedido</button>
+  </div>
+
+  <script>
+    // 1. PRODUCTOS BASE (Simulando catálogo Loyverse)
+    const PRODUCTOS = [
+      { id: 'sh_01', cat: 'shawarma', nombre: 'Shawarma Clásico', desc: 'Carne jugosa marinada, vegetales frescos, toque crocante y crema de ajo de la casa.', precio: 15.00, img: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=300' },
+      { id: 'sh_02', cat: 'shawarma', nombre: 'Shawarma Mixto', desc: 'Doble porción de carne y pollo dorado al fuego con finas hierbas y ensalada.', precio: 18.00, img: 'https://images.unsplash.com/photo-1561651823-34feb02250e4?w=300' },
+      { id: 'bg_01', cat: 'burger', nombre: 'Hamburguesa Panárabe', desc: 'Carne artesanal 150g, queso fundido, vegetales y salsa secreta en pan brioche.', precio: 16.00, img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300' },
+      { id: 'br_01', cat: 'broaster', nombre: 'Pollo Broaster Crujiente', desc: 'Pieza gigante ultra crocante acompañada de papas fritas y ensalada.', precio: 14.00, img: 'https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=300' },
+      { id: 'bb_01', cat: 'bebidas', nombre: 'Gaseosa Inka Kola 500ml', desc: 'Botella personal helada.', precio: 4.50, img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' }
+    ];
+
+    let carrito = [];
+    let itemEnEdicion = null;
+    let corteSeleccionado = 'Entero';
+    let metodoPagoSeleccionado = 'YAPE';
+    let modoCuenta = 'completa'; // 'completa' o 'dividida'
+    let numeroMesa = null;
+
+    // 2. DETECCIÓN DE MESA POR URL
+    (function initMesa() {
+      const params = new URLSearchParams(window.location.search);
+      numeroMesa = params.get('mesa') || params.get('m');
+      const badge = document.getElementById('badgeUbicacion');
+      const salonBar = document.getElementById('bloqueModoSalon');
+
+      if (numeroMesa) {
+        badge.textContent = '📍 Mesa ' + numeroMesa;
+      } else {
+        badge.textContent = '🛵 Delivery / Recojo';
+        salonBar.style.display = 'none';
+      }
+    })();
+
+    // 3. RENDERIZADO DEL CATÁLOGO
+    function renderMenu(filtro = 'shawarma') {
+      const cont = document.getElementById('menuList');
+      cont.innerHTML = '';
+      const filtrados = PRODUCTOS.filter(p => p.cat === filtro);
+
+      filtrados.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.onclick = () => abrirSheetPlato(p);
+        card.innerHTML = `
+          <img src="${p.img}" class="item-img" alt="${p.nombre}">
+          <div class="item-info">
+            <h4 class="item-title">${p.nombre}</h4>
+            <p class="item-desc">${p.desc}</p>
+            <p class="item-price">S/ ${p.precio.toFixed(2)}</p>
+          </div>
+          <button class="btn-add-mini">+</button>
+        `;
+        cont.appendChild(card);
+      });
+    }
+
+    function filtrarCategoria(cat, btn) {
+      document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('activa'));
+      btn.classList.add('activa');
+      renderMenu(cat);
+    }
+
+    // 4. BOTTOM SHEET: PERSONALIZACIÓN
+    function abrirSheetPlato(producto) {
+      itemEnEdicion = producto;
+      corteSeleccionado = 'Entero';
+      document.getElementById('sheetItemNombre').textContent = producto.nombre;
+      document.getElementById('inputNotaPlato').value = '';
+      document.getElementById('chkExtraAjo').checked = false;
+      document.getElementById('chkExtraQueso').checked = false;
+
+      // Reset chips corte
+      document.querySelectorAll('.chip-opt').forEach((c, idx) => {
+        c.classList.toggle('selected', idx === 0);
+      });
+
+      actualizarBotonSheet();
+      document.getElementById('sheetPlato').style.display = 'flex';
+    }
+
+    function cerrarSheetPlato() {
+      document.getElementById('sheetPlato').style.display = 'none';
+      itemEnEdicion = null;
+    }
+
+    function seleccionarCorte(tipo, elem) {
+      corteSeleccionado = tipo;
+      document.querySelectorAll('.chip-opt').forEach(c => c.classList.remove('selected'));
+      elem.classList.add('selected');
+    }
+
+    function actualizarBotonSheet() {
+      if (!itemEnEdicion) return;
+      let total = itemEnEdicion.precio;
+      if (document.getElementById('chkExtraQueso').checked) total += 2.50;
+      document.getElementById('btnAgregarPlatoFinal').textContent = `Agregar al pedido • S/ ${total.toFixed(2)}`;
+    }
+
+    document.getElementById('chkExtraQueso').addEventListener('change', actualizarBotonSheet);
+
+    function confirmarAgregarAlCarrito() {
+      const extraAjo = document.getElementById('chkExtraAjo').checked;
+      const extraQueso = document.getElementById('chkExtraQueso').checked;
+      const nota = document.getElementById('inputNotaPlato').value.trim();
+
+      let precioFinal = itemEnEdicion.precio + (extraQueso ? 2.50 : 0);
+
+      carrito.push({
+        id: itemEnEdicion.id,
+        nombre: itemEnEdicion.nombre,
+        precio: precioFinal,
+        corte: corteSeleccionado,
+        extraAjo: extraAjo,
+        extraQueso: extraQueso,
+        nota: nota
+      });
+
+      cerrarSheetPlato();
+      actualizarBarraCarrito();
+    }
+
+    // 5. CARRITO
+    function actualizarBarraCarrito() {
+      const bar = document.getElementById('barraCarrito');
+      if (carrito.length === 0) {
+        bar.style.display = 'none';        return;
+      }
+      bar.style.display = 'flex';
+      const cant = carrito.length;
+      const total = carrito.reduce((acc, curr) => acc + curr.precio, 0);
+
+      document.getElementById('txtCantCarrito').textContent = cant;
+      document.getElementById('txtTotalCarrito').textContent = `S/ ${total.toFixed(2)}`;
+    }
+
+    function abrirCheckout() {
+      const cont = document.getElementById('listaCheckoutItems');
+      cont.innerHTML = '';
+
+      carrito.forEach((it, idx) => {
+        let detalle = [it.corte];
+        if (it.extraAjo) detalle.push('Extra Ajo');
+        if (it.extraQueso) detalle.push('+Queso');
+        if (it.nota) detalle.push(`"${it.nota}"`);
+
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        row.innerHTML = `
+          <div>
+            <div class="cart-item-title">${it.nombre}</div>
+            <div class="cart-item-sub">${detalle.join(' • ')}</div>
+          </div>
+          <div style="text-align: right;">
+            <b style="color: var(--rojo); font-size: 13px;">S/ ${it.precio.toFixed(2)}</b>
+            <span onclick="eliminarDelCarrito(${idx})" style="color:#94A3B8; font-size:11px; display:block; cursor:pointer;">Quitar</span>
+          </div>
+        `;
+        cont.appendChild(row);
+      });
+
+      document.getElementById('modalCheckout').style.display = 'flex';
+    }
+
+    function cerrarCheckout() {
+      document.getElementById('modalCheckout').style.display = 'none';
+    }
+
+    function eliminarDelCarrito(idx) {
+      carrito.splice(idx, 1);
+      actualizarBarraCarrito();
+      if (carrito.length === 0) cerrarCheckout();
+      else abrirCheckout();
+    }
+
+    // 6. GESTIÓN DE PAGO Y MODO SALÓN
+    function elegirMetodoPago(metodo) {
+      metodoPagoSeleccionado = metodo;
+      document.getElementById('btnPayYape').classList.toggle('selected', metodo === 'YAPE');
+      document.getElementById('btnPayEfectivo').classList.toggle('selected', metodo === 'EFECTIVO');
+
+      const box = document.getElementById('boxDetallePago');
+      if (metodo === 'YAPE') {
+        box.innerHTML = `
+          <b style="color: #6C5CE7; display: block; margin-bottom: 4px;">Paga a nuestro número Yape:</b>
+          <span style="font-size: 15px; font-weight: 800; color: var(--azul);">906 769 744</span>
+          <span style="font-size: 10.5px; color: #64748B; display: block; margin-top: 4px;">Muestra tu constancia en caja para validar y despachar.</span>
+        `;
+      } else {
+        box.innerHTML = `
+          <b style="color: var(--azul); display: block; margin-bottom: 4px;">Pago en Efectivo:</b>
+          <span style="font-size: 12px; color: #64748B;">Paga en caja al terminar tu consumo o espera la cuenta en tu mesa.</span>
+        `;
+      }
+    }
+
+    function seleccionarModoCuenta(modo) {
+      modoCuenta = modo;
+      const btns = document.querySelectorAll('.btn-modo-cuenta');
+      btns[0].classList.toggle('activo', modo === 'completa');
+      btns[1].classList.toggle('activo', modo === 'dividida');
+
+      const inp = document.getElementById('inputNombreDividida');
+      inp.style.display = (modo === 'dividida') ? 'block' : 'none';
+      if (modo === 'dividida') inp.focus();
+    }
+
+    // 7. ENVÍO FINAL DEL PEDIDO
+    function enviarPedidoFinal() {
+      let nombreResp = 'Mesa';
+      if (numeroMesa) {
+        if (modoCuenta === 'dividida') {
+          const val = document.getElementById('inputNombreDividida').value.trim();
+          if (!val) {
+            alert('Por favor, ingresa tu nombre para identificar tu cuenta individual.');
+            return;
+          }
+          nombreResp = val;
+        } else {
+          nombreResp = 'Cuenta Completa';
+        }
+      } else {
+        nombreResp = 'Delivery / Llevar';
+      }
+
+      const total = carrito.reduce((acc, curr) => acc + curr.precio, 0);
+
+      const payloadPedido = {
+        mesa: numeroMesa || 'Delivery',
+        modo: modoCuenta,
+        responsable: nombreResp,
+        metodoPago: metodoPagoSeleccionado,
+        total: total,
+        items: carrito,
+        fecha: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      console.log("PEDIDO LISTO PARA ENVIAR:", payloadPedido);
+
+      alert(`✅ ¡Pedido de S/ ${total.toFixed(2)} enviado con éxito!\n\n${numeroMesa ? 'Mesa: ' + numeroMesa : 'Modalidad: Delivery'}\nMétodo: ${metodoPagoSeleccionado}\nCocina ya está preparando tus platos.`);
+      
+      carrito = [];
+      cerrarCheckout();
+      actualizarBarraCarrito();
+    }
+
+    // Inicio automático
+    renderMenu('shawarma');
+  </script>
+</body>
+</html>
+
+   
